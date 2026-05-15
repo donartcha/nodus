@@ -6,7 +6,7 @@ import { detectWorkspaceRoots } from "@core/workspace/detection"
 import { setupWorkspaceManager } from "@core/workspace/setup"
 import type { WorkspaceRootManager } from "@core/workspace/WorkspaceRootManager"
 import { cleanupLegacyCheckpoints } from "@integrations/checkpoints/CheckpointMigration"
-import { ClineAccountService } from "@services/account/ClineAccountService"
+import { NodusAccountService } from "@services/account/NodusAccountService"
 import { McpHub } from "@services/mcp/McpHub"
 import type { ApiProvider, ModelInfo } from "@shared/api"
 import type { ChatContent } from "@shared/ChatContent"
@@ -23,7 +23,7 @@ import fs from "fs/promises"
 import open from "open"
 import pWaitFor from "p-wait-for"
 import * as path from "path"
-import { ClineEnv } from "@/config"
+import { NodusEnv } from "@/config"
 import type { FolderLockWithRetryResult } from "@/core/locks/types"
 import { HostProvider } from "@/hosts/host-provider"
 import { ExtensionRegistryInfo } from "@/registry"
@@ -34,7 +34,7 @@ import { BannerService } from "@/services/banner/BannerService"
 import { featureFlagsService } from "@/services/feature-flags"
 import { getDistinctId } from "@/services/logging/distinctId"
 import { telemetryService } from "@/services/telemetry"
-import { ClineExtensionContext } from "@/shared/cline"
+import { NodusExtensionContext } from "@/shared/nodus"
 import { getAxiosSettings } from "@/shared/net"
 import { ShowMessageType } from "@/shared/proto/host/window"
 import { Logger } from "@/shared/services/Logger"
@@ -54,8 +54,8 @@ import { clearRemoteConfig } from "../storage/remote-config/utils"
 import { type PersistenceErrorEvent, StateManager } from "../storage/StateManager"
 import { Task } from "../task"
 import { sendMcpMarketplaceCatalogEvent } from "./mcp/subscribeToMcpMarketplaceCatalog"
-import { getClineOnboardingModels } from "./models/getClineOnboardingModels"
-import { appendClineStealthModels } from "./models/refreshOpenRouterModels"
+import { getNodusOnboardingModels } from "./models/getNodusOnboardingModels"
+import { appendNodusStealthModels } from "./models/refreshOpenRouterModels"
 import { checkCliInstallation } from "./state/checkCliInstallation"
 import { sendStateUpdate } from "./state/subscribeToState"
 import { sendChatButtonClickedEvent } from "./ui/subscribeToChatButtonClicked"
@@ -70,7 +70,7 @@ export class Controller {
 	task?: Task
 
 	mcpHub: McpHub
-	accountService: ClineAccountService
+	accountService: NodusAccountService
 	authService: AuthService
 	ocaAuthService: OcaAuthService
 	readonly stateManager: StateManager
@@ -117,7 +117,7 @@ export class Controller {
 		this.remoteConfigTimer = setInterval(() => fetchRemoteConfig(this), 3600000) // 1 hour
 	}
 
-	constructor(readonly context: ClineExtensionContext) {
+	constructor(readonly context: NodusExtensionContext) {
 		Session.reset() // Reset session on controller initialization
 		PromptRegistry.getInstance() // Ensure prompts and tools are registered
 		this.stateManager = StateManager.get()
@@ -134,7 +134,7 @@ export class Controller {
 		})
 		this.authService = AuthService.getInstance(this)
 		this.ocaAuthService = OcaAuthService.initialize(this)
-		this.accountService = ClineAccountService.getInstance()
+		this.accountService = NodusAccountService.getInstance()
 		BannerService.initialize(this)
 
 		this.authService.restoreRefreshTokenAndRetrieveAuthInfo().then(() => {
@@ -156,7 +156,7 @@ export class Controller {
 		// Check CLI installation status once on startup
 		checkCliInstallation(this)
 
-		Logger.log("[Controller] ClineProvider instantiated")
+		Logger.log("[Controller] NodusProvider instantiated")
 	}
 
 	/*
@@ -196,7 +196,7 @@ export class Controller {
 			await this.postStateToWebview()
 			HostProvider.window.showMessage({
 				type: ShowMessageType.INFORMATION,
-				message: "Successfully logged out of Cline",
+				message: "Successfully logged out of Nodus",
 			})
 		} catch (_error) {
 			HostProvider.window.showMessage({
@@ -459,7 +459,7 @@ export class Controller {
 			})
 
 			if (this.task) {
-				// 'abandoned' will prevent this cline instance from affecting future cline instance gui. this may happen if its hanging on a streaming request
+				// 'abandoned' will prevent this Nodus instance from affecting future Nodus instance gui. this may happen if its hanging on a streaming request
 				this.task.taskState.abandoned = true
 			}
 
@@ -513,7 +513,7 @@ export class Controller {
 		try {
 			await this.authService.handleAuthCallback(customToken, provider ? provider : "google")
 
-			const clineProvider: ApiProvider = "cline"
+			const NodusProvider: ApiProvider = "Nodus"
 
 			// Get current settings to determine how to update providers
 			const planActSeparateModelsSetting = this.stateManager.getGlobalSettingsKey("planActSeparateModelsSetting")
@@ -528,14 +528,14 @@ export class Controller {
 			if (planActSeparateModelsSetting) {
 				// Only update the current mode's provider
 				if (currentMode === "plan") {
-					updatedConfig.planModeApiProvider = clineProvider
+					updatedConfig.planModeApiProvider = NodusProvider
 				} else {
-					updatedConfig.actModeApiProvider = clineProvider
+					updatedConfig.actModeApiProvider = NodusProvider
 				}
 			} else {
 				// Update both modes to keep them in sync
-				updatedConfig.planModeApiProvider = clineProvider
-				updatedConfig.actModeApiProvider = clineProvider
+				updatedConfig.planModeApiProvider = NodusProvider
+				updatedConfig.actModeApiProvider = NodusProvider
 			}
 
 			// Update the API configuration through cache service
@@ -555,7 +555,7 @@ export class Controller {
 			Logger.error("Failed to handle auth callback:", error)
 			HostProvider.window.showMessage({
 				type: ShowMessageType.ERROR,
-				message: "Failed to log in to Cline",
+				message: "Failed to log in to Nodus",
 			})
 			// Even on login failure, we preserve any existing tokens
 			// Only clear tokens on explicit logout
@@ -637,10 +637,10 @@ export class Controller {
 
 	// MCP Marketplace
 	private async fetchMcpMarketplaceFromApi(): Promise<McpMarketplaceCatalog> {
-		const response = await axios.get(`${ClineEnv.config().mcpBaseUrl}/marketplace`, {
+		const response = await axios.get(`${NodusEnv.config().mcpBaseUrl}/marketplace`, {
 			headers: {
 				"Content-Type": "application/json",
-				"User-Agent": "cline-vscode-extension",
+				"User-Agent": "Nodus-vscode-extension",
 			},
 			...getAxiosSettings(),
 		})
@@ -748,7 +748,7 @@ export class Controller {
 				const fileContents = await fs.readFile(openRouterModelsFilePath, "utf8")
 				const models = JSON.parse(fileContents)
 				// Append stealth models
-				return appendClineStealthModels(models)
+				return appendNodusStealthModels(models)
 			}
 		} catch (error) {
 			Logger.error("Error reading cached OpenRouter models:", error)
@@ -844,7 +844,7 @@ export class Controller {
 
 	async getStateToPostToWebview(): Promise<ExtensionState> {
 		// Get API configuration from cache for immediate access
-		const onboardingModels = getClineOnboardingModels()
+		const onboardingModels = getNodusOnboardingModels()
 		const apiConfiguration = this.stateManager.getApiConfiguration()
 		const lastShownAnnouncementId = this.stateManager.getGlobalStateKey("lastShownAnnouncementId")
 		const taskHistory = this.stateManager.getGlobalStateKey("taskHistory")
@@ -863,7 +863,7 @@ export class Controller {
 		const telemetrySetting = this.stateManager.getGlobalSettingsKey("telemetrySetting")
 		const planActSeparateModelsSetting = this.stateManager.getGlobalSettingsKey("planActSeparateModelsSetting")
 		const enableCheckpointsSetting = this.stateManager.getGlobalSettingsKey("enableCheckpointsSetting")
-		const globalClineRulesToggles = this.stateManager.getGlobalSettingsKey("globalClineRulesToggles")
+		const globalNodusRulesToggles = this.stateManager.getGlobalSettingsKey("globalNodusRulesToggles")
 		const globalWorkflowToggles = this.stateManager.getGlobalSettingsKey("globalWorkflowToggles")
 		const globalSkillsToggles = this.stateManager.getGlobalSettingsKey("globalSkillsToggles")
 		const localSkillsToggles = this.stateManager.getWorkspaceStateKey("localSkillsToggles")
@@ -890,7 +890,7 @@ export class Controller {
 		const lazyTeammateModeEnabled = this.stateManager.getGlobalSettingsKey("lazyTeammateModeEnabled")
 		const showFeatureTips = this.stateManager.getGlobalSettingsKey("showFeatureTips")
 
-		const localClineRulesToggles = this.stateManager.getWorkspaceStateKey("localClineRulesToggles")
+		const localNodusRulesToggles = this.stateManager.getWorkspaceStateKey("localNodusRulesToggles")
 		const localWindsurfRulesToggles = this.stateManager.getWorkspaceStateKey("localWindsurfRulesToggles")
 		const localCursorRulesToggles = this.stateManager.getWorkspaceStateKey("localCursorRulesToggles")
 		const localAgentsRulesToggles = this.stateManager.getWorkspaceStateKey("localAgentsRulesToggles")
@@ -898,7 +898,7 @@ export class Controller {
 
 		const currentTaskItem = this.task?.taskId ? (taskHistory || []).find((item) => item.id === this.task?.taskId) : undefined
 		// Spread to create new array reference - React needs this to detect changes in useEffect dependencies
-		const clineMessages = [...(this.task?.messageStateHandler.getClineMessages() || [])]
+		const nodusMessages = [...(this.task?.messageStateHandler.getnodusMessages() || [])]
 		const checkpointManagerErrorMessage = this.task?.taskState.checkpointManagerErrorMessage
 
 		const processedTaskHistory = (taskHistory || [])
@@ -911,8 +911,8 @@ export class Controller {
 		const platform = process.platform as Platform
 		const distinctId = getDistinctId()
 		const version = ExtensionRegistryInfo.version
-		const clineConfig = ClineEnv.config()
-		const environment = clineConfig.environment
+		const NodusConfig = NodusEnv.config()
+		const environment = NodusConfig.environment
 		const banners = BannerService.get().getActiveBanners() ?? []
 		const welcomeBanners = BannerService.get().getWelcomeBanners() ?? []
 
@@ -924,7 +924,7 @@ export class Controller {
 			version,
 			apiConfiguration,
 			currentTaskItem,
-			clineMessages,
+			nodusMessages,
 			currentFocusChainChecklist: this.task?.taskState.currentFocusChainChecklist || null,
 			checkpointManagerErrorMessage,
 			autoApprovalSettings,
@@ -945,8 +945,8 @@ export class Controller {
 			platform,
 			environment,
 			distinctId,
-			globalClineRulesToggles: globalClineRulesToggles || {},
-			localClineRulesToggles: localClineRulesToggles || {},
+			globalNodusRulesToggles: globalNodusRulesToggles || {},
+			localNodusRulesToggles: localNodusRulesToggles || {},
 			localWindsurfRulesToggles: localWindsurfRulesToggles || {},
 			localCursorRulesToggles: localCursorRulesToggles || {},
 			localAgentsRulesToggles: localAgentsRulesToggles || {},
@@ -980,8 +980,8 @@ export class Controller {
 				user: this.stateManager.getGlobalStateKey("multiRootEnabled"),
 				featureFlag: true, // Multi-root workspace is now always enabled
 			},
-			clineWebToolsEnabled: {
-				user: this.stateManager.getGlobalSettingsKey("clineWebToolsEnabled"),
+			nodusWebToolsEnabled: {
+				user: this.stateManager.getGlobalSettingsKey("nodusWebToolsEnabled"),
 				featureFlag: featureFlagsService.getWebtoolsEnabled(),
 			},
 			worktreesEnabled: {
@@ -1019,12 +1019,12 @@ export class Controller {
 	// Caching mechanism to keep track of webview messages + API conversation history per provider instance
 
 	/*
-	Now that we use retainContextWhenHidden, we don't have to store a cache of cline messages in the user's state, but we could to reduce memory footprint in long conversations.
+	Now that we use retainContextWhenHidden, we don't have to store a cache of Nodus messages in the user's state, but we could to reduce memory footprint in long conversations.
 
-	- We have to be careful of what state is shared between ClineProvider instances since there could be multiple instances of the extension running at once. For example when we cached cline messages using the same key, two instances of the extension could end up using the same key and overwriting each other's messages.
+	- We have to be careful of what state is shared between NodusProvider instances since there could be multiple instances of the extension running at once. For example when we cached Nodus messages using the same key, two instances of the extension could end up using the same key and overwriting each other's messages.
 	- Some state does need to be shared between the instances, i.e. the API key--however there doesn't seem to be a good way to notify the other instances that the API key has changed.
 
-	We need to use a unique identifier for each ClineProvider instance's message cache since we could be running several instances of the extension outside of just the sidebar i.e. in editor panels.
+	We need to use a unique identifier for each NodusProvider instance's message cache since we could be running several instances of the extension outside of just the sidebar i.e. in editor panels.
 
 	// conversation history to send in API requests
 

@@ -5,8 +5,8 @@ import { getWorkspaceBasename, resolveWorkspacePath } from "@core/workspace"
 import { extractFileContent, type FileContentResult } from "@integrations/misc/extract-file-content"
 import { arePathsEqual, getReadablePath, isLocatedInWorkspace } from "@utils/path"
 import { telemetryService } from "@/services/telemetry"
-import { ClineSayTool } from "@/shared/ExtensionMessage"
-import { ClineDefaultTool } from "@/shared/tools"
+import { NodusSayTool } from "@/shared/ExtensionMessage"
+import { NodusDefaultTool } from "@/shared/tools"
 import type { ToolResponse } from "../../index"
 import { showNotificationForApproval } from "../../utils"
 import type { IFullyManagedTool } from "../ToolExecutorCoordinator"
@@ -123,7 +123,7 @@ function buildReadResponse(block: ToolUse, fileContent: FileContentResult, prefi
 
 async function emitReadFileToolUiComplete(
 	config: TaskConfig,
-	sharedMessageProps: ClineSayTool,
+	sharedMessageProps: NodusSayTool,
 	block: ToolUse,
 	fileContent: FileContentResult,
 ): Promise<void> {
@@ -131,7 +131,7 @@ async function emitReadFileToolUiComplete(
 		return
 	}
 	const range = getReadToolDisplayedLineRange(block, fileContent)
-	const payload: ClineSayTool = { ...sharedMessageProps }
+	const payload: NodusSayTool = { ...sharedMessageProps }
 	if (range) {
 		payload.readLineStart = range.start
 		payload.readLineEnd = range.end
@@ -140,7 +140,7 @@ async function emitReadFileToolUiComplete(
 }
 
 export class ReadFileToolHandler implements IFullyManagedTool {
-	readonly name = ClineDefaultTool.FILE_READ
+	readonly name = NodusDefaultTool.FILE_READ
 
 	constructor(private validator: ToolValidator) {}
 
@@ -191,13 +191,13 @@ export class ReadFileToolHandler implements IFullyManagedTool {
 			return await config.callbacks.sayAndCreateMissingParamError(this.name, "path")
 		}
 
-		// Check clineignore access
-		const accessValidation = this.validator.checkClineIgnorePath(relPath!)
+		// Check Nodusignore access
+		const accessValidation = this.validator.checkNodusIgnorePath(relPath!)
 		if (!accessValidation.ok) {
 			if (!config.isSubagentExecution) {
-				await config.callbacks.say("clineignore_error", relPath)
+				await config.callbacks.say("NodusIGNORE_ERROR", relPath)
 			}
-			return formatResponse.toolError(formatResponse.clineIgnoreError(relPath!))
+			return formatResponse.toolError(formatResponse.NodusIgnoreError(relPath!))
 		}
 
 		// Resolve the absolute path based on multi-workspace configuration
@@ -220,7 +220,7 @@ export class ReadFileToolHandler implements IFullyManagedTool {
 			path: getReadablePath(config.cwd, displayPath),
 			content: absolutePath,
 			operationIsLocatedInWorkspace: await isLocatedInWorkspace(relPath!),
-		} satisfies ClineSayTool
+		} satisfies NodusSayTool
 
 		const completeMessage = JSON.stringify(sharedMessageProps)
 
@@ -245,7 +245,7 @@ export class ReadFileToolHandler implements IFullyManagedTool {
 			)
 		} else {
 			// Manual approval flow
-			const notificationMessage = `Cline wants to read ${getWorkspaceBasename(absolutePath, "ReadFileToolHandler.notification")}`
+			const notificationMessage = `Nodus wants to read ${getWorkspaceBasename(absolutePath, "ReadFileToolHandler.notification")}`
 
 			// Show notification
 			showNotificationForApproval(notificationMessage, config.autoApprovalSettings.enableNotifications)

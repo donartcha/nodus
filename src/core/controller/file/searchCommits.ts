@@ -1,5 +1,5 @@
-import { StringRequest } from "@shared/proto/cline/common"
-import { GitCommits } from "@shared/proto/cline/file"
+import { StringRequest } from "@shared/proto/nodus/common"
+import { GitCommits } from "@shared/proto/nodus/file"
 import { searchCommits as searchCommitsUtil } from "@utils/git"
 import { getWorkspacePath } from "@utils/path"
 import { Logger } from "@/shared/services/Logger"

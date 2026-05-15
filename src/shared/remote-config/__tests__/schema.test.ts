@@ -2,7 +2,7 @@ import { expect } from "chai"
 import { describe, it } from "mocha"
 import {
 	AwsBedrockSettingsSchema,
-	ClineSettingsSchema,
+	NodusSettingsSchema,
 	EnterpriseTelemetrySchema,
 	OpenAiCompatibleSchema,
 	PromptUploadingSchema,
@@ -311,17 +311,17 @@ describe("Remote Config Schema", () => {
 		})
 	})
 
-	describe("ClineSettingsSchema", () => {
-		it("should accept valid Cline provider settings", () => {
+	describe("NodusSettingsSchema", () => {
+		it("should accept valid Nodus provider settings", () => {
 			const validSettings = {
 				models: [{ id: "claude-3-5-sonnet-20241022" }, { id: "claude-3-5-haiku-20241022" }],
 			}
-			const result = ClineSettingsSchema.parse(validSettings)
+			const result = NodusSettingsSchema.parse(validSettings)
 			expect(result).to.deep.equal(validSettings)
 		})
 
 		it("should accept empty settings object", () => {
-			const result = ClineSettingsSchema.parse({})
+			const result = NodusSettingsSchema.parse({})
 			expect(result.models).to.be.undefined
 		})
 
@@ -329,12 +329,12 @@ describe("Remote Config Schema", () => {
 			const settings = {
 				models: [{ id: "claude-3-5-sonnet-20241022" }],
 			}
-			expect(() => ClineSettingsSchema.parse(settings)).to.not.throw()
+			expect(() => NodusSettingsSchema.parse(settings)).to.not.throw()
 		})
 
 		it("should reject models with missing id field", () => {
 			expect(() =>
-				ClineSettingsSchema.parse({
+				NodusSettingsSchema.parse({
 					models: [{}],
 				}),
 			).to.throw()
@@ -740,7 +740,7 @@ describe("Remote Config Schema", () => {
 						awsBedrockUsePromptCache: true,
 						awsBedrockEndpoint: "https://custom-bedrock.endpoint",
 					},
-					Cline: {
+					Nodus: {
 						models: [{ id: "claude-3-5-sonnet-20241022" }, { id: "claude-3-5-haiku-20241022" }],
 					},
 					Vertex: {
@@ -756,7 +756,7 @@ describe("Remote Config Schema", () => {
 							{ id: "claude-3-5-sonnet-20241022" },
 							{ id: "claude-3-5-sonnet-20241024", thinkingBudgetTokens: 1600 },
 						],
-						baseUrl: "https://example.cline.bot",
+						baseUrl: "https://example.nodus.bot",
 					},
 				},
 				enterpriseTelemetry: {
@@ -797,10 +797,10 @@ describe("Remote Config Schema", () => {
 			expect(result.providerSettings?.AwsBedrock?.awsBedrockUsePromptCache).to.equal(true)
 			expect(result.providerSettings?.AwsBedrock?.awsBedrockEndpoint).to.equal("https://custom-bedrock.endpoint")
 
-			// Verify Cline settings
-			expect(result.providerSettings?.Cline?.models).to.have.lengthOf(2)
-			expect(result.providerSettings?.Cline?.models?.[0].id).to.equal("claude-3-5-sonnet-20241022")
-			expect(result.providerSettings?.Cline?.models?.[1].id).to.equal("claude-3-5-haiku-20241022")
+			// Verify Nodus settings
+			expect(result.providerSettings?.Nodus?.models).to.have.lengthOf(2)
+			expect(result.providerSettings?.Nodus?.models?.[0].id).to.equal("claude-3-5-sonnet-20241022")
+			expect(result.providerSettings?.Nodus?.models?.[1].id).to.equal("claude-3-5-haiku-20241022")
 
 			// Verify Vertex settings
 			expect(result.providerSettings?.Vertex?.models).to.have.lengthOf(2)
@@ -816,7 +816,7 @@ describe("Remote Config Schema", () => {
 			expect(result.providerSettings?.Anthropic?.models?.[0].thinkingBudgetTokens).to.be.undefined
 			expect(result.providerSettings?.Anthropic?.models?.[1].id).to.equal("claude-3-5-sonnet-20241024")
 			expect(result.providerSettings?.Anthropic?.models?.[1].thinkingBudgetTokens).to.equal(1600)
-			expect(result.providerSettings?.Anthropic?.baseUrl).to.equal("https://example.cline.bot")
+			expect(result.providerSettings?.Anthropic?.baseUrl).to.equal("https://example.nodus.bot")
 
 			// Verify OpenTelemetry settings
 			expect(result.openTelemetryEnabled).to.equal(true)

@@ -12,7 +12,7 @@
  * - Provides summary for environment details
  */
 
-import { ClineTempManager } from "@services/temp"
+import { NodusTempManager } from "@services/temp"
 import * as fs from "fs"
 import { BACKGROUND_COMMAND_TIMEOUT_MS, DEFAULT_TERMINAL_OUTPUT_LINE_LIMIT } from "../constants"
 import type { BackgroundCommand, ITerminalManager, TerminalInfo, TerminalProcessResultPromise } from "../types"
@@ -166,7 +166,7 @@ export class StandaloneTerminalManager implements ITerminalManager {
 		// Create new terminal
 		const newTerminalInfo = this.registry.createTerminal({
 			cwd: cwd,
-			name: `Cline Terminal ${this.registry.size + 1}`,
+			name: `Nodus Terminal ${this.registry.size + 1}`,
 		})
 		this.terminalIds.add(newTerminalInfo.id)
 		return newTerminalInfo
@@ -410,8 +410,8 @@ export class StandaloneTerminalManager implements ITerminalManager {
 		existingOutput: string[] = [],
 	): BackgroundCommand {
 		const id = `background-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-		// Use ClineTempManager for proper temp file management and cleanup
-		const logFilePath = ClineTempManager.createTempFilePath("background")
+		// Use NodusTempManager for proper temp file management and cleanup
+		const logFilePath = NodusTempManager.createTempFilePath("background")
 
 		const backgroundCommand: BackgroundCommand = {
 			id,

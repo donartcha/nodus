@@ -1,5 +1,5 @@
 import { parseRemoteSkillEntries } from "@core/context/instructions/user-instructions/skills"
-import { RefreshedSkills, SkillInfo } from "@shared/proto/cline/file"
+import { RefreshedSkills, SkillInfo } from "@shared/proto/nodus/file"
 import fs from "fs/promises"
 import path from "path"
 import { parseYamlFrontmatter } from "@/core/context/instructions/user-instructions/frontmatter"

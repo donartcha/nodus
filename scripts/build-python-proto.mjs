@@ -75,14 +75,14 @@ async function ensureInitPy(dir) {
 /**
  * Parse proto files to extract service names with their source file and package.
  * Returns array of:
- * { serviceName: string, serviceKey: string, protoPackage: "cline"|"host", moduleBase: string }
+ * { serviceName: string, serviceKey: string, protoPackage: "nodus"|"host", moduleBase: string }
  */
 async function parseServicesWithFiles(protoDir, protoFiles) {
 	const services = []
 	for (const relPath of protoFiles) {
 		const full = path.join(protoDir, relPath)
 		const content = await fs.readFile(full, "utf8")
-		const pkg = relPath.startsWith("host/") ? "host" : "cline"
+		const pkg = relPath.startsWith("host/") ? "host" : "nodus"
 		const moduleBase = path.basename(relPath, ".proto")
 		const serviceRe = /service\s+(\w+Service)\s*\{([\s\S]*?)\}/g
 		for (const m of content.matchAll(serviceRe)) {
@@ -148,7 +148,7 @@ class ConnectionManager:
 	await ensureInitPy(outDir)
 }
 
-async function generateClineClientPy(outDir, services) {
+async function generatenodusClientPy(outDir, services) {
 	// Import per-service wrapper clients
 	const importLines = []
 	const seen = new Set()
@@ -184,12 +184,12 @@ import grpc
 from .connection import ConnectionManager
 ${importLines.join("\n")}
 
-class ClineClient:
+class nodusClient:
     """
-    Unified Python client analogous to src/generated/grpc-go/client/ClineClient.
+    Unified Python client analogous to src/generated/grpc-go/client/nodusClient.
 
     Usage:
-        client = ClineClient("localhost:17611")
+        client = nodusClient("localhost:17611")
         client.connect()
         # Call wrappers, e.g.: client.Task.SomeRpc(...)
         client.disconnect()
@@ -224,7 +224,7 @@ ${nilLines.join("\n")}
 `
 	const clientDir = outDir
 	await fs.mkdir(clientDir, { recursive: true })
-	await fs.writeFile(path.join(clientDir, "cline_client.py"), content)
+	await fs.writeFile(path.join(clientDir, "nodus_client.py"), content)
 }
 
 async function generatePythonClient(protoDir, pyOutDir, clientDir, protoFiles) {
@@ -244,8 +244,8 @@ async function generatePythonClient(protoDir, pyOutDir, clientDir, protoFiles) {
 	await ensureInitPy(servicesDir)
 	await generateServiceClientsPy(servicesDir, services)
 
-	// cline_client.py (unified that composes service wrappers)
-	await generateClineClientPy(clientDir, services)
+	// nodus_client.py (unified that composes service wrappers)
+	await generatenodusClientPy(clientDir, services)
 }
 
 async function generateServiceClientsPy(outDir, services) {
@@ -308,9 +308,9 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "cline-grpc-python"
+name = "nodus-grpc-python"
 version = "0.1.0"
-description = "Generated Python gRPC stubs and client wrappers for Cline protos"
+description = "Generated Python gRPC stubs and client wrappers for nodus protos"
 license = { text: "Apache-2.0" }
 requires-python = ">=3.9"
 dependencies = [
@@ -390,12 +390,12 @@ async function main() {
 	// Ensure package structure (__init__.py) for imports
 	await ensureInitPy(PY_OUT_DIR)
 	try {
-		const clineDir = path.join(PY_OUT_DIR, "cline")
+		const nodusDir = path.join(PY_OUT_DIR, "nodus")
 		const hostDir = path.join(PY_OUT_DIR, "host")
 		// These may or may not exist depending on which protos are present
 		await fs
-			.stat(clineDir)
-			.then(() => ensureInitPy(clineDir))
+			.stat(nodusDir)
+			.then(() => ensureInitPy(nodusDir))
 			.catch(() => {})
 		await fs
 			.stat(hostDir)

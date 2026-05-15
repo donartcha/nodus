@@ -2,7 +2,7 @@ import { strict as assert } from "node:assert"
 import fs from "node:fs/promises"
 import os from "node:os"
 import path from "node:path"
-import { ClineDefaultTool } from "@shared/tools"
+import { NodusDefaultTool } from "@shared/tools"
 import * as pathUtils from "@utils/path"
 import { afterEach, beforeEach, describe, it } from "mocha"
 import sinon from "sinon"
@@ -101,7 +101,7 @@ function createConfig() {
 			browserSession: {},
 			urlContentFetcher: {},
 			diffViewProvider: {},
-			clineIgnoreController: { validateAccess: () => true, filterPaths: (paths: string[]) => paths },
+			NodusIgnoreController: { validateAccess: () => true, filterPaths: (paths: string[]) => paths },
 			commandPermissionController: {},
 			contextManager: {},
 		},
@@ -121,7 +121,7 @@ describe("ListCodeDefinitionNamesToolHandler.execute – error recovery", () => 
 
 	beforeEach(async () => {
 		sandbox = sinon.createSandbox()
-		tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "cline-listdef-test-"))
+		tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "Nodus-listdef-test-"))
 		sandbox.stub(pathUtils, "isLocatedInWorkspace").resolves(true)
 	})
 
@@ -133,7 +133,7 @@ describe("ListCodeDefinitionNamesToolHandler.execute – error recovery", () => 
 	function makeBlock(relPath?: string) {
 		return {
 			type: "tool_use" as const,
-			name: ClineDefaultTool.LIST_CODE_DEF,
+			name: NodusDefaultTool.LIST_CODE_DEF,
 			params: relPath !== undefined ? { path: relPath } : {},
 			partial: false,
 		}
@@ -270,7 +270,7 @@ describe("ListFilesToolHandler.execute – error recovery", () => {
 
 	beforeEach(async () => {
 		sandbox = sinon.createSandbox()
-		tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "cline-listfiles-test-"))
+		tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "Nodus-listfiles-test-"))
 		sandbox.stub(pathUtils, "isLocatedInWorkspace").resolves(true)
 	})
 
@@ -285,7 +285,7 @@ describe("ListFilesToolHandler.execute – error recovery", () => {
 		if (recursive !== undefined) params.recursive = recursive
 		return {
 			type: "tool_use" as const,
-			name: ClineDefaultTool.LIST_FILES,
+			name: NodusDefaultTool.LIST_FILES,
 			params,
 			partial: false,
 		}
@@ -376,20 +376,20 @@ describe("ListFilesToolHandler.execute – error recovery", () => {
 		assert.equal(taskState.consecutiveMistakeCount, 3)
 	})
 
-	it("increments consecutiveMistakeCount on clineignore denial", async () => {
+	it("increments consecutiveMistakeCount on Nodusignore denial", async () => {
 		const { config, taskState } = createConfig()
-		// Create a validator whose clineIgnoreController blocks all paths
+		// Create a validator whose NodusIgnoreController blocks all paths
 		const blockingValidator = new ToolValidator({ validateAccess: () => false } as any)
 		const handler = new ListFilesToolHandler(blockingValidator)
 
 		const result = await handler.execute(config, makeBlock("blocked-dir"))
 
 		assert.equal(typeof result, "string")
-		assert.ok((result as string).includes("clineignore"))
+		assert.ok((result as string).includes("Nodusignore"))
 		assert.equal(taskState.consecutiveMistakeCount, 1)
 	})
 
-	it("accumulates clineignore denials across repeated calls", async () => {
+	it("accumulates Nodusignore denials across repeated calls", async () => {
 		const { config, taskState } = createConfig()
 		const blockingValidator = new ToolValidator({ validateAccess: () => false } as any)
 		const handler = new ListFilesToolHandler(blockingValidator)
@@ -408,7 +408,7 @@ describe("SearchFilesToolHandler.execute – error recovery", () => {
 
 	beforeEach(async () => {
 		sandbox = sinon.createSandbox()
-		tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "cline-search-test-"))
+		tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "Nodus-search-test-"))
 		sandbox.stub(pathUtils, "isLocatedInWorkspace").resolves(true)
 	})
 
@@ -424,7 +424,7 @@ describe("SearchFilesToolHandler.execute – error recovery", () => {
 		if (filePattern !== undefined) params.file_pattern = filePattern
 		return {
 			type: "tool_use" as const,
-			name: ClineDefaultTool.SEARCH,
+			name: NodusDefaultTool.SEARCH,
 			params,
 			partial: false,
 		}

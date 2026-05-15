@@ -1,7 +1,7 @@
-import { Empty } from "@shared/proto/cline/common"
-import { AskResponseRequest } from "@shared/proto/cline/task"
+import { Empty } from "@shared/proto/nodus/common"
+import { AskResponseRequest } from "@shared/proto/nodus/task"
 import { Logger } from "@/shared/services/Logger"
-import { ClineAskResponse } from "../../../shared/WebviewMessage"
+import { NodusAskResponse } from "../../../shared/WebviewMessage"
 import { Controller } from ".."
 
 /**
@@ -18,8 +18,8 @@ export async function askResponse(controller: Controller, request: AskResponseRe
 			return Empty.create()
 		}
 
-		// Map the string responseType to the ClineAskResponse enum
-		let responseType: ClineAskResponse
+		// Map the string responseType to the NodusAskResponse enum
+		let responseType: NodusAskResponse
 		switch (request.responseType) {
 			case "yesButtonClicked":
 				responseType = "yesButtonClicked"

@@ -1,7 +1,7 @@
 import { isGPT5ModelFamily, isNextGenModelFamily, isNextGenModelProvider } from "@utils/model-utils"
 import { ModelFamily } from "@/shared/prompts"
 import { Logger } from "@/shared/services/Logger"
-import { ClineDefaultTool } from "@/shared/tools"
+import { NodusDefaultTool } from "@/shared/tools"
 import { SystemPromptSection } from "../../templates/placeholders"
 import { createVariant } from "../variant-builder"
 import { validateVariant } from "../variant-validator"
@@ -45,25 +45,25 @@ export const config = createVariant(ModelFamily.NATIVE_NEXT_GEN)
 		SystemPromptSection.SKILLS,
 	)
 	.tools(
-		ClineDefaultTool.ASK,
-		ClineDefaultTool.BASH,
-		ClineDefaultTool.FILE_READ,
-		ClineDefaultTool.FILE_NEW,
-		ClineDefaultTool.FILE_EDIT,
-		ClineDefaultTool.SEARCH,
-		ClineDefaultTool.LIST_FILES,
-		ClineDefaultTool.LIST_CODE_DEF,
-		ClineDefaultTool.BROWSER,
-		ClineDefaultTool.WEB_FETCH,
-		ClineDefaultTool.WEB_SEARCH,
-		ClineDefaultTool.MCP_ACCESS,
-		ClineDefaultTool.ATTEMPT,
-		ClineDefaultTool.PLAN_MODE,
-		ClineDefaultTool.MCP_DOCS,
-		ClineDefaultTool.TODO,
-		ClineDefaultTool.GENERATE_EXPLANATION,
-		ClineDefaultTool.USE_SKILL,
-		ClineDefaultTool.USE_SUBAGENTS,
+		NodusDefaultTool.ASK,
+		NodusDefaultTool.BASH,
+		NodusDefaultTool.FILE_READ,
+		NodusDefaultTool.FILE_NEW,
+		NodusDefaultTool.FILE_EDIT,
+		NodusDefaultTool.SEARCH,
+		NodusDefaultTool.LIST_FILES,
+		NodusDefaultTool.LIST_CODE_DEF,
+		NodusDefaultTool.BROWSER,
+		NodusDefaultTool.WEB_FETCH,
+		NodusDefaultTool.WEB_SEARCH,
+		NodusDefaultTool.MCP_ACCESS,
+		NodusDefaultTool.ATTEMPT,
+		NodusDefaultTool.PLAN_MODE,
+		NodusDefaultTool.MCP_DOCS,
+		NodusDefaultTool.TODO,
+		NodusDefaultTool.GENERATE_EXPLANATION,
+		NodusDefaultTool.USE_SKILL,
+		NodusDefaultTool.USE_SUBAGENTS,
 	)
 	.placeholders({
 		MODEL_FAMILY: ModelFamily.NATIVE_NEXT_GEN,

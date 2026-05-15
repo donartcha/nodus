@@ -10,7 +10,7 @@ import { telemetryService } from "@services/telemetry"
 import { findLastIndex } from "@shared/array"
 import { COMPLETION_RESULT_CHANGES_FLAG } from "@shared/ExtensionMessage"
 import { Logger } from "@shared/services/Logger"
-import { ClineDefaultTool } from "@shared/tools"
+import { NodusDefaultTool } from "@shared/tools"
 import type { ToolResponse } from "../../index"
 import { showNotificationForApproval } from "../../utils"
 import { buildUserFeedbackContent } from "../../utils/buildUserFeedbackContent"
@@ -24,7 +24,7 @@ const TASK_PREVIEW_MAX_CHARS = 8000
 
 function getInitialTaskPreview(config: TaskConfig): string | undefined {
 	const firstTaskMessage = config.messageState
-		.getClineMessages()
+		.getnodusMessages()
 		.find((message) => message.say === "task")
 		?.text?.trim()
 	if (!firstTaskMessage) {
@@ -37,7 +37,7 @@ function getInitialTaskPreview(config: TaskConfig): string | undefined {
 }
 
 export class AttemptCompletionHandler implements IToolHandler, IPartialBlockHandler {
-	readonly name = ClineDefaultTool.ATTEMPT
+	readonly name = NodusDefaultTool.ATTEMPT
 
 	getDescription(block: ToolUse): string {
 		return `[${block.name}]`
@@ -113,18 +113,18 @@ export class AttemptCompletionHandler implements IToolHandler, IPartialBlockHand
 		const addNewChangesFlagToLastCompletionResultMessage = async () => {
 			// Add newchanges flag if there are new changes to the workspace
 			const hasNewChanges = await config.callbacks.doesLatestTaskCompletionHaveNewChanges()
-			const clineMessages = config.messageState.getClineMessages()
+			const nodusMessages = config.messageState.getnodusMessages()
 
-			const lastCompletionResultMessageIndex = findLastIndex(clineMessages, (m: any) => m.say === "completion_result")
+			const lastCompletionResultMessageIndex = findLastIndex(nodusMessages, (m: any) => m.say === "completion_result")
 			const lastCompletionResultMessage =
-				lastCompletionResultMessageIndex !== -1 ? clineMessages[lastCompletionResultMessageIndex] : undefined
+				lastCompletionResultMessageIndex !== -1 ? nodusMessages[lastCompletionResultMessageIndex] : undefined
 			if (
 				lastCompletionResultMessage &&
 				lastCompletionResultMessageIndex !== -1 &&
 				hasNewChanges &&
 				!lastCompletionResultMessage.text?.endsWith(COMPLETION_RESULT_CHANGES_FLAG)
 			) {
-				await config.messageState.updateClineMessage(lastCompletionResultMessageIndex, {
+				await config.messageState.updateNodusMessage(lastCompletionResultMessageIndex, {
 					text: lastCompletionResultMessage.text + COMPLETION_RESULT_CHANGES_FLAG,
 				})
 			}
@@ -132,22 +132,22 @@ export class AttemptCompletionHandler implements IToolHandler, IPartialBlockHand
 
 		// Remove any partial completion_result message that may exist
 		// Search backwards since other messages may have been inserted after the partial
-		const clineMessages = config.messageState.getClineMessages()
+		const nodusMessages = config.messageState.getnodusMessages()
 		const partialCompletionIndex = findLastIndex(
-			clineMessages,
+			nodusMessages,
 			(m) => m.partial === true && m.type === "say" && m.say === "completion_result",
 		)
 		if (partialCompletionIndex !== -1) {
 			const updatedMessages = [
-				...clineMessages.slice(0, partialCompletionIndex),
-				...clineMessages.slice(partialCompletionIndex + 1),
+				...nodusMessages.slice(0, partialCompletionIndex),
+				...nodusMessages.slice(partialCompletionIndex + 1),
 			]
-			config.messageState.setClineMessages(updatedMessages)
-			await config.messageState.saveClineMessagesAndUpdateHistory()
+			config.messageState.setnodusMessages(updatedMessages)
+			await config.messageState.savenodusMessagesAndUpdateHistory()
 		}
 
 		let commandResult: any
-		const lastMessage = config.messageState.getClineMessages().at(-1)
+		const lastMessage = config.messageState.getnodusMessages().at(-1)
 
 		if (command) {
 			if (lastMessage && lastMessage.ask !== "command") {
@@ -168,7 +168,7 @@ export class AttemptCompletionHandler implements IToolHandler, IPartialBlockHand
 
 			// Check if command should be auto-approved
 			// attempt_completion commands don't have requires_approval param, so we treat them as safe commands
-			const autoApproveResult = config.autoApprover?.shouldAutoApproveTool(ClineDefaultTool.BASH)
+			const autoApproveResult = config.autoApprover?.shouldAutoApproveTool(NodusDefaultTool.BASH)
 			const autoApproveSafe = Array.isArray(autoApproveResult) ? autoApproveResult[0] : autoApproveResult
 
 			if (autoApproveSafe) {
@@ -178,7 +178,7 @@ export class AttemptCompletionHandler implements IToolHandler, IPartialBlockHand
 			} else {
 				// Manual approval flow - need to ask for approval
 				showNotificationForApproval(
-					`Cline wants to execute a command: ${command}`,
+					`Nodus wants to execute a command: ${command}`,
 					config.autoApprovalSettings.enableNotifications,
 				)
 
@@ -207,7 +207,7 @@ export class AttemptCompletionHandler implements IToolHandler, IPartialBlockHand
 
 		// we already sent completion_result says, an empty string asks relinquishes control over button and field
 		// in case last command was interactive and in partial state, the UI is expecting an ask response. This ends the command ask response, freeing up the UI to proceed with the completion ask.
-		if (config.messageState.getClineMessages().at(-1)?.ask === "command_output") {
+		if (config.messageState.getnodusMessages().at(-1)?.ask === "command_output") {
 			await config.callbacks.say("command_output", "")
 		}
 

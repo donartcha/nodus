@@ -17,11 +17,11 @@ export function getConfiguredProviders(
 	const configured: ApiProvider[] = []
 
 	if (!apiConfiguration) {
-		return ["cline"] // Cline is always available
+		return ["Nodus"] // Nodus is always available
 	}
 
-	// Cline - always available (uses account-based auth)
-	configured.push("cline")
+	// Nodus - always available (uses account-based auth)
+	configured.push("Nodus")
 
 	// Anthropic - requires API key
 	if (apiConfiguration.apiKey) {

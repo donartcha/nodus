@@ -3,14 +3,14 @@ import { resolve as resolvePath } from "node:path"
 import type { ToolUse } from "@core/assistant-message"
 import { resolveWorkspacePath } from "@core/workspace"
 import { processFilesIntoText } from "@integrations/misc/extract-text"
-import type { ClineSayTool } from "@shared/ExtensionMessage"
+import type { NodusSayTool } from "@shared/ExtensionMessage"
 import { fileExistsAtPath } from "@utils/fs"
 import { getReadablePath, isLocatedInWorkspace } from "@utils/path"
 import { applyPatch } from "diff"
 import { telemetryService } from "@/services/telemetry"
 import { BASH_WRAPPERS, DiffError, PATCH_MARKERS, type Patch, PatchActionType, type PatchChunk } from "@/shared/Patch"
 import { preserveEscaping } from "@/shared/string"
-import { ClineDefaultTool } from "@/shared/tools"
+import { NodusDefaultTool } from "@/shared/tools"
 import type { ToolResponse } from "../../index"
 import { showNotificationForApproval } from "../../utils"
 import type { IFullyManagedTool } from "../ToolExecutorCoordinator"
@@ -36,14 +36,14 @@ interface Commit {
 	changes: Record<string, FileChange>
 }
 
-export const PatchClineSayMap = {
+export const PatchNodusSayMap = {
 	[PatchActionType.ADD]: "newFileCreated",
 	[PatchActionType.DELETE]: "fileDeleted",
 	[PatchActionType.UPDATE]: "editedExistingFile",
 }
 
 export class ApplyPatchHandler implements IFullyManagedTool {
-	readonly name = ClineDefaultTool.APPLY_PATCH
+	readonly name = NodusDefaultTool.APPLY_PATCH
 	private config?: TaskConfig
 	private pathResolver?: PathResolver
 	private providerOps?: FileProviderOperations
@@ -156,7 +156,7 @@ export class ApplyPatchHandler implements IFullyManagedTool {
 			.ask(
 				"tool",
 				JSON.stringify({
-					tool: PatchClineSayMap[actionType],
+					tool: PatchNodusSayMap[actionType],
 					path: getReadablePath(config.cwd, finalPath),
 					content: rawInput,
 					operationIsLocatedInWorkspace: await isLocatedInWorkspace(finalPath),
@@ -334,8 +334,8 @@ export class ApplyPatchHandler implements IFullyManagedTool {
 				const change = commit.changes[changedFilePath]
 				// For move operations, track the new path instead
 				const pathToTrack = change.type === PatchActionType.UPDATE && change.movePath ? change.movePath : changedFilePath
-				config.services.fileContextTracker.markFileAsEditedByCline(pathToTrack)
-				await config.services.fileContextTracker.trackFileContext(pathToTrack, "cline_edited")
+				config.services.fileContextTracker.markFileAsEditedByNodus(pathToTrack)
+				await config.services.fileContextTracker.trackFileContext(pathToTrack, "nodus_edited")
 
 				// Invalidate file read cache for all changed files so re-reads get fresh content
 				config.taskState.fileReadCache.delete(resolvePath(config.cwd, pathToTrack).toLowerCase())
@@ -519,9 +519,9 @@ export class ApplyPatchHandler implements IFullyManagedTool {
 			const absolutePath = typeof pathResult === "string" ? pathResult : pathResult.absolutePath
 			const resolvedPath = typeof pathResult === "string" ? filePath : pathResult.resolvedPath
 
-			const accessValidation = this.validator.checkClineIgnorePath(resolvedPath)
+			const accessValidation = this.validator.checkNodusIgnorePath(resolvedPath)
 			if (!accessValidation.ok) {
-				await config.callbacks.say("clineignore_error", resolvedPath)
+				await config.callbacks.say("NodusIGNORE_ERROR", resolvedPath)
 				throw new DiffError(`Access denied: ${resolvedPath}`)
 			}
 
@@ -681,7 +681,7 @@ export class ApplyPatchHandler implements IFullyManagedTool {
 		}
 	}
 
-	private async generateChangeSummary(changes: Record<string, FileChange>): Promise<ClineSayTool[]> {
+	private async generateChangeSummary(changes: Record<string, FileChange>): Promise<NodusSayTool[]> {
 		const summaries = await Promise.all(
 			Object.entries(changes).map(async ([file, change]) => {
 				const operationIsLocatedInWorkspace = await isLocatedInWorkspace(file)
@@ -692,7 +692,7 @@ export class ApplyPatchHandler implements IFullyManagedTool {
 							path: file,
 							content: change.newContent,
 							operationIsLocatedInWorkspace,
-						} as ClineSayTool
+						} as NodusSayTool
 					case PatchActionType.UPDATE:
 						return {
 							tool: change.movePath ? "newFileCreated" : "editedExistingFile",
@@ -700,14 +700,14 @@ export class ApplyPatchHandler implements IFullyManagedTool {
 							content: change.movePath ? change.oldContent : change.newContent,
 							operationIsLocatedInWorkspace,
 							startLineNumbers: change.startLineNumbers,
-						} as ClineSayTool
+						} as NodusSayTool
 					case PatchActionType.DELETE:
 						return {
 							tool: "fileDeleted",
 							path: file,
 							content: change.newContent,
 							operationIsLocatedInWorkspace,
-						} as ClineSayTool
+						} as NodusSayTool
 				}
 			}),
 		)
@@ -718,7 +718,7 @@ export class ApplyPatchHandler implements IFullyManagedTool {
 	private async handleApproval(
 		config: TaskConfig,
 		block: ToolUse,
-		message: ClineSayTool,
+		message: NodusSayTool,
 		rawInput: string,
 		change?: FileChange,
 	): Promise<boolean> {
@@ -764,7 +764,7 @@ export class ApplyPatchHandler implements IFullyManagedTool {
 			return true
 		}
 
-		showNotificationForApproval(`Cline wants to edit '${message.path}'`, config.autoApprovalSettings.enableNotifications)
+		showNotificationForApproval(`Nodus wants to edit '${message.path}'`, config.autoApprovalSettings.enableNotifications)
 
 		await config.callbacks.removeLastPartialMessageIfExistsWithType("say", "tool")
 		const { response, text, images, files } = await config.callbacks.ask("tool", completeMessage, false)

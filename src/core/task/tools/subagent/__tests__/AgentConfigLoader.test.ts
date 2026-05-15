@@ -3,7 +3,7 @@ import fs from "fs/promises"
 import { afterEach, describe, it } from "mocha"
 import os from "os"
 import * as path from "path"
-import { ClineDefaultTool, getToolUseNames } from "@/shared/tools"
+import { NodusDefaultTool, getToolUseNames } from "@/shared/tools"
 import { AgentConfigLoader, getAgentsConfigPath, parseAgentConfigFromYaml, readAgentConfigsFromDisk } from "../AgentConfigLoader"
 
 async function createTempHomeDir(): Promise<string> {
@@ -34,11 +34,11 @@ You are a code reviewer.`
 		assert.equal(parsed.name, "code-reviewer")
 		assert.equal(parsed.description, "Reviews code for quality and best practices")
 		assert.equal(parsed.modelId, "sonnet")
-		assert.deepEqual(parsed.tools, [ClineDefaultTool.FILE_READ, ClineDefaultTool.LIST_FILES, ClineDefaultTool.SEARCH])
+		assert.deepEqual(parsed.tools, [NodusDefaultTool.FILE_READ, NodusDefaultTool.LIST_FILES, NodusDefaultTool.SEARCH])
 		assert.equal(parsed.systemPrompt, "You are a code reviewer.")
 	})
 
-	it("supports raw Cline tool ids in tools", () => {
+	it("supports raw Nodus tool ids in tools", () => {
 		const content = `---
 name: cli-agent
 description: Uses internal ids
@@ -51,7 +51,7 @@ modelId: sonnet
 Prompt body`
 
 		const parsed = parseAgentConfigFromYaml(content)
-		assert.deepEqual(parsed.tools, [ClineDefaultTool.FILE_READ, ClineDefaultTool.LIST_FILES])
+		assert.deepEqual(parsed.tools, [NodusDefaultTool.FILE_READ, NodusDefaultTool.LIST_FILES])
 	})
 
 	it("throws for unknown tools", () => {
@@ -75,7 +75,7 @@ Prompt body`
 		assert.equal(result.size, 0)
 	})
 
-	it("loads all yaml/yml files from homeDir/.cline/data/agents", async () => {
+	it("loads all yaml/yml files from homeDir/.nodus/data/agents", async () => {
 		const tempHome = await createTempHomeDir()
 		tempDirs.push(tempHome)
 
@@ -113,10 +113,10 @@ Reviewer prompt`,
 		const localAgent = loader.getCachedConfig("local-agent")
 		const reviewer = loader.getCachedConfig("reviewer")
 		assert.equal(localAgent?.name, "local-agent")
-		assert.deepEqual(localAgent?.tools, [ClineDefaultTool.FILE_READ])
+		assert.deepEqual(localAgent?.tools, [NodusDefaultTool.FILE_READ])
 		assert.equal(localAgent?.systemPrompt, "Prompt body")
 		assert.equal(reviewer?.name, "reviewer")
-		assert.deepEqual(reviewer?.tools, [ClineDefaultTool.LIST_FILES])
+		assert.deepEqual(reviewer?.tools, [NodusDefaultTool.LIST_FILES])
 		assert.equal(loader.getAllCachedConfigs().size, 2)
 	})
 

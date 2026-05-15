@@ -5,7 +5,7 @@ import { HostProvider } from "@/hosts/host-provider"
 import { Logger } from "@/shared/services/Logger"
 import type { StorageContext } from "@/shared/storage/storage-context"
 import { FileContextTracker } from "./core/context/context-tracking/FileContextTracker"
-import { clearOnboardingModelsCache } from "./core/controller/models/getClineOnboardingModels"
+import { clearOnboardingModelsCache } from "./core/controller/models/getNodusOnboardingModels"
 import { HookDiscoveryCache } from "./core/hooks/HookDiscoveryCache"
 import { HookProcessRegistry } from "./core/hooks/HookProcessRegistry"
 import { StateManager } from "./core/storage/StateManager"
@@ -16,7 +16,7 @@ import { featureFlagsService } from "./services/feature-flags"
 import { getDistinctId } from "./services/logging/distinctId"
 import { telemetryService } from "./services/telemetry"
 import { PostHogClientProvider } from "./services/telemetry/providers/posthog/PostHogClientProvider"
-import { ClineTempManager } from "./services/temp"
+import { NodusTempManager } from "./services/temp"
 import { cleanupTestMode } from "./services/test/TestMode"
 import { ShowMessageType } from "./shared/proto/host/window"
 import { syncWorker } from "./shared/services/worker/sync"
@@ -25,27 +25,27 @@ import { getLatestAnnouncementId } from "./utils/announcements"
 import { arePathsEqual } from "./utils/path"
 
 /**
- * Performs intialization for Cline that is common to all platforms.
+ * Performs intialization for Nodus that is common to all platforms.
  *
  * @param context
  * @returns The webview provider
- * @throws ClineConfigurationError if endpoints.json exists but is invalid
+ * @throws NodusConfigurationError if endpoints.json exists but is invalid
  */
 export async function initialize(storageContext: StorageContext): Promise<WebviewProvider> {
 	// Configure the shared Logging class to use HostProvider's output channels and debug logger
 	Logger.subscribe((msg: string) => HostProvider.get().logToChannel(msg)) // File system logging
 	Logger.subscribe((msg: string) => HostProvider.env.debugLog({ value: msg })) // Host debug logging
 
-	// Initialize ClineEndpoint configuration (reads bundled and ~/.cline/endpoints.json if present)
-	// This must be done before any other code that calls ClineEnv.config()
-	// Throws ClineConfigurationError if config file exists but is invalid
-	const { ClineEndpoint } = await import("./config")
-	await ClineEndpoint.initialize(HostProvider.get().extensionFsPath)
+	// Initialize NodusEndpoint configuration (reads bundled and ~/.nodus/endpoints.json if present)
+	// This must be done before any other code that calls NodusEnv.config()
+	// Throws NodusConfigurationError if config file exists but is invalid
+	const { NodusEndpoint } = await import("./config")
+	await NodusEndpoint.initialize(HostProvider.get().extensionFsPath)
 
 	try {
 		await StateManager.initialize(storageContext)
 	} catch (error) {
-		Logger.error("[Cline] CRITICAL: Failed to initialize StateManager:", error)
+		Logger.error("[Nodus] CRITICAL: Failed to initialize StateManager:", error)
 		HostProvider.window.showMessage({
 			type: ShowMessageType.ERROR,
 			message: "Failed to initialize storage. Please check logs for details or try restarting the client.",
@@ -55,7 +55,7 @@ export async function initialize(storageContext: StorageContext): Promise<Webvie
 	// =============== External services ===============
 	await ErrorService.initialize()
 	// Initialize PostHog client provider (skip in self-hosted mode)
-	if (!ClineEndpoint.isSelfHosted()) {
+	if (!NodusEndpoint.isSelfHosted()) {
 		PostHogClientProvider.getInstance()
 	}
 
@@ -73,7 +73,7 @@ export async function initialize(storageContext: StorageContext): Promise<Webvie
 	const blobStoreSettings = stateManager.getRemoteConfigSettings()?.blobStoreConfig ?? getBlobStoreSettingsFromEnv()
 	syncWorker().init({ ...blobStoreSettings, userDistinctId: getDistinctId() })
 	// Clean up old temp files in background (non-blocking) and start periodic cleanup every 24 hours
-	ClineTempManager.startPeriodicCleanup()
+	NodusTempManager.startPeriodicCleanup()
 	// Clean up orphaned file context warnings (startup cleanup)
 	FileContextTracker.cleanupOrphanedWarnings(stateManager)
 
@@ -85,11 +85,11 @@ export async function initialize(storageContext: StorageContext): Promise<Webvie
 async function showVersionUpdateAnnouncement(stateManager: StateManager) {
 	// Version checking for autoupdate notification
 	const currentVersion = ExtensionRegistryInfo.version
-	const previousVersion = stateManager.getGlobalStateKey("clineVersion")
+	const previousVersion = stateManager.getGlobalStateKey("nodusVersion")
 	// Perform post-update actions if necessary
 	try {
 		if (!previousVersion || currentVersion !== previousVersion) {
-			Logger.log(`Cline version changed: ${previousVersion} -> ${currentVersion}. First run or update detected.`)
+			Logger.log(`Nodus version changed: ${previousVersion} -> ${currentVersion}. First run or update detected.`)
 
 			// Check if there's a new announcement to show
 			const lastShownAnnouncementId = stateManager.getGlobalStateKey("lastShownAnnouncementId")
@@ -98,15 +98,15 @@ async function showVersionUpdateAnnouncement(stateManager: StateManager) {
 			if (lastShownAnnouncementId !== latestAnnouncementId) {
 				// Show notification when there's a new announcement (major/minor updates or fresh installs)
 				const message = previousVersion
-					? `Cline has been updated to v${currentVersion}`
-					: `Welcome to Cline v${currentVersion}`
+					? `Nodus has been updated to v${currentVersion}`
+					: `Welcome to Nodus v${currentVersion}`
 				HostProvider.window.showMessage({
 					type: ShowMessageType.INFORMATION,
 					message,
 				})
 			}
 			// Always update the main version tracker for the next launch.
-			await stateManager.setGlobalState("clineVersion", currentVersion)
+			await stateManager.setGlobalState("nodusVersion", currentVersion)
 		}
 	} catch (error) {
 		const errorMessage = error instanceof Error ? error.message : String(error)
@@ -116,7 +116,7 @@ async function showVersionUpdateAnnouncement(stateManager: StateManager) {
 
 /**
  * Checks if this workspace was opened from the worktree quick launch button.
- * If so, opens the Cline sidebar and clears the state.
+ * If so, opens the Nodus sidebar and clears the state.
  */
 async function checkWorktreeAutoOpen(stateManager: StateManager): Promise<void> {
 	try {
@@ -139,8 +139,8 @@ async function checkWorktreeAutoOpen(stateManager: StateManager): Promise<void> 
 		if (arePathsEqual(currentPath, worktreeAutoOpenPath)) {
 			// Clear the state first to prevent re-triggering
 			stateManager.setGlobalState("worktreeAutoOpenPath", undefined)
-			// Open the Cline sidebar
-			await HostProvider.workspace.openClineSidebarPanel({})
+			// Open the Nodus sidebar
+			await HostProvider.workspace.openNodusSidebarPanel({})
 		}
 	} catch (error) {
 		Logger.error("Error checking worktree auto-open", error)
@@ -148,7 +148,7 @@ async function checkWorktreeAutoOpen(stateManager: StateManager): Promise<void> 
 }
 
 /**
- * Performs cleanup when Cline is deactivated that is common to all platforms.
+ * Performs cleanup when Nodus is deactivated that is common to all platforms.
  */
 export async function tearDown(): Promise<void> {
 	AgentConfigLoader.getInstance()?.dispose()
@@ -166,7 +166,7 @@ export async function tearDown(): Promise<void> {
 	// Clean up hook discovery cache
 	HookDiscoveryCache.getInstance().dispose()
 	// Stop periodic temp file cleanup
-	ClineTempManager.stopPeriodicCleanup()
+	NodusTempManager.stopPeriodicCleanup()
 
 	// Clean up test mode
 	cleanupTestMode()

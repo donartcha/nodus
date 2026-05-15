@@ -14,7 +14,7 @@
  */
 
 import { findLastIndex } from "@shared/array"
-import { ClineToolResponseContent } from "@shared/messages"
+import { NodusToolResponseContent } from "@shared/messages"
 import { Logger } from "@/shared/services/Logger"
 import { orchestrateCommandExecution } from "./CommandOrchestrator"
 import { StandaloneTerminalManager } from "./standalone/StandaloneTerminalManager"
@@ -99,7 +99,7 @@ export class CommandExecutor {
 		command: string,
 		timeoutSeconds: number | undefined,
 		options?: CommandExecutionOptions,
-	): Promise<[boolean, ClineToolResponseContent]> {
+	): Promise<[boolean, NodusToolResponseContent]> {
 		// Strip leading `cd` to workspace from command
 		const workspaceCdPrefix = `cd ${this.cwd} && `
 		if (command.startsWith(workspaceCdPrefix)) {
@@ -200,12 +200,12 @@ export class CommandExecutor {
 			await new Promise((resolve) => setTimeout(resolve, 300))
 
 			// Find the last command_output message and update it
-			const messages = this.callbacks.getClineMessages()
+			const messages = this.callbacks.getnodusMessages()
 			const lastCommandOutputIndex = findLastIndex(messages, (m) => m.ask === "command_output")
 			if (lastCommandOutputIndex !== -1) {
 				const existingText = messages[lastCommandOutputIndex].text || ""
 				const cancellationNotice = "\n\nCommand(s) cancelled by user."
-				await this.callbacks.updateClineMessage(lastCommandOutputIndex, {
+				await this.callbacks.updateNodusMessage(lastCommandOutputIndex, {
 					text: existingText + cancellationNotice,
 				})
 			}

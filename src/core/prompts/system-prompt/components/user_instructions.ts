@@ -10,13 +10,13 @@ The following additional instructions are provided by the user, and should be fo
 
 export async function getUserInstructions(variant: PromptVariant, context: SystemPromptContext): Promise<string | undefined> {
 	const customInstructions = buildUserInstructions(
-		context.globalClineRulesFileInstructions,
-		context.localClineRulesFileInstructions,
+		context.globalNodusRulesFileInstructions,
+		context.localNodusRulesFileInstructions,
 		context.localCursorRulesFileInstructions,
 		context.localCursorRulesDirInstructions,
 		context.localWindsurfRulesFileInstructions,
 		context.localAgentsRulesFileInstructions,
-		context.clineIgnoreInstructions,
+		context.NodusIgnoreInstructions,
 		context.preferredLanguageInstructions,
 	)
 
@@ -33,24 +33,24 @@ export async function getUserInstructions(variant: PromptVariant, context: Syste
 }
 
 function buildUserInstructions(
-	globalClineRulesFileInstructions?: string,
-	localClineRulesFileInstructions?: string,
+	globalNodusRulesFileInstructions?: string,
+	localNodusRulesFileInstructions?: string,
 	localCursorRulesFileInstructions?: string,
 	localCursorRulesDirInstructions?: string,
 	localWindsurfRulesFileInstructions?: string,
 	localAgentsRulesFileInstructions?: string,
-	clineIgnoreInstructions?: string,
+	NodusIgnoreInstructions?: string,
 	preferredLanguageInstructions?: string,
 ): string | undefined {
 	const customInstructions = []
 	if (preferredLanguageInstructions) {
 		customInstructions.push(preferredLanguageInstructions)
 	}
-	if (globalClineRulesFileInstructions) {
-		customInstructions.push(globalClineRulesFileInstructions)
+	if (globalNodusRulesFileInstructions) {
+		customInstructions.push(globalNodusRulesFileInstructions)
 	}
-	if (localClineRulesFileInstructions) {
-		customInstructions.push(localClineRulesFileInstructions)
+	if (localNodusRulesFileInstructions) {
+		customInstructions.push(localNodusRulesFileInstructions)
 	}
 	if (localCursorRulesFileInstructions) {
 		customInstructions.push(localCursorRulesFileInstructions)
@@ -64,8 +64,8 @@ function buildUserInstructions(
 	if (localAgentsRulesFileInstructions) {
 		customInstructions.push(localAgentsRulesFileInstructions)
 	}
-	if (clineIgnoreInstructions) {
-		customInstructions.push(clineIgnoreInstructions)
+	if (NodusIgnoreInstructions) {
+		customInstructions.push(NodusIgnoreInstructions)
 	}
 	if (customInstructions.length === 0) {
 		return undefined

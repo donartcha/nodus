@@ -1,6 +1,6 @@
 import { ModelFamily } from "@/shared/prompts"
 import { Logger } from "@/shared/services/Logger"
-import { ClineDefaultTool } from "@/shared/tools"
+import { NodusDefaultTool } from "@/shared/tools"
 import { isHermesModelFamily } from "@/utils/model-utils"
 import { SystemPromptSection } from "../../templates/placeholders"
 import { createVariant } from "../variant-builder"
@@ -37,25 +37,25 @@ export const config = createVariant(ModelFamily.HERMES)
 		SystemPromptSection.SKILLS,
 	)
 	.tools(
-		ClineDefaultTool.BASH,
-		ClineDefaultTool.FILE_READ,
-		ClineDefaultTool.FILE_NEW,
-		ClineDefaultTool.FILE_EDIT,
-		ClineDefaultTool.SEARCH,
-		ClineDefaultTool.LIST_FILES,
-		ClineDefaultTool.LIST_CODE_DEF,
-		ClineDefaultTool.BROWSER,
-		ClineDefaultTool.MCP_USE,
-		ClineDefaultTool.MCP_ACCESS,
-		ClineDefaultTool.ASK,
-		ClineDefaultTool.ATTEMPT,
-		ClineDefaultTool.NEW_TASK,
-		ClineDefaultTool.PLAN_MODE,
-		ClineDefaultTool.MCP_DOCS,
-		ClineDefaultTool.TODO,
-		ClineDefaultTool.GENERATE_EXPLANATION,
-		ClineDefaultTool.USE_SKILL,
-		ClineDefaultTool.USE_SUBAGENTS,
+		NodusDefaultTool.BASH,
+		NodusDefaultTool.FILE_READ,
+		NodusDefaultTool.FILE_NEW,
+		NodusDefaultTool.FILE_EDIT,
+		NodusDefaultTool.SEARCH,
+		NodusDefaultTool.LIST_FILES,
+		NodusDefaultTool.LIST_CODE_DEF,
+		NodusDefaultTool.BROWSER,
+		NodusDefaultTool.MCP_USE,
+		NodusDefaultTool.MCP_ACCESS,
+		NodusDefaultTool.ASK,
+		NodusDefaultTool.ATTEMPT,
+		NodusDefaultTool.NEW_TASK,
+		NodusDefaultTool.PLAN_MODE,
+		NodusDefaultTool.MCP_DOCS,
+		NodusDefaultTool.TODO,
+		NodusDefaultTool.GENERATE_EXPLANATION,
+		NodusDefaultTool.USE_SKILL,
+		NodusDefaultTool.USE_SUBAGENTS,
 	)
 	.placeholders({
 		MODEL_FAMILY: "hermes",

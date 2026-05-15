@@ -1,13 +1,13 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios"
 import { Controller } from "@/core/controller"
-import { ClineAccountService } from "@/services/account/ClineAccountService"
-import { buildBasicClineHeaders } from "@/services/EnvUtils"
+import { NodusAccountService } from "@/services/account/NodusAccountService"
+import { buildBasicNodusHeaders } from "@/services/EnvUtils"
 import { getAxiosSettings } from "@/shared/net"
 import { Logger } from "@/shared/services/Logger"
 import { ConfiguredAPIKeys } from "@/shared/storage/state-keys"
-import { ClineEnv } from "../../../config"
+import { NodusEnv } from "../../../config"
 import { AuthService } from "../../../services/auth/AuthService"
-import { CLINE_API_ENDPOINT } from "../../../shared/cline/api"
+import { NODUS_API_ENDPOINT } from "../../../shared/nodus/api"
 import { APIKeySchema, type APIKeySettings, RemoteConfig, RemoteConfigSchema } from "../../../shared/remote-config/schema"
 import { deleteRemoteConfigFromCache, readRemoteConfigFromCache, writeRemoteConfigToCache } from "../disk"
 import { applyRemoteConfig, clearRemoteConfig, isRemoteConfigEnabled } from "./utils"
@@ -30,7 +30,7 @@ function parseApiKeys(value: string): APIKeySettings {
 }
 
 /**
- * Helper function to make authenticated requests to the Cline API
+ * Helper function to make authenticated requests to the Nodus API
  * @param endpoint The API endpoint path (with {id} placeholder if needed)
  * @param organizationId The organization ID to replace in the endpoint
  * @returns The response data on success
@@ -42,19 +42,19 @@ async function makeAuthenticatedRequest<T>(endpoint: string, organizationId: str
 	// Get authentication token
 	const authToken = await authService.getAuthToken()
 	if (!authToken) {
-		throw new Error("No Cline account auth token found")
+		throw new Error("No Nodus account auth token found")
 	}
 
 	// Construct URL by replacing {id} placeholder with organizationId
 	const apiEndpoint = endpoint.replace("{id}", organizationId)
-	const url = new URL(apiEndpoint, ClineEnv.config().apiBaseUrl).toString()
+	const url = new URL(apiEndpoint, NodusEnv.config().apiBaseUrl).toString()
 
 	// Make authenticated request
 	const requestConfig: AxiosRequestConfig = {
 		headers: {
 			Authorization: `Bearer ${authToken}`,
 			"Content-Type": "application/json",
-			...(await buildBasicClineHeaders()),
+			...(await buildBasicNodusHeaders()),
 		},
 		...getAxiosSettings(),
 	}
@@ -100,7 +100,7 @@ async function fetchRemoteConfigForOrganization(organizationId: string): Promise
 	try {
 		// Fetch config data using helper
 		const configData = await makeAuthenticatedRequest<{ value: string; enabled: boolean }>(
-			CLINE_API_ENDPOINT.REMOTE_CONFIG,
+			NODUS_API_ENDPOINT.REMOTE_CONFIG,
 			organizationId,
 		)
 
@@ -147,7 +147,7 @@ async function fetchRemoteConfigForOrganization(organizationId: string): Promise
 async function fetchApiKeysForOrganization(organizationId: string): Promise<APIKeySettings> {
 	try {
 		// Fetch API keys string using helper
-		const response = await makeAuthenticatedRequest<{ providerApiKeys: string }>(CLINE_API_ENDPOINT.API_KEYS, organizationId)
+		const response = await makeAuthenticatedRequest<{ providerApiKeys: string }>(NODUS_API_ENDPOINT.API_KEYS, organizationId)
 
 		// Parse and return API keys
 		return parseApiKeys(response?.providerApiKeys)
@@ -160,7 +160,7 @@ async function fetchApiKeysForOrganization(organizationId: string): Promise<APIK
 async function discoverRemoteConfigOrg(): Promise<
 	{ organizationId: string; discoveredValue?: string } | undefined
 > {
-	const accountService = ClineAccountService.getInstance()
+	const accountService = NodusAccountService.getInstance()
 
 	const discovery = await accountService.fetchUserRemoteConfig()
 	if (!discovery) {

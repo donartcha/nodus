@@ -3,10 +3,10 @@ import { formatResponse } from "@core/prompts/responses"
 import { WorkspacePathAdapter } from "@core/workspace/WorkspacePathAdapter"
 import { showApprovalNotification, showSystemNotification } from "@integrations/notifications"
 import { COMMAND_REQ_APP_STRING } from "@shared/combineCommandSequences"
-import { ClineAsk } from "@shared/ExtensionMessage"
+import { NodusAsk } from "@shared/ExtensionMessage"
 import { arePathsEqual } from "@utils/path"
 import { telemetryService } from "@/services/telemetry"
-import { ClineDefaultTool } from "@/shared/tools"
+import { NodusDefaultTool } from "@/shared/tools"
 import type { ToolResponse } from "../../index"
 import type { IFullyManagedTool } from "../ToolExecutorCoordinator"
 import type { ToolValidator } from "../ToolValidator"
@@ -56,7 +56,7 @@ export function resolveCommandTimeoutSeconds(
 }
 
 export class ExecuteCommandToolHandler implements IFullyManagedTool {
-	readonly name = ClineDefaultTool.BASH
+	readonly name = NodusDefaultTool.BASH
 
 	constructor(_validator: ToolValidator) {}
 
@@ -80,7 +80,7 @@ export class ExecuteCommandToolHandler implements IFullyManagedTool {
 			return
 		}
 		await uiHelpers
-			.ask("command" as ClineAsk, uiHelpers.removeClosingTag(block, "command", command), block.partial)
+			.ask("command" as NodusAsk, uiHelpers.removeClosingTag(block, "command", command), block.partial)
 			.catch(() => {})
 	}
 
@@ -101,7 +101,7 @@ export class ExecuteCommandToolHandler implements IFullyManagedTool {
 			config.taskState.consecutiveMistakeCount++
 			await config.callbacks.say(
 				"error",
-				"Cline tried to use execute_command without value for required parameter 'command'. Retrying...",
+				"Nodus tried to use execute_command without value for required parameter 'command'. Retrying...",
 			)
 			return formatResponse.toolError(formatResponse.executeCommandMissingCommandError())
 		}
@@ -158,20 +158,20 @@ export class ExecuteCommandToolHandler implements IFullyManagedTool {
 			// If no hint, use primary workspace (cwd)
 		}
 
-		// Check command permission validation (CLINE_COMMAND_PERMISSIONS env var)
+		// Check command permission validation (NODUS_COMMAND_PERMISSIONS env var)
 		const permissionResult = config.services.commandPermissionController.validateCommand(actualCommand)
 		if (!permissionResult.allowed) {
 			let errorMessage: string
 			if (permissionResult.failedSegment) {
 				errorMessage =
-					`Command "${actualCommand}" was denied by CLINE_COMMAND_PERMISSIONS. ` +
+					`Command "${actualCommand}" was denied by NODUS_COMMAND_PERMISSIONS. ` +
 					`Segment "${permissionResult.failedSegment}" ${permissionResult.reason}.`
 			} else {
 				const matchedPattern = permissionResult.matchedPattern
 					? ` (matched pattern: ${permissionResult.matchedPattern})`
 					: ""
 				errorMessage =
-					`Command "${actualCommand}" was denied by CLINE_COMMAND_PERMISSIONS. ` +
+					`Command "${actualCommand}" was denied by NODUS_COMMAND_PERMISSIONS. ` +
 					`Reason: ${permissionResult.reason}${matchedPattern}`
 			}
 			if (!config.isSubagentExecution) {
@@ -180,13 +180,13 @@ export class ExecuteCommandToolHandler implements IFullyManagedTool {
 			return formatResponse.toolError(formatResponse.permissionDeniedError(errorMessage))
 		}
 
-		// Check clineignore validation for command
-		const ignoredFileAttemptedToAccess = config.services.clineIgnoreController.validateCommand(actualCommand)
+		// Check Nodusignore validation for command
+		const ignoredFileAttemptedToAccess = config.services.NodusIgnoreController.validateCommand(actualCommand)
 		if (ignoredFileAttemptedToAccess) {
 			if (!config.isSubagentExecution) {
-				await config.callbacks.say("clineignore_error", ignoredFileAttemptedToAccess)
+				await config.callbacks.say("NodusIGNORE_ERROR", ignoredFileAttemptedToAccess)
 			}
-			return formatResponse.toolError(formatResponse.clineIgnoreError(ignoredFileAttemptedToAccess))
+			return formatResponse.toolError(formatResponse.NodusIgnoreError(ignoredFileAttemptedToAccess))
 		}
 
 		let didAutoApprove = false

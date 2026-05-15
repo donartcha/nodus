@@ -5,7 +5,7 @@ import { shouldSkipReasoningForModel } from "@utils/model-utils"
 import axios from "axios"
 import OpenAI from "openai"
 import type { ChatCompletionTool as OpenAITool } from "openai/resources/chat/completions"
-import { ClineStorageMessage } from "@/shared/messages/content"
+import { NodusStorageMessage } from "@/shared/messages/content"
 import { createOpenAIClient, getAxiosSettings } from "@/shared/net"
 import { Logger } from "@/shared/services/Logger"
 import { ApiHandler, CommonApiHandlerOptions } from "../"
@@ -44,8 +44,8 @@ export class OpenRouterHandler implements ApiHandler {
 					baseURL: "https://openrouter.ai/api/v1",
 					apiKey: this.options.openRouterApiKey,
 					defaultHeaders: {
-						"HTTP-Referer": "https://cline.bot", // Optional, for including your app on openrouter.ai rankings.
-						"X-Title": "Cline", // Optional. Shows in rankings on openrouter.ai.
+						"HTTP-Referer": "https://nodus.bot", // Optional, for including your app on openrouter.ai rankings.
+						"X-Title": "Nodus", // Optional. Shows in rankings on openrouter.ai.
 					},
 				})
 			} catch (error: any) {
@@ -56,7 +56,7 @@ export class OpenRouterHandler implements ApiHandler {
 	}
 
 	@withRetry()
-	async *createMessage(systemPrompt: string, messages: ClineStorageMessage[], tools?: OpenAITool[]): ApiStream {
+	async *createMessage(systemPrompt: string, messages: NodusStorageMessage[], tools?: OpenAITool[]): ApiStream {
 		const client = this.ensureClient()
 		this.lastGenerationId = undefined
 

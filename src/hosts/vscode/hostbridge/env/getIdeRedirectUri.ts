@@ -1,4 +1,5 @@
-import { EmptyRequest, String } from "@shared/proto/cline/common"
+import { ExtensionRegistryInfo } from "@/registry"
+import { EmptyRequest, String } from "@shared/proto/nodus/common"
 import * as vscode from "vscode"
 
 export async function getIdeRedirectUri(_: EmptyRequest): Promise<String> {
@@ -9,5 +10,5 @@ export async function getIdeRedirectUri(_: EmptyRequest): Promise<String> {
 		return { value: "" }
 	}
 	const uriScheme = vscode.env.uriScheme || "vscode"
-	return { value: `${uriScheme}://saoudrizwan.claude-dev` }
+	return { value: `${uriScheme}://${ExtensionRegistryInfo.id}` }
 }

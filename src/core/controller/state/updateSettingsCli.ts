@@ -1,11 +1,11 @@
 import { buildApiHandler } from "@core/api"
 
-import { Empty } from "@shared/proto/cline/common"
-import { PlanActMode, UpdateSettingsRequestCli } from "@shared/proto/cline/state"
+import { Empty } from "@shared/proto/nodus/common"
+import { PlanActMode, UpdateSettingsRequestCli } from "@shared/proto/nodus/state"
 import { convertProtoToApiProvider } from "@shared/proto-conversions/models/api-configuration-conversion"
 import { Settings } from "@shared/storage/state-keys"
 import { TelemetrySetting } from "@shared/TelemetrySetting"
-import { ClineEnv } from "@/config"
+import { NodusEnv } from "@/config"
 import { HostProvider } from "@/hosts/host-provider"
 import { ShowMessageType } from "@/shared/proto/host/window"
 import { Logger } from "@/shared/services/Logger"
@@ -28,7 +28,7 @@ export async function updateSettingsCli(controller: Controller, request: UpdateS
 
 	try {
 		if (request.environment !== undefined) {
-			ClineEnv.setEnvironment(request.environment)
+			NodusEnv.setEnvironment(request.environment)
 			await accountLogoutClicked(controller, Empty.create())
 		}
 
@@ -48,7 +48,7 @@ export async function updateSettingsCli(controller: Controller, request: UpdateS
 				telemetrySetting,
 				yoloModeToggled,
 				useAutoCondense,
-				clineWebToolsEnabled,
+				nodusWebToolsEnabled,
 				worktreesEnabled,
 				subagentsEnabled,
 				focusChainSettings,
@@ -150,12 +150,12 @@ export async function updateSettingsCli(controller: Controller, request: UpdateS
 				controller.stateManager.setGlobalState("useAutoCondense", useAutoCondense)
 			}
 
-			// Update Cline web tools setting (requires telemetry)
-			if (clineWebToolsEnabled !== undefined) {
+			// Update Nodus web tools setting (requires telemetry)
+			if (nodusWebToolsEnabled !== undefined) {
 				if (controller.task) {
-					telemetryService.captureClineWebToolsToggle(controller.task.ulid, clineWebToolsEnabled)
+					telemetryService.captureNodusWebToolsToggle(controller.task.ulid, nodusWebToolsEnabled)
 				}
-				controller.stateManager.setGlobalState("clineWebToolsEnabled", clineWebToolsEnabled)
+				controller.stateManager.setGlobalState("nodusWebToolsEnabled", nodusWebToolsEnabled)
 			}
 
 			// Update worktrees setting
@@ -182,7 +182,7 @@ export async function updateSettingsCli(controller: Controller, request: UpdateS
 
 				const newFocusChainSettings = {
 					enabled: isEnabled,
-					remindClineInterval: focusChainSettings.remindClineInterval,
+					remindNodusInterval: focusChainSettings.remindNodusInterval,
 				}
 				controller.stateManager.setGlobalState("focusChainSettings", newFocusChainSettings)
 

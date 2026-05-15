@@ -3,11 +3,11 @@
  * Tests API fetching, caching, auth updates, and rate limit backoff
  */
 
-import type { BannerRules } from "@shared/ClineBanner"
+import type { BannerRules } from "@shared/NodusBanner"
 import { expect } from "chai"
 import { afterEach, beforeEach, describe, it } from "mocha"
 import * as sinon from "sinon"
-import { ClineEnv, Environment } from "@/config"
+import { NodusEnv, Environment } from "@/config"
 import { Controller } from "@/core/controller"
 import { StateManager } from "@/core/storage/StateManager"
 import { HostRegistryInfo } from "@/registry"
@@ -81,12 +81,12 @@ describe("BannerService", () => {
 			distinctId: "test-distinct-id",
 		})
 
-		// Mock ClineEnv.config() to return a valid config
-		sandbox.stub(ClineEnv, "config").returns({
+		// Mock NodusEnv.config() to return a valid config
+		sandbox.stub(NodusEnv, "config").returns({
 			environment: Environment.production,
-			appBaseUrl: "https://app.cline-mock.bot",
-			apiBaseUrl: "https://api.cline-mock.bot",
-			mcpBaseUrl: "https://api.cline-mock.bot/v1/mcp",
+			appBaseUrl: "https://app.nodus-mock.bot",
+			apiBaseUrl: "https://api.nodus-mock.bot",
+			mcpBaseUrl: "https://api.nodus-mock.bot/v1/mcp",
 		})
 
 		const authService = AuthService.getInstance()
@@ -924,8 +924,8 @@ describe("BannerService", () => {
 			})
 		})
 
-		it('should return "jetbrains" when ide is "Cline for JetBrains" (case-insensitive)', async () => {
-			stubHostInfo({ ide: "Cline for JetBrains" })
+		it('should return "jetbrains" when ide is "Nodus for JetBrains" (case-insensitive)', async () => {
+			stubHostInfo({ ide: "Nodus for JetBrains" })
 			mockFetch.resolves(createSuccessResponse(emptyResponse))
 
 			await mockFetchForTesting(mockFetch, async () => {
@@ -1003,7 +1003,7 @@ describe("BannerService", () => {
 		})
 
 		it("should prefer ide field over platform field for detection", async () => {
-			stubHostInfo({ ide: "Cline for JetBrains", platform: "Visual Studio Code 1.103.0" })
+			stubHostInfo({ ide: "Nodus for JetBrains", platform: "Visual Studio Code 1.103.0" })
 			mockFetch.resolves(createSuccessResponse(emptyResponse))
 
 			await mockFetchForTesting(mockFetch, async () => {

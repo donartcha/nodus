@@ -28,7 +28,7 @@ export const getEnvironmentColor = (environment: Environment | undefined, type: 
 			: "var(--vscode-foreground)" // Default for production
 }
 
-export function getClineEnvironmentClassname(environment: Environment | undefined, type = "text") {
+export function getNodusEnvironmentClassname(environment: Environment | undefined, type = "text") {
 	if (type === "border") {
 		switch (environment) {
 			case "local":

@@ -1,20 +1,20 @@
 // Core content types
 export type {
-	ClineAssistantContent,
-	ClineAssistantRedactedThinkingBlock,
-	ClineAssistantThinkingBlock,
-	ClineAssistantToolUseBlock,
-	ClineContent,
-	ClineDocumentContentBlock,
-	ClineImageContentBlock,
-	ClineMessageRole,
-	ClinePromptInputContent,
-	ClineReasoningDetailParam,
-	ClineStorageMessage,
-	ClineTextContentBlock,
-	ClineToolResponseContent,
-	ClineUserContent,
-	ClineUserToolResultContentBlock,
+	NodusAssistantContent,
+	NodusAssistantRedactedThinkingBlock,
+	NodusAssistantThinkingBlock,
+	NodusAssistantToolUseBlock,
+	NodusContent,
+	NodusDocumentContentBlock,
+	NodusImageContentBlock,
+	NodusMessageRole,
+	NodusPromptInputContent,
+	NodusReasoningDetailParam,
+	NodusStorageMessage,
+	NodusTextContentBlock,
+	NodusToolResponseContent,
+	NodusUserContent,
+	NodusUserToolResultContentBlock,
 } from "./content"
-export { cleanContentBlock, convertClineStorageToAnthropicMessage, REASONING_DETAILS_PROVIDERS } from "./content"
-export type { ClineMessageMetricsInfo, ClineMessageModelInfo } from "./metrics"
+export { cleanContentBlock, convertNodusStorageToAnthropicMessage, REASONING_DETAILS_PROVIDERS } from "./content"
+export type { NodusMessageMetricsInfo, NodusMessageModelInfo } from "./metrics"

@@ -12,7 +12,7 @@ import { sendMcpButtonClickedEvent } from "./core/controller/ui/subscribeToMcpBu
 import { sendSettingsButtonClickedEvent } from "./core/controller/ui/subscribeToSettingsButtonClicked"
 import { sendWorktreesButtonClickedEvent } from "./core/controller/ui/subscribeToWorktreesButtonClicked"
 import { WebviewProvider } from "./core/webview"
-import { createClineAPI } from "./exports"
+import { createNodusAPI } from "./exports"
 import { initializeTestMode } from "./services/test/TestMode"
 import "./utils/path" // necessary to have access to String.prototype.toPosix
 import path from "node:path"
@@ -22,10 +22,10 @@ import { vscodeHostBridgeClient } from "@/hosts/vscode/hostbridge/client/host-gr
 import { createStorageContext } from "@/shared/storage/storage-context"
 import { readTextFromClipboard, writeTextToClipboard } from "@/utils/env"
 import { initialize, tearDown } from "./common"
-import { addToCline } from "./core/controller/commands/addToCline"
-import { explainWithCline } from "./core/controller/commands/explainWithCline"
-import { fixWithCline } from "./core/controller/commands/fixWithCline"
-import { improveWithCline } from "./core/controller/commands/improveWithCline"
+import { addToNodus } from "./core/controller/commands/addToNodus"
+import { explainWithNodus } from "./core/controller/commands/explainWithNodus"
+import { fixWithNodus } from "./core/controller/commands/fixWithNodus"
+import { improveWithNodus } from "./core/controller/commands/improveWithNodus"
 import { sendAddToInputEvent } from "./core/controller/ui/subscribeToAddToInput"
 import { sendShowWebviewEvent } from "./core/controller/ui/subscribeToShowWebview"
 import { HookDiscoveryCache } from "./core/hooks/HookDiscoveryCache"
@@ -40,7 +40,7 @@ import {
 import { workspaceResolver } from "./core/workspace"
 import { findMatchingNotebookCell, getContextForCommand, showWebview } from "./hosts/vscode/commandUtils"
 import { abortCommitGeneration, generateCommitMsg } from "./hosts/vscode/commit-message-generator"
-import { registerClineOutputChannel } from "./hosts/vscode/hostbridge/env/debugLog"
+import { registerNodusOutputChannel } from "./hosts/vscode/hostbridge/env/debugLog"
 import {
 	disposeVscodeCommentReviewController,
 	getVscodeCommentReviewController,
@@ -73,7 +73,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	await cleanupLegacyVSCodeStorage(context)
 
 	// 3. One-time export of VSCode's native storage to shared file-backed stores.
-	// After this, all platforms (VSCode, CLI, JetBrains) read from ~/.cline/data/.
+	// After this, all platforms (VSCode, CLI, JetBrains) read from ~/.nodus/data/.
 	const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath
 	const storageContext = createStorageContext({ workspacePath })
 	await exportVSCodeStorageToSharedFiles(context, storageContext)
@@ -163,14 +163,14 @@ export async function activate(context: vscode.ExtensionContext) {
 		const isTaskUri = getUriPath(url) === TASK_URI_PATH
 
 		if (isTaskUri) {
-			await openClineSidebarForTaskUri()
+			await openNodusSidebarForTaskUri()
 		}
 
 		let success = await SharedUriHandler.handleUri(url)
 
 		// Task deeplinks can race with first-time sidebar initialization.
 		if (!success && isTaskUri) {
-			await openClineSidebarForTaskUri()
+			await openNodusSidebarForTaskUri()
 			success = await SharedUriHandler.handleUri(url)
 		}
 
@@ -182,16 +182,16 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	// Register size testing commands in development mode
 	if (IS_DEV) {
-		vscode.commands.executeCommand("setContext", "cline.isDevMode", IS_DEV)
+		vscode.commands.executeCommand("setContext", "nodus.isDevMode", IS_DEV)
 		// Use dynamic import to avoid loading the module in production
 		import("./dev/commands/tasks")
 			.then((module) => {
 				const devTaskCommands = module.registerTaskCommands(webview.controller)
 				context.subscriptions.push(...devTaskCommands)
-				Logger.log("[Cline Dev] Dev mode activated & dev commands registered")
+				Logger.log("[Nodus Dev] Dev mode activated & dev commands registered")
 			})
 			.catch((error) => {
-				Logger.log("[Cline Dev] Failed to register dev commands: " + error)
+				Logger.log("[Nodus Dev] Failed to register dev commands: " + error)
 			})
 	}
 
@@ -284,40 +284,40 @@ export async function activate(context: vscode.ExtensionContext) {
 						)
 					}
 
-					// Add to Cline (Always available)
-					const addAction = new vscode.CodeAction("Add to Cline", vscode.CodeActionKind.QuickFix)
+					// Add to Nodus (Always available)
+					const addAction = new vscode.CodeAction("Add to Nodus", vscode.CodeActionKind.QuickFix)
 					addAction.command = {
 						command: commands.AddToChat,
-						title: "Add to Cline",
+						title: "Add to Nodus",
 						arguments: [expandedRange, context.diagnostics],
 					}
 					actions.push(addAction)
 
-					// Explain with Cline (Always available)
-					const explainAction = new vscode.CodeAction("Explain with Cline", vscode.CodeActionKind.RefactorExtract) // Using a refactor kind
+					// Explain with Nodus (Always available)
+					const explainAction = new vscode.CodeAction("Explain with Nodus", vscode.CodeActionKind.RefactorExtract) // Using a refactor kind
 					explainAction.command = {
 						command: commands.ExplainCode,
-						title: "Explain with Cline",
+						title: "Explain with Nodus",
 						arguments: [expandedRange],
 					}
 					actions.push(explainAction)
 
-					// Improve with Cline (Always available)
-					const improveAction = new vscode.CodeAction("Improve with Cline", vscode.CodeActionKind.RefactorRewrite) // Using a refactor kind
+					// Improve with Nodus (Always available)
+					const improveAction = new vscode.CodeAction("Improve with Nodus", vscode.CodeActionKind.RefactorRewrite) // Using a refactor kind
 					improveAction.command = {
 						command: commands.ImproveCode,
-						title: "Improve with Cline",
+						title: "Improve with Nodus",
 						arguments: [expandedRange],
 					}
 					actions.push(improveAction)
 
-					// Fix with Cline (Only if diagnostics exist)
+					// Fix with Nodus (Only if diagnostics exist)
 					if (context.diagnostics.length > 0) {
-						const fixAction = new vscode.CodeAction("Fix with Cline", vscode.CodeActionKind.QuickFix)
+						const fixAction = new vscode.CodeAction("Fix with Nodus", vscode.CodeActionKind.QuickFix)
 						fixAction.isPreferred = true
 						fixAction.command = {
-							command: commands.FixWithCline,
-							title: "Fix with Cline",
+							command: commands.FixWithNodus,
+							title: "Fix with Nodus",
 							arguments: [expandedRange, context.diagnostics],
 						}
 						actions.push(fixAction)
@@ -342,16 +342,16 @@ export async function activate(context: vscode.ExtensionContext) {
 			if (!context) {
 				return
 			}
-			await addToCline(context.controller, context.commandContext)
+			await addToNodus(context.controller, context.commandContext)
 		}),
 	)
 	context.subscriptions.push(
-		vscode.commands.registerCommand(commands.FixWithCline, async (range: vscode.Range, diagnostics: vscode.Diagnostic[]) => {
+		vscode.commands.registerCommand(commands.FixWithNodus, async (range: vscode.Range, diagnostics: vscode.Diagnostic[]) => {
 			const context = await getContextForCommand(range, diagnostics)
 			if (!context) {
 				return
 			}
-			await fixWithCline(context.controller, context.commandContext)
+			await fixWithNodus(context.controller, context.commandContext)
 		}),
 	)
 	context.subscriptions.push(
@@ -360,7 +360,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			if (!context) {
 				return
 			}
-			await explainWithCline(context.controller, context.commandContext)
+			await explainWithNodus(context.controller, context.commandContext)
 		}),
 	)
 	context.subscriptions.push(
@@ -369,7 +369,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			if (!context) {
 				return
 			}
-			await improveWithCline(context.controller, context.commandContext)
+			await improveWithNodus(context.controller, context.commandContext)
 		}),
 	)
 
@@ -449,7 +449,7 @@ Current Notebook Cell Context (JSON, sanitized of image data):
 ${ctx.cellJson || "{}"}
 \`\`\``
 
-				await addToCline(ctx.controller, ctx.commandContext, notebookContext)
+				await addToNodus(ctx.controller, ctx.commandContext, notebookContext)
 			},
 		),
 	)
@@ -465,7 +465,7 @@ ${ctx.cellJson || "{}"}
 					? `\n\nCurrent Notebook Cell Context (JSON, sanitized of image data):\n\`\`\`json\n${ctx.cellJson}\n\`\`\``
 					: undefined
 
-				await explainWithCline(ctx.controller, ctx.commandContext, notebookContext)
+				await explainWithNodus(ctx.controller, ctx.commandContext, notebookContext)
 			},
 		),
 	)
@@ -491,7 +491,7 @@ Current Notebook Cell Context (JSON, sanitized of image data):
 ${ctx.cellJson || "{}"}
 \`\`\``
 
-				await improveWithCline(ctx.controller, ctx.commandContext, notebookContext)
+				await improveWithNodus(ctx.controller, ctx.commandContext, notebookContext)
 			},
 		),
 	)
@@ -499,7 +499,7 @@ ${ctx.cellJson || "{}"}
 	// Register the openWalkthrough command handler
 	context.subscriptions.push(
 		vscode.commands.registerCommand(commands.Walkthrough, async () => {
-			await vscode.commands.executeCommand("workbench.action.openWalkthrough", `${context.extension.id}#ClineWalkthrough`)
+			await vscode.commands.executeCommand("workbench.action.openWalkthrough", `${context.extension.id}#NodusWalkthrough`)
 			telemetryService.captureButtonClick("command_openWalkthrough")
 		}),
 	)
@@ -525,7 +525,7 @@ ${ctx.cellJson || "{}"}
 
 	// Listen for secrets changes (e.g., cross-window login/logout sync)
 	const unsubSecrets = storageContext.secrets.onDidChange((event) => {
-		if (event.key === "cline:clineAccountId") {
+		if (event.key === "nodus:nodusAccountId") {
 			const secretValue = storageContext.secrets.get<string>(event.key)
 			const activeWebview = WebviewProvider.getVisibleInstance()
 			const controller = activeWebview?.controller
@@ -542,9 +542,9 @@ ${ctx.cellJson || "{}"}
 	})
 	context.subscriptions.push({ dispose: unsubSecrets })
 
-	Logger.log(`[Cline] extension activated in ${performance.now() - activationStartTime} ms`)
+	Logger.log(`[Nodus] extension activated in ${performance.now() - activationStartTime} ms`)
 
-	return createClineAPI(webview.controller)
+	return createNodusAPI(webview.controller)
 }
 
 async function showJupyterPromptInput(title: string, placeholder: string): Promise<string | undefined> {
@@ -594,8 +594,8 @@ async function showJupyterPromptInput(title: string, placeholder: string): Promi
 }
 
 function setupHostProvider(context: ExtensionContext) {
-	const outputChannel = registerClineOutputChannel(context)
-	outputChannel.appendLine("[Cline] Setting up VS Code host...")
+	const outputChannel = registerNodusOutputChannel(context)
+	outputChannel.appendLine("[Nodus] Setting up VS Code host...")
 
 	const createWebview = () => new VscodeWebviewProvider(context)
 	const createDiffView = () => new VscodeDiffViewProvider()
@@ -623,7 +623,7 @@ function setupHostProvider(context: ExtensionContext) {
 		createCommentReview,
 		createTerminalManager,
 		vscodeHostBridgeClient,
-		() => {}, // No-op logger, logging is handled via HostProvider.env.debugLog
+		() => { }, // No-op logger, logging is handled via HostProvider.env.debugLog
 		getCallbackUrl,
 		getBinaryLocation,
 		context.extensionUri.fsPath,
@@ -639,7 +639,7 @@ function getUriPath(url: string): string | undefined {
 	}
 }
 
-async function openClineSidebarForTaskUri(): Promise<void> {
+async function openNodusSidebarForTaskUri(): Promise<void> {
 	const sidebarWaitTimeoutMs = 3000
 	const sidebarWaitIntervalMs = 50
 
@@ -653,7 +653,7 @@ async function openClineSidebarForTaskUri(): Promise<void> {
 		await new Promise((resolve) => setTimeout(resolve, sidebarWaitIntervalMs))
 	}
 
-	Logger.warn("Task URI handling timed out waiting for Cline sidebar visibility")
+	Logger.warn("Task URI handling timed out waiting for Nodus sidebar visibility")
 }
 
 async function getBinaryLocation(name: string): Promise<string> {
@@ -725,7 +725,7 @@ async function cleanupLegacyVSCodeStorage(context: ExtensionContext): Promise<vo
 
 		Logger.info("[VS Code Storage Migrations] Starting")
 
-		// Migrate custom instructions to global Cline rules (one-time cleanup)
+		// Migrate custom instructions to global Nodus rules (one-time cleanup)
 		await migrateCustomInstructionsToGlobalRules(context)
 
 		// Migrate welcomeViewCompleted setting based on existing API keys (one-time cleanup)

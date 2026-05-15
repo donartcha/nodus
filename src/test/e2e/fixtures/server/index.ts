@@ -1,23 +1,23 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http"
 import type { Socket } from "node:net"
 import { v4 as uuidv4 } from "uuid"
-import type { BalanceResponse, OrganizationBalanceResponse, UserResponse } from "../../../../shared/ClineAccount"
+import type { BalanceResponse, OrganizationBalanceResponse, UserResponse } from "../../../../shared/NodusAccount"
 import { E2E_MOCK_API_RESPONSES, E2E_REGISTERED_MOCK_ENDPOINTS } from "./api"
-import { ClineDataMock } from "./data"
+import { NodusDataMock } from "./data"
 
 const E2E_API_SERVER_PORT = 7777
 
-export const MOCK_CLINE_API_SERVER_URL = `http://localhost:${E2E_API_SERVER_PORT}`
+export const MOCK_NODUS_API_SERVER_URL = `http://localhost:${E2E_API_SERVER_PORT}`
 
-const useVerboseLogging = process.env.CLINE_E2E_TESTS_VERBOSE === "true"
+const useVerboseLogging = process.env.nodus_E2E_TESTS_VERBOSE === "true"
 function log(...args: unknown[]) {
 	if (useVerboseLogging) {
-		console.log("[ClineApiServerMock]", ...args)
+		console.log("[NodusApiServerMock]", ...args)
 	}
 }
 
-export class ClineApiServerMock {
-	static globalSharedServer: ClineApiServerMock | null = null
+export class NodusApiServerMock {
+	static globalSharedServer: NodusApiServerMock | null = null
 	static globalSockets: Set<Socket> = new Set()
 
 	private currentUser: UserResponse | null = null
@@ -27,7 +27,7 @@ export class ClineApiServerMock {
 	private spendLimitExceeded = false
 	public generationCounter = 0
 
-	public readonly API_USER = new ClineDataMock("personal")
+	public readonly API_USER = new NodusDataMock("personal")
 
 	constructor(public readonly server: Server) {}
 
@@ -122,17 +122,17 @@ export class ClineApiServerMock {
 	}
 
 	// Starts the global shared server
-	public static async startGlobalServer(): Promise<ClineApiServerMock> {
+	public static async startGlobalServer(): Promise<NodusApiServerMock> {
 		log("=== SERVER FIXTURE CALLED ===")
-		if (ClineApiServerMock.globalSharedServer) {
+		if (NodusApiServerMock.globalSharedServer) {
 			log("Using existing global server")
-			return ClineApiServerMock.globalSharedServer
+			return NodusApiServerMock.globalSharedServer
 		}
 
 		log("Starting global server...")
 		const server = createServer((req: IncomingMessage, res: ServerResponse) => {
 			// Parse URL and method
-			const parsedUrl = new URL(req.url || "/", MOCK_CLINE_API_SERVER_URL)
+			const parsedUrl = new URL(req.url || "/", MOCK_NODUS_API_SERVER_URL)
 			const path = parsedUrl.pathname
 			const query = Object.fromEntries(parsedUrl.searchParams.entries())
 			const method = req.method || "GET"
@@ -177,11 +177,11 @@ export class ClineApiServerMock {
 			// Authenticate the token and set current user
 			if (isAuthRequired && authToken) {
 				log(`Authenticating token: ${authToken}`)
-				const user = ClineApiServerMock.globalSharedServer!.API_USER.getUserByToken(authToken)
+				const user = NodusApiServerMock.globalSharedServer!.API_USER.getUserByToken(authToken)
 				if (!user) {
 					return sendApiError("Invalid token", 401)
 				}
-				ClineApiServerMock.globalSharedServer!.setCurrentUser(user)
+				NodusApiServerMock.globalSharedServer!.setCurrentUser(user)
 			}
 
 			log("=== MOCK SERVER REQUEST ===")
@@ -194,14 +194,14 @@ export class ClineApiServerMock {
 			// Route handling
 			const handleRequest = async () => {
 				// Try to match the route using registered endpoints
-				const routeMatch = ClineApiServerMock.matchRoute(path, method)
+				const routeMatch = NodusApiServerMock.matchRoute(path, method)
 
 				if (!routeMatch.matched) {
 					return sendJson({ error: "Not found" }, 404)
 				}
 
 				const { baseRoute, endpoint, params = {} } = routeMatch
-				const controller = ClineApiServerMock.globalSharedServer!
+				const controller = NodusApiServerMock.globalSharedServer!
 
 				// Health check endpoints
 				if (baseRoute === "/health") {
@@ -330,7 +330,7 @@ export class ClineApiServerMock {
 							return sendApiError("Invalid or expired authorization code", 400)
 						}
 
-						// Return format matching ClineAuthProvider expectations
+						// Return format matching NodusAuthProvider expectations
 						return sendApiResponse({
 							accessToken: code + "_access",
 							refreshToken: code + "_refresh",
@@ -340,7 +340,7 @@ export class ClineApiServerMock {
 								subject: user.id,
 								email: user.email,
 								name: user.displayName,
-								clineUserId: user.id,
+								NodusUserId: user.id,
 								accounts: null,
 								organizations: user.organizations,
 							},
@@ -364,7 +364,7 @@ export class ClineApiServerMock {
 							return sendApiError("Invalid or expired refresh token", 400)
 						}
 
-						// Return format matching ClineAuthProvider expectations
+						// Return format matching NodusAuthProvider expectations
 						return sendApiResponse({
 							accessToken: originalToken + "_access_refreshed",
 							refreshToken: refreshToken, // Keep same refresh token
@@ -374,7 +374,7 @@ export class ClineApiServerMock {
 								subject: user.id,
 								email: user.email,
 								name: user.displayName,
-								clineUserId: user.id,
+								NodusUserId: user.id,
 								accounts: null,
 							},
 						})
@@ -430,7 +430,7 @@ export class ClineApiServerMock {
 						if (body.includes("edit_request")) {
 							responseText = E2E_MOCK_API_RESPONSES.EDIT_REQUEST
 						}
-						if (body.includes("[diff.test.ts] Hello, Cline!")) {
+						if (body.includes("[diff.test.ts] Hello, Nodus!")) {
 							// The playwright test in diff.test.ts needs the "API Request..." text
 							// to be on the screen long enough to detect it.  This worked at 100ms
 							// too, but setting to 500ms to cover slower CI boxes.
@@ -512,7 +512,7 @@ export class ClineApiServerMock {
 									index: 0,
 									message: {
 										role: "assistant",
-										content: "Hello! I'm a mock Cline API response.",
+										content: "Hello! I'm a mock Nodus API response.",
 									},
 									finish_reason: "stop",
 								},
@@ -599,14 +599,14 @@ export class ClineApiServerMock {
 		})
 
 		// Initialize the controller after the server is created
-		const controller = new ClineApiServerMock(server)
-		ClineApiServerMock.globalSharedServer = controller
+		const controller = new NodusApiServerMock(server)
+		NodusApiServerMock.globalSharedServer = controller
 
 		// Track connections for proper cleanup
 		server.on("connection", (socket) => {
-			ClineApiServerMock.globalSockets.add(socket)
+			NodusApiServerMock.globalSockets.add(socket)
 			socket.on("close", () => {
-				ClineApiServerMock.globalSockets.delete(socket)
+				NodusApiServerMock.globalSockets.delete(socket)
 			})
 		})
 
@@ -616,7 +616,7 @@ export class ClineApiServerMock {
 					console.error(`Failed to start server on port ${E2E_API_SERVER_PORT}:`, error)
 					reject(error)
 				} else {
-					log(`ClineApiServerMock listening on port ${E2E_API_SERVER_PORT}`)
+					log(`NodusApiServerMock listening on port ${E2E_API_SERVER_PORT}`)
 					resolve()
 				}
 			})
@@ -627,15 +627,15 @@ export class ClineApiServerMock {
 
 	// Stops the global shared server
 	public static async stopGlobalServer(): Promise<void> {
-		if (!ClineApiServerMock.globalSharedServer) {
+		if (!NodusApiServerMock.globalSharedServer) {
 			return
 		}
 
-		const server = ClineApiServerMock.globalSharedServer.server
+		const server = NodusApiServerMock.globalSharedServer.server
 
 		// Clean shutdown - destroy all socket connections first
-		ClineApiServerMock.globalSockets.forEach((socket) => socket.destroy())
-		ClineApiServerMock.globalSockets.clear()
+		NodusApiServerMock.globalSockets.forEach((socket) => socket.destroy())
+		NodusApiServerMock.globalSockets.clear()
 
 		await new Promise<void>((resolve, reject) => {
 			server.close((err) => {
@@ -648,6 +648,6 @@ export class ClineApiServerMock {
 			})
 		})
 
-		ClineApiServerMock.globalSharedServer = null
+		NodusApiServerMock.globalSharedServer = null
 	}
 }

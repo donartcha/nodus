@@ -12,6 +12,10 @@ const STANDALONE_SERVER_SETUP_FILE = path.resolve("src/generated/hosts/standalon
 
 const SCRIPT_NAME = path.relative(process.cwd(), fileURLToPath(import.meta.url))
 
+function lowerFirst(name) {
+	return name.charAt(0).toLowerCase() + name.slice(1)
+}
+
 export async function main() {
 	const { protobusServices } = await loadServicesFromProtoDescriptor()
 	await generateWebviewProtobusClients(protobusServices)
@@ -32,6 +36,7 @@ async function generateWebviewProtobusClients(protobusServices) {
 	for (const [serviceName, def] of Object.entries(protobusServices)) {
 		const rpcs = []
 		for (const [rpcName, rpc] of Object.entries(def.service)) {
+			const handlerName = lowerFirst(rpcName)
 			const requestType = getFqn(rpc.requestType.type.name)
 			const responseType = getFqn(rpc.responseType.type.name)
 
@@ -39,17 +44,17 @@ async function generateWebviewProtobusClients(protobusServices) {
 				throw new Error("Request streaming is not supported")
 			}
 			if (!rpc.responseStream) {
-				rpcs.push(`    static async ${rpcName}(request: ${requestType}): Promise<${responseType}> {
-		return this.makeUnaryRequest("${rpcName}", request, ${requestType}.toJSON, ${responseType}.fromJSON)
+				rpcs.push(`    static async ${handlerName}(request: ${requestType}): Promise<${responseType}> {
+		return this.makeUnaryRequest("${handlerName}", request, ${requestType}.toJSON, ${responseType}.fromJSON)
 	}`)
 			} else {
-				rpcs.push(`    static ${rpcName}(request: ${requestType}, callbacks: Callbacks<${responseType}>): ()=>void {
-		return this.makeStreamingRequest("${rpcName}", request, ${requestType}.toJSON, ${responseType}.fromJSON, callbacks)
+				rpcs.push(`    static ${handlerName}(request: ${requestType}, callbacks: Callbacks<${responseType}>): ()=>void {
+		return this.makeStreamingRequest("${handlerName}", request, ${requestType}.toJSON, ${responseType}.fromJSON, callbacks)
 	}`)
 			}
 		}
 		clients.push(`export class ${serviceName}Client extends ProtoBusClient {
-	static override serviceName: string = "cline.${serviceName}"
+	static override serviceName: string = "nodus.${serviceName}"
 ${rpcs.join("\n")}
 }`)
 	}
@@ -77,16 +82,17 @@ async function generateVscodeServiceTypes(protobusServices) {
 		servers.push(`// ${domain} Service Handler Types`)
 		servers.push(`export type ${serviceName}Handlers = {`)
 		for (const [rpcName, rpc] of Object.entries(def.service)) {
+			const handlerName = lowerFirst(rpcName)
 			const requestType = getFqn(rpc.requestType.type.name)
 			const responseType = getFqn(rpc.responseType.type.name)
 			if (rpc.requestStream) {
 				throw new Error("Request streaming is not supported")
 			}
 			if (!rpc.responseStream) {
-				servers.push(`     ${rpcName}:(controller: Controller, request: ${requestType}) => Promise<${responseType}>`)
+				servers.push(`     ${handlerName}:(controller: Controller, request: ${requestType}) => Promise<${responseType}>`)
 			} else {
 				servers.push(
-					`     ${rpcName}:(controller: Controller, request: ${requestType}, responseStream: StreamingResponseHandler<${responseType}>, requestId?: string) => Promise<void>`,
+					`     ${handlerName}:(controller: Controller, request: ${requestType}, responseStream: StreamingResponseHandler<${responseType}>, requestId?: string) => Promise<void>`,
 				)
 			}
 		}
@@ -119,11 +125,13 @@ async function generateVscodeProtobusServers(protobusServices) {
 		imports.push(`// ${domain} Service`)
 		servers.push(`const ${serviceName}Handlers: serviceTypes.${serviceName}Handlers = {`)
 		for (const [rpcName, _rpc] of Object.entries(def.service)) {
-			imports.push(`import { ${rpcName} } from "@core/controller/${dir}/${rpcName}"`)
-			servers.push(`    ${rpcName}: ${rpcName},`)
+			const handlerName = lowerFirst(rpcName)
+			console.log(`RPC Name: ${rpcName}`)
+			imports.push(`import { ${handlerName} } from "@core/controller/${dir}/${handlerName}"`)
+			servers.push(`    ${handlerName}: ${handlerName},`)
 		}
 		servers.push(`} \n`)
-		serviceMap.push(`    "cline.${serviceName}": ${serviceName}Handlers,`)
+		serviceMap.push(`    "nodus.${serviceName}": ${serviceName}Handlers,`)
 		imports.push("")
 	}
 
@@ -154,20 +162,21 @@ async function generateStandaloneProtobusServiceSetup(protobusServices) {
 		const dir = getDirName(name)
 		imports.push(`// ${domain} Service`)
 		handlerSetup.push(`    // ${domain} Service`)
-		handlerSetup.push(`    server.addService(cline.${name}Service, {`)
+		handlerSetup.push(`    server.addService(nodus.${name}Service, {`)
 		for (const [rpcName, rpc] of Object.entries(def.service)) {
-			imports.push(`import { ${rpcName} } from "@core/controller/${dir}/${rpcName}"`)
-			const requestType = "cline." + rpc.requestType.type.name
-			const responseType = "cline." + rpc.responseType.type.name
+			const handlerName = lowerFirst(rpcName)
+			imports.push(`import { ${handlerName} } from "@core/controller/${dir}/${handlerName}"`)
+			const requestType = "nodus." + rpc.requestType.type.name
+			const responseType = "nodus." + rpc.responseType.type.name
 			if (rpc.requestStream) {
 				throw new Error("Request streaming is not supported")
 			}
 			if (rpc.responseStream) {
 				handlerSetup.push(
-					`        ${rpcName}: wrapStreamingResponse<${requestType},${responseType}>(${rpcName}, controller),`,
+					`        ${handlerName}: wrapStreamingResponse<${requestType},${responseType}>(${handlerName}, controller),`,
 				)
 			} else {
-				handlerSetup.push(`         ${rpcName}: wrapper<${requestType},${responseType}>(${rpcName}, controller),`)
+				handlerSetup.push(`         ${handlerName}: wrapper<${requestType},${responseType}>(${handlerName}, controller),`)
 			}
 		}
 		handlerSetup.push(`    });`)
@@ -179,7 +188,7 @@ async function generateStandaloneProtobusServiceSetup(protobusServices) {
 	const output = `// GENERATED CODE -- DO NOT EDIT!
 // Generated by ${SCRIPT_NAME}
 import * as grpc from "@grpc/grpc-js"
-import { cline } from "@generated/grpc-js"
+import { nodus } from "@generated/grpc-js"
 import { Controller } from "@core/controller"
 import { GrpcHandlerWrapper, GrpcStreamingResponseHandlerWrapper } from "@hosts/external/grpc-types"
 

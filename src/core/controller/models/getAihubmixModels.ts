@@ -1,5 +1,5 @@
-import { EmptyRequest } from "@shared/proto/cline/common"
-import { OpenRouterCompatibleModelInfo, OpenRouterModelInfo } from "@shared/proto/cline/models"
+import { EmptyRequest } from "@shared/proto/nodus/common"
+import { OpenRouterCompatibleModelInfo, OpenRouterModelInfo } from "@shared/proto/nodus/models"
 import axios from "axios"
 import { getAxiosSettings } from "@/shared/net"
 import { Logger } from "@/shared/services/Logger"

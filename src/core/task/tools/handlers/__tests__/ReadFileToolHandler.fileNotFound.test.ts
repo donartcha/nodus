@@ -2,7 +2,7 @@ import { strict as assert } from "node:assert"
 import fs from "node:fs/promises"
 import os from "node:os"
 import path from "node:path"
-import { ClineDefaultTool } from "@shared/tools"
+import { NodusDefaultTool } from "@shared/tools"
 import * as pathUtils from "@utils/path"
 import { afterEach, beforeEach, describe, it } from "mocha"
 import sinon from "sinon"
@@ -98,7 +98,7 @@ function createConfig() {
 			browserSession: {},
 			urlContentFetcher: {},
 			diffViewProvider: {},
-			clineIgnoreController: { validateAccess: () => true },
+			NodusIgnoreController: { validateAccess: () => true },
 			commandPermissionController: {},
 			contextManager: {},
 		},
@@ -114,7 +114,7 @@ function createConfig() {
 function makeBlock(relPath?: string) {
 	return {
 		type: "tool_use" as const,
-		name: ClineDefaultTool.FILE_READ,
+		name: NodusDefaultTool.FILE_READ,
 		params: relPath !== undefined ? { path: relPath } : {},
 		partial: false,
 	}
@@ -123,7 +123,7 @@ function makeBlock(relPath?: string) {
 function makeBlockWithRange(relPath: string, startLine?: string, endLine?: string) {
 	return {
 		type: "tool_use" as const,
-		name: ClineDefaultTool.FILE_READ,
+		name: NodusDefaultTool.FILE_READ,
 		params: {
 			path: relPath,
 			...(startLine !== undefined ? { start_line: startLine } : {}),
@@ -138,7 +138,7 @@ describe("ReadFileToolHandler.execute – file not found", () => {
 
 	beforeEach(async () => {
 		sandbox = sinon.createSandbox()
-		tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "cline-read-test-"))
+		tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "Nodus-read-test-"))
 		sandbox.stub(pathUtils, "isLocatedInWorkspace").resolves(true)
 	})
 

@@ -1,10 +1,10 @@
 import { ModelFamily } from "@/shared/prompts"
-import { ClineDefaultTool } from "@/shared/tools"
-import type { ClineToolSpec } from "../spec"
+import { NodusDefaultTool } from "@/shared/tools"
+import type { NodusToolSpec } from "../spec"
 
-const id = ClineDefaultTool.GENERATE_EXPLANATION
+const id = NodusDefaultTool.GENERATE_EXPLANATION
 
-const GENERIC: ClineToolSpec = {
+const GENERIC: NodusToolSpec = {
 	variant: ModelFamily.GENERIC,
 	id,
 	name: "generate_explanation",

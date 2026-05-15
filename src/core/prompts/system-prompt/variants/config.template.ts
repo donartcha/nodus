@@ -13,7 +13,7 @@
 
 import { ModelFamily } from "@/shared/prompts"
 import { Logger } from "@/shared/services/Logger"
-import { ClineDefaultTool } from "@/shared/tools"
+import { NodusDefaultTool } from "@/shared/tools"
 import { PromptVariant } from ".."
 import { SystemPromptSection } from "../templates/placeholders"
 import { baseTemplate } from "./generic/template"
@@ -47,22 +47,22 @@ export const config: Omit<PromptVariant, "id"> = createVariant(ModelFamily.GENER
 	.tools(
 		// Define tool order - this is type-safe and will show available options.
 		// If a tool is listed here but no variant was registered, it will fall back to the generic variant.
-		ClineDefaultTool.BASH,
-		ClineDefaultTool.FILE_READ,
-		ClineDefaultTool.FILE_NEW,
-		ClineDefaultTool.FILE_EDIT,
-		ClineDefaultTool.SEARCH,
-		ClineDefaultTool.LIST_FILES,
-		ClineDefaultTool.LIST_CODE_DEF,
-		ClineDefaultTool.BROWSER,
-		ClineDefaultTool.MCP_USE,
-		ClineDefaultTool.MCP_ACCESS,
-		ClineDefaultTool.ASK,
-		ClineDefaultTool.ATTEMPT,
-		ClineDefaultTool.NEW_TASK,
-		ClineDefaultTool.PLAN_MODE,
-		ClineDefaultTool.MCP_DOCS,
-		ClineDefaultTool.TODO,
+		NodusDefaultTool.BASH,
+		NodusDefaultTool.FILE_READ,
+		NodusDefaultTool.FILE_NEW,
+		NodusDefaultTool.FILE_EDIT,
+		NodusDefaultTool.SEARCH,
+		NodusDefaultTool.LIST_FILES,
+		NodusDefaultTool.LIST_CODE_DEF,
+		NodusDefaultTool.BROWSER,
+		NodusDefaultTool.MCP_USE,
+		NodusDefaultTool.MCP_ACCESS,
+		NodusDefaultTool.ASK,
+		NodusDefaultTool.ATTEMPT,
+		NodusDefaultTool.NEW_TASK,
+		NodusDefaultTool.PLAN_MODE,
+		NodusDefaultTool.MCP_DOCS,
+		NodusDefaultTool.TODO,
 	)
 	.placeholders({
 		MODEL_FAMILY: "your-model-family", // Replace with appropriate model family
@@ -78,7 +78,7 @@ export const config: Omit<PromptVariant, "id"> = createVariant(ModelFamily.GENER
 	//     template: customRulesTemplate,
 	// })
 	// Optional: Override specific tools
-	// .overrideTool(ClineDefaultTool.BASH, {
+	// .overrideTool(NodusDefaultTool.BASH, {
 	//     enabled: false,
 	// })
 	.build()
@@ -111,7 +111,7 @@ export const createMinimalVariant = (family: ModelFamily) =>
 			SystemPromptSection.RULES,
 			SystemPromptSection.SYSTEM_INFO,
 		)
-		.tools(ClineDefaultTool.FILE_READ, ClineDefaultTool.FILE_NEW, ClineDefaultTool.ATTEMPT)
+		.tools(NodusDefaultTool.FILE_READ, NodusDefaultTool.FILE_NEW, NodusDefaultTool.ATTEMPT)
 
 // Full-featured variant for advanced models
 export const createAdvancedVariant = (family: ModelFamily) =>
@@ -132,22 +132,22 @@ export const createAdvancedVariant = (family: ModelFamily) =>
 			SystemPromptSection.USER_INSTRUCTIONS,
 		)
 		.tools(
-			ClineDefaultTool.BASH,
-			ClineDefaultTool.FILE_READ,
-			ClineDefaultTool.FILE_NEW,
-			ClineDefaultTool.FILE_EDIT,
-			ClineDefaultTool.SEARCH,
-			ClineDefaultTool.LIST_FILES,
-			ClineDefaultTool.LIST_CODE_DEF,
-			ClineDefaultTool.BROWSER,
-			ClineDefaultTool.WEB_FETCH,
-			ClineDefaultTool.MCP_USE,
-			ClineDefaultTool.MCP_ACCESS,
-			ClineDefaultTool.ASK,
-			ClineDefaultTool.ATTEMPT,
-			ClineDefaultTool.NEW_TASK,
-			ClineDefaultTool.PLAN_MODE,
-			ClineDefaultTool.MCP_DOCS,
-			ClineDefaultTool.TODO,
-			ClineDefaultTool.USE_SUBAGENTS,
+			NodusDefaultTool.BASH,
+			NodusDefaultTool.FILE_READ,
+			NodusDefaultTool.FILE_NEW,
+			NodusDefaultTool.FILE_EDIT,
+			NodusDefaultTool.SEARCH,
+			NodusDefaultTool.LIST_FILES,
+			NodusDefaultTool.LIST_CODE_DEF,
+			NodusDefaultTool.BROWSER,
+			NodusDefaultTool.WEB_FETCH,
+			NodusDefaultTool.MCP_USE,
+			NodusDefaultTool.MCP_ACCESS,
+			NodusDefaultTool.ASK,
+			NodusDefaultTool.ATTEMPT,
+			NodusDefaultTool.NEW_TASK,
+			NodusDefaultTool.PLAN_MODE,
+			NodusDefaultTool.MCP_DOCS,
+			NodusDefaultTool.TODO,
+			NodusDefaultTool.USE_SUBAGENTS,
 		)

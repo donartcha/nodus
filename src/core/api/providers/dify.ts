@@ -1,5 +1,5 @@
 import { buildExternalBasicHeaders } from "@/services/EnvUtils"
-import { ClineStorageMessage } from "@/shared/messages/content"
+import { NodusStorageMessage } from "@/shared/messages/content"
 import { fetch } from "@/shared/net"
 import { Logger } from "@/shared/services/Logger"
 import { ModelInfo } from "../../../shared/api"
@@ -99,7 +99,7 @@ export class DifyHandler implements ApiHandler {
 		}
 	}
 
-	async *createMessage(systemPrompt: string, messages: ClineStorageMessage[]): ApiStream {
+	async *createMessage(systemPrompt: string, messages: NodusStorageMessage[]): ApiStream {
 		Logger.log("[DIFY DEBUG] createMessage called with:", {
 			systemPromptLength: systemPrompt?.length || 0,
 			messagesCount: messages?.length || 0,
@@ -112,7 +112,7 @@ export class DifyHandler implements ApiHandler {
 			query: query,
 			response_mode: "streaming",
 			conversation_id: this.conversationId || "",
-			user: "cline-user", // A unique user identifier
+			user: "Nodus-user", // A unique user identifier
 			files: [],
 		}
 
@@ -383,7 +383,7 @@ export class DifyHandler implements ApiHandler {
 		}
 	}
 
-	private convertMessagesToQuery(systemPrompt: string, messages: ClineStorageMessage[]): string {
+	private convertMessagesToQuery(systemPrompt: string, messages: NodusStorageMessage[]): string {
 		// Dify's context is managed by `conversation_id`. The `query` should be the last user message.
 		// The system prompt is typically configured in the Dify App itself.
 		const lastUserMessage = messages.filter((m) => m.role === "user").pop()
@@ -426,10 +426,10 @@ export class DifyHandler implements ApiHandler {
 	 * Upload a file for use in conversations
 	 * @param file File buffer to upload
 	 * @param filename Name of the file
-	 * @param user User identifier (defaults to "cline-user")
+	 * @param user User identifier (defaults to "Nodus-user")
 	 * @returns Promise with file upload response
 	 */
-	async uploadFile(file: Buffer, filename: string, user: string = "cline-user"): Promise<DifyFileResponse> {
+	async uploadFile(file: Buffer, filename: string, user: string = "Nodus-user"): Promise<DifyFileResponse> {
 		const formData = new FormData()
 		formData.append("file", new Blob([new Uint8Array(file)]), filename)
 		formData.append("user", user)
@@ -451,10 +451,10 @@ export class DifyHandler implements ApiHandler {
 	/**
 	 * Stop generation for a specific task
 	 * @param taskId Task ID from streaming response
-	 * @param user User identifier (defaults to "cline-user")
+	 * @param user User identifier (defaults to "Nodus-user")
 	 * @returns Promise that resolves when generation is stopped
 	 */
-	async stopGeneration(taskId: string, user: string = "cline-user"): Promise<void> {
+	async stopGeneration(taskId: string, user: string = "Nodus-user"): Promise<void> {
 		const response = await fetch(`${this.baseUrl}/chat-messages/${taskId}/stop`, {
 			method: "POST",
 			headers: this.jsonHeaders(),
@@ -470,14 +470,14 @@ export class DifyHandler implements ApiHandler {
 	/**
 	 * Get conversation history messages with pagination
 	 * @param conversationId Conversation ID
-	 * @param user User identifier (defaults to "cline-user")
+	 * @param user User identifier (defaults to "Nodus-user")
 	 * @param firstId First message ID for pagination (optional)
 	 * @param limit Number of messages to return (default: 20)
 	 * @returns Promise with conversation history
 	 */
 	async getConversationHistory(
 		conversationId: string,
-		user: string = "cline-user",
+		user: string = "Nodus-user",
 		firstId?: string,
 		limit: number = 20,
 	): Promise<DifyHistoryResponse> {
@@ -500,14 +500,14 @@ export class DifyHandler implements ApiHandler {
 
 	/**
 	 * Get list of conversations for a user
-	 * @param user User identifier (defaults to "cline-user")
+	 * @param user User identifier (defaults to "Nodus-user")
 	 * @param lastId Last conversation ID for pagination (optional)
 	 * @param limit Number of conversations to return (default: 20)
 	 * @param sortBy Sort field (default: "-updated_at")
 	 * @returns Promise with conversations list
 	 */
 	async getConversations(
-		user: string = "cline-user",
+		user: string = "Nodus-user",
 		lastId?: string,
 		limit: number = 20,
 		sortBy: string = "-updated_at",
@@ -536,10 +536,10 @@ export class DifyHandler implements ApiHandler {
 	/**
 	 * Delete a conversation
 	 * @param conversationId Conversation ID to delete
-	 * @param user User identifier (defaults to "cline-user")
+	 * @param user User identifier (defaults to "Nodus-user")
 	 * @returns Promise that resolves when conversation is deleted
 	 */
-	async deleteConversation(conversationId: string, user: string = "cline-user"): Promise<void> {
+	async deleteConversation(conversationId: string, user: string = "Nodus-user"): Promise<void> {
 		const response = await fetch(`${this.baseUrl}/conversations/${conversationId}`, {
 			method: "DELETE",
 			headers: this.jsonHeaders(),
@@ -555,14 +555,14 @@ export class DifyHandler implements ApiHandler {
 	/**
 	 * Rename a conversation
 	 * @param conversationId Conversation ID to rename
-	 * @param user User identifier (defaults to "cline-user")
+	 * @param user User identifier (defaults to "Nodus-user")
 	 * @param name New conversation name (optional if auto_generate is true)
 	 * @param autoGenerate Whether to auto-generate the name (default: false)
 	 * @returns Promise with updated conversation details
 	 */
 	async renameConversation(
 		conversationId: string,
-		user: string = "cline-user",
+		user: string = "Nodus-user",
 		name?: string,
 		autoGenerate: boolean = false,
 	): Promise<DifyConversationResponse> {
@@ -590,14 +590,14 @@ export class DifyHandler implements ApiHandler {
 	 * @param messageId Message ID to provide feedback for
 	 * @param rating Rating: "like" or "dislike"
 	 * @param content Optional feedback content
-	 * @param user User identifier (defaults to "cline-user")
+	 * @param user User identifier (defaults to "Nodus-user")
 	 * @returns Promise that resolves when feedback is submitted
 	 */
 	async submitMessageFeedback(
 		messageId: string,
 		rating: "like" | "dislike",
 		content?: string,
-		user: string = "cline-user",
+		user: string = "Nodus-user",
 	): Promise<void> {
 		const body: any = { rating, user }
 		if (content) {

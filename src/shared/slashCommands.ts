@@ -26,13 +26,13 @@ export const BASE_SLASH_COMMANDS: SlashCommand[] = [
 	},
 	{
 		name: "newrule",
-		description: "Create a new Cline rule based on your conversation",
+		description: "Create a new Nodus rule based on your conversation",
 		section: "default",
 		cliCompatible: true,
 	},
 	{
 		name: "reportbug",
-		description: "Create a Github issue with Cline",
+		description: "Create a Github issue with Nodus",
 		section: "default",
 		cliCompatible: true,
 	},
@@ -51,7 +51,7 @@ export const VSCODE_ONLY_COMMANDS: SlashCommand[] = [
 export const CLI_ONLY_COMMANDS: SlashCommand[] = [
 	{
 		name: "help",
-		description: "Learn how to use Cline CLI",
+		description: "Learn how to use Nodus CLI",
 		section: "default",
 		cliCompatible: true,
 	},

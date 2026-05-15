@@ -7,9 +7,9 @@ import { parseWorkspaceInlinePath } from "@/core/workspace/utils/parseWorkspaceI
 import { WorkspacePathAdapter } from "@/core/workspace/WorkspacePathAdapter"
 import { resolveWorkspacePath } from "@/core/workspace/WorkspaceResolver"
 import { telemetryService } from "@/services/telemetry"
-import { ClineSayTool } from "@/shared/ExtensionMessage"
+import { NodusSayTool } from "@/shared/ExtensionMessage"
 import { Logger } from "@/shared/services/Logger"
-import { ClineDefaultTool } from "@/shared/tools"
+import { NodusDefaultTool } from "@/shared/tools"
 import type { ToolResponse } from "../../index"
 import { showNotificationForApproval } from "../../utils"
 import type { IFullyManagedTool } from "../ToolExecutorCoordinator"
@@ -19,7 +19,7 @@ import type { StronglyTypedUIHelpers } from "../types/UIHelpers"
 import { ToolResultUtils } from "../utils/ToolResultUtils"
 
 export class SearchFilesToolHandler implements IFullyManagedTool {
-	readonly name = ClineDefaultTool.SEARCH
+	readonly name = NodusDefaultTool.SEARCH
 
 	constructor(private validator: ToolValidator) {}
 
@@ -88,7 +88,7 @@ export class SearchFilesToolHandler implements IFullyManagedTool {
 				absolutePath,
 				regex,
 				filePattern,
-				config.services.clineIgnoreController,
+				config.services.NodusIgnoreController,
 			)
 
 			// Parse the result count from the first line
@@ -188,7 +188,7 @@ export class SearchFilesToolHandler implements IFullyManagedTool {
 			regex: uiHelpers.removeClosingTag(block, "regex", regex),
 			filePattern: uiHelpers.removeClosingTag(block, "file_pattern", filePattern),
 			operationIsLocatedInWorkspace: await isLocatedInWorkspace(relPath),
-		} satisfies ClineSayTool
+		} satisfies NodusSayTool
 
 		const partialMessage = JSON.stringify(sharedMessageProps)
 
@@ -320,7 +320,7 @@ export class SearchFilesToolHandler implements IFullyManagedTool {
 			regex: regex,
 			filePattern: filePattern,
 			operationIsLocatedInWorkspace: await isLocatedInWorkspace(parsedPath),
-		} satisfies ClineSayTool
+		} satisfies NodusSayTool
 
 		const completeMessage = JSON.stringify(sharedMessageProps)
 
@@ -346,7 +346,7 @@ export class SearchFilesToolHandler implements IFullyManagedTool {
 			)
 		} else {
 			// Manual approval flow
-			const notificationMessage = `Cline wants to search files for ${regex}`
+			const notificationMessage = `Nodus wants to search files for ${regex}`
 
 			// Show notification
 			showNotificationForApproval(notificationMessage, config.autoApprovalSettings.enableNotifications)

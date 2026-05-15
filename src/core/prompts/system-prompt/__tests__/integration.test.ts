@@ -128,7 +128,7 @@ const baseContext: SystemPromptContext = {
 	cwd: "/test/project",
 	ide: "TestIde",
 	supportsBrowserUse: true,
-	clineWebToolsEnabled: true,
+	nodusWebToolsEnabled: true,
 	subagentsEnabled: true,
 	mcpHub: {
 		getServers: () => [
@@ -143,10 +143,10 @@ const baseContext: SystemPromptContext = {
 			},
 		],
 	} as unknown as McpHub,
-	focusChainSettings: { enabled: true, remindClineInterval: 6 },
+	focusChainSettings: { enabled: true, remindNodusInterval: 6 },
 	browserSettings: { viewport: { width: 1280, height: 720 } },
-	globalClineRulesFileInstructions: "Follow global rules",
-	localClineRulesFileInstructions: "Follow local rules",
+	globalNodusRulesFileInstructions: "Follow global rules",
+	localNodusRulesFileInstructions: "Follow local rules",
 	preferredLanguageInstructions: "Prefer TypeScript",
 	isTesting: true,
 	providerInfo: mockProviderInfo,
@@ -186,17 +186,17 @@ const contextVariations: Array<{ name: string; override: Partial<SystemPromptCon
 	{ name: "basic", override: {} },
 	{ name: "no-browser", override: { supportsBrowserUse: false } },
 	{ name: "no-mcp", override: { mcpHub: { getServers: () => [] } as unknown as McpHub } },
-	{ name: "no-focus-chain", override: { focusChainSettings: { enabled: false, remindClineInterval: 0 } } },
+	{ name: "no-focus-chain", override: { focusChainSettings: { enabled: false, remindNodusInterval: 0 } } },
 ]
 
 const modelTestCases = [
 	{ family: ModelFamily.GENERIC, modelId: "gpt-3", providerId: "openai" },
 	{ family: ModelFamily.GLM, modelId: "glm-4.6", providerId: "zai" },
 	{ family: ModelFamily.HERMES, modelId: "hermes-4", providerId: "test" },
-	{ family: ModelFamily.DEVSTRAL, modelId: "devstral", providerId: "cline" },
+	{ family: ModelFamily.DEVSTRAL, modelId: "devstral", providerId: "Nodus" },
 	{ family: ModelFamily.NEXT_GEN, modelId: "claude-sonnet-4", providerId: "anthropic" },
 	{ family: ModelFamily.XS, modelId: "qwen3_coder", providerId: "lmstudio" },
-	{ family: ModelFamily.NATIVE_NEXT_GEN, modelId: "claude-4-5-sonnet", providerId: "cline" },
+	{ family: ModelFamily.NATIVE_NEXT_GEN, modelId: "claude-4-5-sonnet", providerId: "Nodus" },
 	{ family: ModelFamily.GPT_5, modelId: "gpt-5", providerId: "openai" },
 	{ family: ModelFamily.NATIVE_GPT_5, modelId: "gpt-5-codex", providerId: "openai" },
 	{ family: ModelFamily.NATIVE_GPT_5_1, modelId: "gpt-5-1", providerId: "openai" },

@@ -1,8 +1,8 @@
-import { ClineDefaultTool, getToolUseNames } from "@shared/tools"
+import { NodusDefaultTool, getToolUseNames } from "@shared/tools"
 import { nanoid } from "nanoid"
 import { AssistantMessageContent, TextStreamContent, ToolParamName, ToolUse, toolParamNames } from "." // Assuming types are defined in index.ts or a similar file
 
-// parseAssistantmessageV1 removed in https://github.com/cline/cline/pull/5425
+// parseAssistantmessageV1 removed in https://github.com/Nodus/Nodus/pull/5425
 
 /**
  * @description **Version 2**
@@ -173,7 +173,7 @@ export function parseAssistantMessageV2(assistantMessage: string): AssistantMess
 					// Start the new tool use
 					currentToolUse = {
 						type: "tool_use",
-						name: toolName as ClineDefaultTool,
+						name: toolName as NodusDefaultTool,
 						params: {},
 						partial: true, // Assume partial until closing tag is found
 						call_id: nanoid(8),

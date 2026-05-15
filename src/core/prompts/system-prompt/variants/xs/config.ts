@@ -1,7 +1,7 @@
 import { isLocalModel } from "@utils/model-utils"
 import { ModelFamily } from "@/shared/prompts"
 import { Logger } from "@/shared/services/Logger"
-import { ClineDefaultTool } from "@/shared/tools"
+import { NodusDefaultTool } from "@/shared/tools"
 import { SystemPromptSection } from "../../templates/placeholders"
 import { createVariant } from "../variant-builder"
 import { validateVariant } from "../variant-validator"
@@ -41,15 +41,15 @@ export const config = createVariant(ModelFamily.XS)
 		SystemPromptSection.SKILLS,
 	)
 	.tools(
-		ClineDefaultTool.BASH,
-		ClineDefaultTool.FILE_READ,
-		ClineDefaultTool.FILE_NEW,
-		ClineDefaultTool.FILE_EDIT,
-		ClineDefaultTool.SEARCH,
-		ClineDefaultTool.ASK,
-		ClineDefaultTool.ATTEMPT,
-		ClineDefaultTool.PLAN_MODE,
-		ClineDefaultTool.USE_SUBAGENTS,
+		NodusDefaultTool.BASH,
+		NodusDefaultTool.FILE_READ,
+		NodusDefaultTool.FILE_NEW,
+		NodusDefaultTool.FILE_EDIT,
+		NodusDefaultTool.SEARCH,
+		NodusDefaultTool.ASK,
+		NodusDefaultTool.ATTEMPT,
+		NodusDefaultTool.PLAN_MODE,
+		NodusDefaultTool.USE_SUBAGENTS,
 	)
 	.placeholders({
 		MODEL_FAMILY: ModelFamily.XS,

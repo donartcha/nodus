@@ -4,7 +4,7 @@
  * the StandaloneTerminalManager used in CLI/JetBrains environments.
  */
 
-import type { ClineToolResponseContent } from "@shared/messages"
+import type { NodusToolResponseContent } from "@shared/messages"
 import type { EventEmitter } from "events"
 
 // =============================================================================
@@ -333,12 +333,12 @@ export interface CommandExecutorCallbacks {
 	/** Update the background command running state in the controller */
 	updateBackgroundCommandState: (running: boolean) => void
 	/**
-	 * Update a cline message by index
+	 * Update a Nodus message by index
 	 * Supports updating commandCompleted status and/or text content
 	 */
-	updateClineMessage: (index: number, updates: { commandCompleted?: boolean; text?: string }) => Promise<void>
-	/** Get cline messages array */
-	getClineMessages: () => Array<{ ask?: string; say?: string; text?: string }>
+	updateNodusMessage: (index: number, updates: { commandCompleted?: boolean; text?: string }) => Promise<void>
+	/** Get Nodus messages array */
+	getnodusMessages: () => Array<{ ask?: string; say?: string; text?: string }>
 	/** Add content to user message for next API request */
 	addToUserMessageContent: (content: { type: string; text: string }) => void
 }
@@ -420,7 +420,7 @@ export interface OrchestrationResult {
 	/** Whether the user rejected/cancelled the command */
 	userRejected: boolean
 	/** The result content to return */
-	result: ClineToolResponseContent
+	result: NodusToolResponseContent
 	/** Whether the command completed */
 	completed: boolean
 	/** All output lines captured */

@@ -1,22 +1,22 @@
-import type { ClineMessage } from "@shared/ExtensionMessage"
+import type { NodusMessage } from "@shared/ExtensionMessage"
 import { describe, expect, it } from "vitest"
 import { groupLowStakesTools, isToolGroup } from "./messageUtils"
 
-const createTextMessage = (ts: number, text: string): ClineMessage => ({
+const createTextMessage = (ts: number, text: string): NodusMessage => ({
 	type: "say",
 	say: "text",
 	text,
 	ts,
 })
 
-const createToolMessage = (ts: number, tool: string): ClineMessage => ({
+const createToolMessage = (ts: number, tool: string): NodusMessage => ({
 	type: "say",
 	say: "tool",
 	text: JSON.stringify({ tool, path: "src/file.ts" }),
 	ts,
 })
 
-const createReasoningMessage = (ts: number, text: string): ClineMessage => ({
+const createReasoningMessage = (ts: number, text: string): NodusMessage => ({
 	type: "say",
 	say: "reasoning",
 	text,

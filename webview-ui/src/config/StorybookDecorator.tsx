@@ -5,7 +5,7 @@ import "../../src/index.css"
 import { cn } from "@heroui/react"
 import type { Decorator } from "@storybook/react-vite"
 import React from "react"
-import { ClineAuthContext, ClineAuthContextType, ClineAuthProvider, useClineAuth } from "@/context/ClineAuthContext"
+import { NodusAuthContext, NodusAuthContextType, NodusAuthProvider, useNodusAuth } from "@/context/NodusAuthContext"
 import {
 	ExtensionStateContext,
 	ExtensionStateContextProvider,
@@ -45,9 +45,9 @@ function StorybookDecoratorProvider(className = "relative"): Decorator {
 		return (
 			<div className={className}>
 				<ExtensionStateContextProvider>
-					<ClineAuthProvider>
+					<NodusAuthProvider>
 						<ThemeHandler theme={parameters?.globals?.theme}>{React.createElement(story)}</ThemeHandler>
-					</ClineAuthProvider>
+					</NodusAuthProvider>
 				</ExtensionStateContextProvider>
 			</div>
 		)
@@ -63,23 +63,23 @@ const ExtensionStateProviderWithOverrides: React.FC<{
 	return <ExtensionStateContext.Provider value={{ ...extensionState, ...overrides }}>{children}</ExtensionStateContext.Provider>
 }
 
-const ClineAuthProviderWithOverrides: React.FC<{
-	overrides?: Partial<ClineAuthContextType>
+const NodusAuthProviderWithOverrides: React.FC<{
+	overrides?: Partial<NodusAuthContextType>
 	children: React.ReactNode
 }> = ({ overrides, children }) => {
-	const authContext = useClineAuth()
-	return <ClineAuthContext.Provider value={{ ...authContext, ...overrides }}>{children}</ClineAuthContext.Provider>
+	const authContext = useNodusAuth()
+	return <NodusAuthContext.Provider value={{ ...authContext, ...overrides }}>{children}</NodusAuthContext.Provider>
 }
 
 export const createStorybookDecorator =
-	(overrideStates?: Partial<ExtensionStateContextType>, classNames?: string, authOverrides?: Partial<ClineAuthContextType>) =>
+	(overrideStates?: Partial<ExtensionStateContextType>, classNames?: string, authOverrides?: Partial<NodusAuthContextType>) =>
 	(Story: any) => (
 		<ExtensionStateProviderWithOverrides overrides={overrideStates}>
-			<ClineAuthProviderWithOverrides overrides={authOverrides}>
+			<NodusAuthProviderWithOverrides overrides={authOverrides}>
 				<div className={cn("max-w-lg mx-auto", classNames)}>
 					<Story />
 				</div>
-			</ClineAuthProviderWithOverrides>
+			</NodusAuthProviderWithOverrides>
 		</ExtensionStateProviderWithOverrides>
 	)
 

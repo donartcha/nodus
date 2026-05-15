@@ -1,10 +1,10 @@
 import { HostProvider } from "@hosts/host-provider"
 import type { BrowserSettings } from "@shared/BrowserSettings"
-import { ApiFormat, apiFormatToJSON } from "@shared/proto/cline/models"
+import { ApiFormat, apiFormatToJSON } from "@shared/proto/nodus/models"
 import { ShowMessageType } from "@shared/proto/host/window"
 import type { TaskFeedbackType } from "@shared/WebviewMessage"
 import * as os from "os"
-import { ClineAccountUserInfo } from "@/services/auth/AuthService"
+import { NodusAccountUserInfo } from "@/services/auth/AuthService"
 import { Setting } from "@/shared/proto/index.host"
 import { Logger } from "@/shared/services/Logger"
 import { Mode } from "@/shared/storage/types"
@@ -69,17 +69,17 @@ export enum TerminalHangStage {
 
 export type TelemetryMetadata = {
 	/**
-	 * The extension or cline-core version. JetBrains and CLI have different
-	 * versioning than the VSCode Extension, but on those platforms this will be the _cline-core version_
+	 * The extension or Nodus-core version. JetBrains and CLI have different
+	 * versioning than the VSCode Extension, but on those platforms this will be the _Nodus-core version_
 	 * which uses the same as the versioning as the VSCode extension.
 	 */
 	extension_version: string
 	/**
-	 * The type of cline distribution, e.g VSCode Extension, JetBrains Plugin or CLI. This
+	 * The type of Nodus distribution, e.g VSCode Extension, JetBrains Plugin or CLI. This
 	 * is different than the `platform` because there are many variants of VSCode and JetBrains but they
 	 * all use the same extension or plugin.
 	 */
-	cline_type: string
+	nodus_type: string
 	/** The name of the host IDE or environment e.g. VSCode, Cursor, IntelliJ Professional Edition, etc. */
 	platform: string
 	/** The version of the host environment */
@@ -113,7 +113,7 @@ export interface TokenUsage {
 const MAX_ERROR_MESSAGE_LENGTH = 500
 
 /**
- * TelemetryService handles telemetry event tracking for the Cline extension
+ * TelemetryService handles telemetry event tracking for the Nodus extension
  * Uses an abstracted telemetry provider to support multiple analytics backends
  * Respects user privacy settings and VSCode's global telemetry configuration
  */
@@ -139,59 +139,59 @@ export class TelemetryService {
 	private taskErrorCounts = new Map<string, number>()
 	public static readonly METRICS = {
 		TASK: {
-			TURNS_TOTAL: "cline.turns.total",
-			TURNS_PER_TASK: "cline.turns.per_task",
-			TOKENS_INPUT_TOTAL: "cline.tokens.input.total",
-			TOKENS_INPUT_PER_RESPONSE: "cline.tokens.input.per_response",
-			TOKENS_OUTPUT_TOTAL: "cline.tokens.output.total",
-			TOKENS_OUTPUT_PER_RESPONSE: "cline.tokens.output.per_response",
-			COST_TOTAL: "cline.cost.total",
-			COST_PER_EVENT: "cline.cost.per_event",
+			TURNS_TOTAL: "Nodus.turns.total",
+			TURNS_PER_TASK: "Nodus.turns.per_task",
+			TOKENS_INPUT_TOTAL: "Nodus.tokens.input.total",
+			TOKENS_INPUT_PER_RESPONSE: "Nodus.tokens.input.per_response",
+			TOKENS_OUTPUT_TOTAL: "Nodus.tokens.output.total",
+			TOKENS_OUTPUT_PER_RESPONSE: "Nodus.tokens.output.per_response",
+			COST_TOTAL: "Nodus.cost.total",
+			COST_PER_EVENT: "Nodus.cost.per_event",
 		},
 		CACHE: {
-			WRITE_TOTAL: "cline.cache.write.tokens.total",
-			WRITE_PER_EVENT: "cline.cache.write.tokens.per_event",
-			READ_TOTAL: "cline.cache.read.tokens.total",
-			READ_PER_EVENT: "cline.cache.read.tokens.per_event",
-			HITS_TOTAL: "cline.cache.hits.total",
+			WRITE_TOTAL: "Nodus.cache.write.tokens.total",
+			WRITE_PER_EVENT: "Nodus.cache.write.tokens.per_event",
+			READ_TOTAL: "Nodus.cache.read.tokens.total",
+			READ_PER_EVENT: "Nodus.cache.read.tokens.per_event",
+			HITS_TOTAL: "Nodus.cache.hits.total",
 		},
 		TOOLS: {
-			CALLS_TOTAL: "cline.tool.calls.total",
-			CALLS_PER_TASK: "cline.tool.calls.per_task",
+			CALLS_TOTAL: "Nodus.tool.calls.total",
+			CALLS_PER_TASK: "Nodus.tool.calls.per_task",
 		},
 		ERRORS: {
-			TOTAL: "cline.errors.total",
-			PER_TASK: "cline.errors.per_task",
+			TOTAL: "Nodus.errors.total",
+			PER_TASK: "Nodus.errors.per_task",
 		},
 		API: {
-			TTFT_SECONDS: "cline.api.ttft.seconds",
-			DURATION_SECONDS: "cline.api.duration.seconds",
-			THROUGHPUT_TOKENS_PER_SECOND: "cline.api.throughput.tokens_per_second",
+			TTFT_SECONDS: "Nodus.api.ttft.seconds",
+			DURATION_SECONDS: "Nodus.api.duration.seconds",
+			THROUGHPUT_TOKENS_PER_SECOND: "Nodus.api.throughput.tokens_per_second",
 		},
 		HOOKS: {
-			EXECUTIONS_TOTAL: "cline.hooks.executions.total",
-			DURATION_SECONDS: "cline.hooks.duration.seconds",
-			FAILURES_TOTAL: "cline.hooks.failures.total",
-			CANCELLATIONS_TOTAL: "cline.hooks.cancellations.total",
-			CONTEXT_MODIFICATIONS_TOTAL: "cline.hooks.context_modifications.total",
-			CACHE_ACCESSES_TOTAL: "cline.hooks.cache.accesses.total",
+			EXECUTIONS_TOTAL: "Nodus.hooks.executions.total",
+			DURATION_SECONDS: "Nodus.hooks.duration.seconds",
+			FAILURES_TOTAL: "Nodus.hooks.failures.total",
+			CANCELLATIONS_TOTAL: "Nodus.hooks.cancellations.total",
+			CONTEXT_MODIFICATIONS_TOTAL: "Nodus.hooks.context_modifications.total",
+			CACHE_ACCESSES_TOTAL: "Nodus.hooks.cache.accesses.total",
 		},
 		AI_OUTPUT: {
-			ACCEPTED_LINES_ADDED: "cline.ai_output.accepted.lines_added.total",
-			ACCEPTED_LINES_DELETED: "cline.ai_output.accepted.lines_deleted.total",
-			ACCEPTED_LINES_CHANGED: "cline.ai_output.accepted.lines_changed.total",
-			ACCEPTED_FILES_CREATED: "cline.ai_output.accepted.files_created.total",
-			ACCEPTED_FILES_DELETED: "cline.ai_output.accepted.files_deleted.total",
-			ACCEPTED_FILES_MOVED: "cline.ai_output.accepted.files_moved.total",
-			REJECTED_LINES_ADDED: "cline.ai_output.rejected.lines_added.total",
-			REJECTED_LINES_DELETED: "cline.ai_output.rejected.lines_deleted.total",
-			REJECTED_LINES_CHANGED: "cline.ai_output.rejected.lines_changed.total",
-			REJECTED_FILES_CREATED: "cline.ai_output.rejected.files_created.total",
-			REJECTED_FILES_DELETED: "cline.ai_output.rejected.files_deleted.total",
-			REJECTED_FILES_MOVED: "cline.ai_output.rejected.files_moved.total",
+			ACCEPTED_LINES_ADDED: "Nodus.ai_output.accepted.lines_added.total",
+			ACCEPTED_LINES_DELETED: "Nodus.ai_output.accepted.lines_deleted.total",
+			ACCEPTED_LINES_CHANGED: "Nodus.ai_output.accepted.lines_changed.total",
+			ACCEPTED_FILES_CREATED: "Nodus.ai_output.accepted.files_created.total",
+			ACCEPTED_FILES_DELETED: "Nodus.ai_output.accepted.files_deleted.total",
+			ACCEPTED_FILES_MOVED: "Nodus.ai_output.accepted.files_moved.total",
+			REJECTED_LINES_ADDED: "Nodus.ai_output.rejected.lines_added.total",
+			REJECTED_LINES_DELETED: "Nodus.ai_output.rejected.lines_deleted.total",
+			REJECTED_LINES_CHANGED: "Nodus.ai_output.rejected.lines_changed.total",
+			REJECTED_FILES_CREATED: "Nodus.ai_output.rejected.files_created.total",
+			REJECTED_FILES_DELETED: "Nodus.ai_output.rejected.files_deleted.total",
+			REJECTED_FILES_MOVED: "Nodus.ai_output.rejected.files_moved.total",
 		},
 		GRPC: {
-			RESPONSE_SIZE_BYTES: "cline.grpc.response.size_bytes",
+			RESPONSE_SIZE_BYTES: "Nodus.grpc.response.size_bytes",
 		},
 	}
 	// Event constants for tracking user interactions and system events
@@ -284,14 +284,14 @@ export class TelemetryService {
 			SLASH_COMMAND_USED: "task.slash_command_used",
 			// Tracks when a feature is toggled on/off
 			FEATURE_TOGGLED: "task.feature_toggled",
-			// Tracks when individual Cline rules are toggled on/off
+			// Tracks when individual Nodus rules are toggled on/off
 			RULE_TOGGLED: "task.rule_toggled",
 			// Tracks when auto condense setting is toggled on/off
 			AUTO_CONDENSE_TOGGLED: "task.auto_condense_toggled",
 			// Tracks when yolo mode setting is toggled on/off
 			YOLO_MODE_TOGGLED: "task.yolo_mode_toggled",
-			// Tracks when Cline web tools setting is toggled on/off
-			CLINE_WEB_TOOLS_TOGGLED: "task.cline_web_tools_toggled",
+			// Tracks when Nodus web tools setting is toggled on/off
+			NODUS_WEB_TOOLS_TOGGLED: "task.nodus_web_tools_toggled",
 			// Tracks task initialization timing
 			INITIALIZATION: "task.initialization",
 			// Terminal execution telemetry events
@@ -359,7 +359,7 @@ export class TelemetryService {
 			extension_version: extensionVersion,
 			platform: hostVersion.platform || "unknown",
 			platform_version: hostVersion.version || "unknown",
-			cline_type: hostVersion.clineType || "unknown",
+			nodus_type: hostVersion.nodusType || "unknown",
 			os_type: os.platform(),
 			os_version: os.version(),
 			// `remoteName` is normalized by the host bridge to `undefined` for local workspaces.
@@ -400,13 +400,13 @@ export class TelemetryService {
 		// We only enable telemetry if global host telemetry is enabled
 		const hostSetting = await HostProvider.env.getTelemetrySettings({})
 		if (hostSetting.isEnabled === Setting.DISABLED) {
-			// Only show warning if user has opted in to Cline telemetry but host telemetry is disabled
+			// Only show warning if user has opted in to Nodus telemetry but host telemetry is disabled
 			if (didUserOptIn) {
 				void HostProvider.window
 					.showMessage({
 						type: ShowMessageType.WARNING,
 						message:
-							"Anonymous Cline error and usage reporting is enabled, but IDE telemetry is disabled. To enable error and usage reporting for this extension, enable telemetry in IDE settings.",
+							"Anonymous Nodus error and usage reporting is enabled, but IDE telemetry is disabled. To enable error and usage reporting for this extension, enable telemetry in IDE settings.",
 						options: {
 							items: ["Open Settings"],
 						},
@@ -638,7 +638,7 @@ export class TelemetryService {
 	 * Identifies the accounts user
 	 * @param userInfo The user's information
 	 */
-	public identifyAccount(userInfo: ClineAccountUserInfo) {
+	public identifyAccount(userInfo: NodusAccountUserInfo) {
 		const propertiesWithMetadata: TelemetryProperties = {
 			...this.telemetryMetadata,
 		}
@@ -698,7 +698,7 @@ export class TelemetryService {
 	}
 
 	/**
-	 * Records when cline calls the task completion_result tool signifying that cline is done with the task
+	 * Records when Nodus calls the task completion_result tool signifying that Nodus is done with the task
 	 * @param ulid Unique identifier for the task
 	 */
 	public captureTaskCompleted(
@@ -840,7 +840,7 @@ export class TelemetryService {
 	 * @param ulid Unique identifier for the task
 	 * @param tokensIn Number of input tokens consumed
 	 * @param tokensOut Number of output tokens generated
-	 * @param provider The API provider identifier (e.g. "anthropic", "openai", "cline")
+	 * @param provider The API provider identifier (e.g. "anthropic", "openai", "Nodus")
 	 * @param model The model used for token calculation
 	 */
 	public captureTokenUsage(
@@ -1564,13 +1564,13 @@ export class TelemetryService {
 	}
 
 	/**
-	 * Records when individual Cline rules are toggled on/off
+	 * Records when individual Nodus rules are toggled on/off
 	 * @param ulid Unique identifier for the task (to track rule changes within task context)
 	 * @param ruleFileName The filename of the rule (sanitized to exclude full path)
 	 * @param enabled Whether the rule is being enabled (true) or disabled (false)
 	 * @param isGlobal Whether this is a global rule or workspace-specific rule
 	 */
-	public captureClineRuleToggled(ulid: string, ruleFileName: string, enabled: boolean, isGlobal: boolean) {
+	public captureNodusRuleToggled(ulid: string, ruleFileName: string, enabled: boolean, isGlobal: boolean) {
 		// Sanitize filename to remove any path information for privacy
 		const sanitizedFileName = ruleFileName.split("/").pop() || ruleFileName.split("\\").pop() || ruleFileName
 
@@ -1618,13 +1618,13 @@ export class TelemetryService {
 	}
 
 	/**
-	 * Records when Cline web tools are enabled/disabled by the user
+	 * Records when Nodus web tools are enabled/disabled by the user
 	 * @param ulid Unique identifier for the task
-	 * @param enabled Whether Cline web tools are enabled (true) or disabled (false)
+	 * @param enabled Whether Nodus web tools are enabled (true) or disabled (false)
 	 */
-	public captureClineWebToolsToggle(ulid: string, enabled: boolean) {
+	public captureNodusWebToolsToggle(ulid: string, enabled: boolean) {
 		this.capture({
-			event: TelemetryService.EVENTS.TASK.CLINE_WEB_TOOLS_TOGGLED,
+			event: TelemetryService.EVENTS.TASK.NODUS_WEB_TOOLS_TOGGLED,
 			properties: {
 				ulid,
 				enabled,
@@ -1778,11 +1778,11 @@ export class TelemetryService {
 		})
 
 		const isMultiRoot = rootCount > 1
-		this.recordGauge("cline.workspace.active_roots", rootCount, {
+		this.recordGauge("Nodus.workspace.active_roots", rootCount, {
 			is_multi_root: isMultiRoot,
 		})
 		// Retire the previous series to avoid leaking gauge entries when the flag flips.
-		this.recordGauge("cline.workspace.active_roots", null, {
+		this.recordGauge("Nodus.workspace.active_roots", null, {
 			is_multi_root: !isMultiRoot,
 		})
 	}

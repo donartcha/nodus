@@ -1,6 +1,6 @@
 import type { ExtensionMessage } from "@shared/ExtensionMessage"
-import { ResetStateRequest } from "@shared/proto/cline/state"
-import { UserOrganization } from "@shared/proto/index.cline"
+import { ResetStateRequest } from "@shared/proto/nodus/state"
+import { UserOrganization } from "@shared/proto/index.nodus"
 import {
 	CheckCheck,
 	FlaskConical,
@@ -15,7 +15,7 @@ import {
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useEvent } from "react-use"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
-import { useClineAuth } from "@/context/ClineAuthContext"
+import { useNodusAuth } from "@/context/NodusAuthContext"
 import { useExtensionState } from "@/context/ExtensionStateContext"
 import { cn } from "@/lib/utils"
 import { StateServiceClient } from "@/services/grpc-client"
@@ -93,7 +93,7 @@ export const SETTINGS_TABS: SettingsTab[] = [
 	{
 		id: "about",
 		name: "About",
-		tooltipText: "About Cline",
+		tooltipText: "About Nodus",
 		headerText: "About",
 		icon: Info,
 	},
@@ -147,7 +147,7 @@ const SettingsView = ({ onDone, targetSection }: SettingsViewProps) => {
 	) // Empty deps - these imports never change
 
 	const { version, environment, settingsInitialModelTab } = useExtensionState()
-	const { activeOrganization } = useClineAuth()
+	const { activeOrganization } = useNodusAuth()
 
 	const [activeTab, setActiveTab] = useState<string>(targetSection || SETTINGS_TABS[0].id)
 

@@ -42,18 +42,18 @@ const GeneralSettingsSection = ({ renderSectionHeader }: GeneralSettingsSectionP
 					</Tooltip>
 
 					<p className="text-sm mt-[5px] text-description">
-						Help improve Cline by sending usage data and error reports. No code, prompts, or personal information are
+						Help improve Nodus by sending usage data and error reports. No code, prompts, or personal information are
 						ever sent. See our{" "}
 						<VSCodeLink
 							className="text-inherit"
-							href="https://docs.cline.bot/more-info/telemetry"
+							href="https://docs.nodus.bot/more-info/telemetry"
 							style={{ fontSize: "inherit", textDecoration: "underline" }}>
 							telemetry overview
 						</VSCodeLink>{" "}
 						and{" "}
 						<VSCodeLink
 							className="text-inherit"
-							href="https://cline.bot/privacy"
+							href="https://nodus.bot/privacy"
 							style={{ fontSize: "inherit", textDecoration: "underline" }}>
 							privacy policy
 						</VSCodeLink>{" "}

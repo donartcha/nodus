@@ -6,14 +6,14 @@ import type { Environment } from "../config"
 import { AutoApprovalSettings } from "./AutoApprovalSettings"
 import { ApiConfiguration } from "./api"
 import { BrowserSettings } from "./BrowserSettings"
-import { ClineFeatureSetting } from "./ClineFeatureSetting"
-import { BannerCardData } from "./cline/banner"
-import { ClineRulesToggles } from "./cline-rules"
+import { NodusFeatureSetting } from "./NodusFeatureSetting"
+import { BannerCardData } from "./nodus/banner"
+import { NodusRulesToggles } from "./nodus-rules"
 import { FocusChainSettings } from "./FocusChainSettings"
 import { HistoryItem } from "./HistoryItem"
 import { McpDisplayMode } from "./McpDisplayMode"
-import { ClineMessageModelInfo } from "./messages"
-import { OnboardingModelGroup } from "./proto/cline/state"
+import { NodusMessageModelInfo } from "./messages"
+import { OnboardingModelGroup } from "./proto/nodus/state"
 import { Mode } from "./storage/types"
 import { TelemetrySetting } from "./TelemetrySetting"
 import { UserInfo } from "./UserInfo"
@@ -35,7 +35,7 @@ export type Platform = "aix" | "darwin" | "freebsd" | "linux" | "openbsd" | "sun
 
 export const DEFAULT_PLATFORM = "unknown"
 
-export const COMMAND_CANCEL_TOKEN = "__cline_command_cancel__"
+export const COMMAND_CANCEL_TOKEN = "__nodus_command_cancel__"
 export interface ExtensionState {
 	isNewUser: boolean
 	welcomeViewCompleted: boolean
@@ -47,7 +47,7 @@ export interface ExtensionState {
 	preferredLanguage?: string
 	mode: Mode
 	checkpointManagerErrorMessage?: string
-	clineMessages: ClineMessage[]
+	nodusMessages: NodusMessage[]
 	currentTaskItem?: HistoryItem
 	currentFocusChainChecklist?: string | null
 	mcpMarketplaceEnabled?: boolean
@@ -71,22 +71,22 @@ export interface ExtensionState {
 	userInfo?: UserInfo
 	version: string
 	distinctId: string
-	globalClineRulesToggles: ClineRulesToggles
-	localClineRulesToggles: ClineRulesToggles
-	localWorkflowToggles: ClineRulesToggles
-	globalWorkflowToggles: ClineRulesToggles
-	localCursorRulesToggles: ClineRulesToggles
-	localWindsurfRulesToggles: ClineRulesToggles
-	remoteRulesToggles?: ClineRulesToggles
-	remoteWorkflowToggles?: ClineRulesToggles
-	localAgentsRulesToggles: ClineRulesToggles
+	globalNodusRulesToggles: NodusRulesToggles
+	localNodusRulesToggles: NodusRulesToggles
+	localWorkflowToggles: NodusRulesToggles
+	globalWorkflowToggles: NodusRulesToggles
+	localCursorRulesToggles: NodusRulesToggles
+	localWindsurfRulesToggles: NodusRulesToggles
+	remoteRulesToggles?: NodusRulesToggles
+	remoteWorkflowToggles?: NodusRulesToggles
+	localAgentsRulesToggles: NodusRulesToggles
 	mcpResponsesCollapsed?: boolean
 	strictPlanModeEnabled?: boolean
 	yoloModeToggled?: boolean
 	useAutoCondense?: boolean
 	subagentsEnabled?: boolean
-	clineWebToolsEnabled?: ClineFeatureSetting
-	worktreesEnabled?: ClineFeatureSetting
+	nodusWebToolsEnabled?: NodusFeatureSetting
+	worktreesEnabled?: NodusFeatureSetting
 	focusChainSettings: FocusChainSettings
 	customPrompt?: string
 	favoritedModelIds: string[]
@@ -94,7 +94,7 @@ export interface ExtensionState {
 	workspaceRoots: WorkspaceRoot[]
 	primaryRootIndex: number
 	isMultiRootWorkspace: boolean
-	multiRootSetting: ClineFeatureSetting
+	multiRootSetting: NodusFeatureSetting
 	lastDismissedInfoBannerVersion: number
 	lastDismissedModelBannerVersion: number
 	lastDismissedCliBannerVersion: number
@@ -115,11 +115,11 @@ export interface ExtensionState {
 	openAiCodexIsAuthenticated?: boolean
 }
 
-export interface ClineMessage {
+export interface NodusMessage {
 	ts: number
 	type: "ask" | "say"
-	ask?: ClineAsk
-	say?: ClineSay
+	ask?: NodusAsk
+	say?: NodusSay
 	text?: string
 	reasoning?: string
 	images?: string[]
@@ -131,10 +131,10 @@ export interface ClineMessage {
 	isOperationOutsideWorkspace?: boolean
 	conversationHistoryIndex?: number
 	conversationHistoryDeletedRange?: [number, number] // for when conversation history is truncated for API requests
-	modelInfo?: ClineMessageModelInfo
+	modelInfo?: NodusMessageModelInfo
 }
 
-export type ClineAsk =
+export type NodusAsk =
 	| "followup"
 	| "plan_mode_respond"
 	| "act_mode_respond"
@@ -154,7 +154,7 @@ export type ClineAsk =
 	| "report_bug"
 	| "use_subagents"
 
-export type ClineSay =
+export type NodusSay =
 	| "task"
 	| "error"
 	| "error_retry"
@@ -180,7 +180,7 @@ export type ClineSay =
 	| "use_mcp_server"
 	| "diff_error"
 	| "deleted_api_reqs"
-	| "clineignore_error"
+	| "NodusIGNORE_ERROR"
 	| "command_permission_denied"
 	| "checkpoint_created"
 	| "load_mcp_documentation"
@@ -194,7 +194,7 @@ export type ClineSay =
 	| "subagent_usage"
 	| "conditional_rules_applied"
 
-export interface ClineSayTool {
+export interface NodusSayTool {
 	tool:
 		| "editedExistingFile"
 		| "newFileCreated"
@@ -221,7 +221,7 @@ export interface ClineSayTool {
 	readLineEnd?: number
 }
 
-export interface ClineSayHook {
+export interface NodusSayHook {
 	hookName: string // Name of the hook (e.g., "PreToolUse", "PostToolUse")
 	toolName?: string // Tool name if applicable (for PreToolUse/PostToolUse)
 	status: "running" | "completed" | "failed" | "cancelled" // Execution status
@@ -260,13 +260,13 @@ export type HookOutputStreamMeta = {
 export const browserActions = ["launch", "click", "type", "scroll_down", "scroll_up", "close"] as const
 export type BrowserAction = (typeof browserActions)[number]
 
-export interface ClineSayBrowserAction {
+export interface NodusSayBrowserAction {
 	action: BrowserAction
 	coordinate?: string
 	text?: string
 }
 
-export interface ClineSayGenerateExplanation {
+export interface NodusSayGenerateExplanation {
 	title: string
 	fromRef: string
 	toRef: string
@@ -292,7 +292,7 @@ export interface SubagentStatusItem {
 	error?: string
 }
 
-export interface ClineSaySubagentStatus {
+export interface NodusSaySubagentStatus {
 	status: "running" | "completed" | "failed"
 	total: number
 	completed: number
@@ -314,7 +314,7 @@ export type BrowserActionResult = {
 	currentMousePosition?: string
 }
 
-export interface ClineAskUseMcpServer {
+export interface NodusAskUseMcpServer {
 	serverName: string
 	type: "use_mcp_tool" | "access_mcp_resource"
 	toolName?: string
@@ -322,34 +322,34 @@ export interface ClineAskUseMcpServer {
 	uri?: string
 }
 
-export interface ClineAskUseSubagents {
+export interface NodusAskUseSubagents {
 	prompts: string[]
 }
 
-export interface ClinePlanModeResponse {
+export interface NodusPlanModeResponse {
 	response: string
 	options?: string[]
 	selected?: string
 }
 
-export interface ClineAskQuestion {
+export interface NodusAskQuestion {
 	question: string
 	options?: string[]
 	selected?: string
 }
 
-export interface ClineAskNewTask {
+export interface NodusAskNewTask {
 	context: string
 }
 
-export interface ClineApiReqInfo {
+export interface NodusApiReqInfo {
 	request?: string
 	tokensIn?: number
 	tokensOut?: number
 	cacheWrites?: number
 	cacheReads?: number
 	cost?: number
-	cancelReason?: ClineApiReqCancelReason
+	cancelReason?: NodusApiReqCancelReason
 	streamingFailedMessage?: string
 	retryStatus?: {
 		attempt: number
@@ -359,7 +359,7 @@ export interface ClineApiReqInfo {
 	}
 }
 
-export interface ClineSubagentUsageInfo {
+export interface NodusSubagentUsageInfo {
 	source: "subagents"
 	tokensIn: number
 	tokensOut: number
@@ -368,6 +368,6 @@ export interface ClineSubagentUsageInfo {
 	cost: number
 }
 
-export type ClineApiReqCancelReason = "streaming_failed" | "user_cancelled" | "retries_exhausted"
+export type NodusApiReqCancelReason = "streaming_failed" | "user_cancelled" | "retries_exhausted"
 
 export const COMPLETION_RESULT_CHANGES_FLAG = "HAS_CHANGES"

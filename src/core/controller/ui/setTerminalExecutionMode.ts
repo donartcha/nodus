@@ -1,4 +1,4 @@
-import { BooleanRequest, KeyValuePair } from "@shared/proto/cline/common"
+import { BooleanRequest, KeyValuePair } from "@shared/proto/nodus/common"
 import { Controller } from ".."
 
 /**

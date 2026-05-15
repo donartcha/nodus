@@ -1,11 +1,11 @@
 import { expect } from "chai"
 import { afterEach, describe, it } from "mocha"
 import sinon from "sinon"
-import { ClineStorageMessage } from "@/shared/messages/content"
-import { ApiFormat } from "@/shared/proto/index.cline"
+import { NodusStorageMessage } from "@/shared/messages/content"
+import { ApiFormat } from "@/shared/proto/index.nodus"
 import { OcaHandler } from "../oca"
 
-const messages: ClineStorageMessage[] = [{ role: "user", content: "Hello" }]
+const messages: NodusStorageMessage[] = [{ role: "user", content: "Hello" }]
 
 async function collectChunks(stream: AsyncGenerator<any>) {
 	const chunks: any[] = []

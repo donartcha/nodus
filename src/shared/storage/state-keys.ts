@@ -8,7 +8,7 @@ import {
 	OpenAiCompatibleModelInfo,
 } from "@shared/api"
 import { BrowserSettings, DEFAULT_BROWSER_SETTINGS } from "@shared/BrowserSettings"
-import { ClineRulesToggles } from "@shared/cline-rules"
+import { NodusRulesToggles } from "@shared/nodus-rules"
 import { DEFAULT_FOCUS_CHAIN_SETTINGS, FocusChainSettings } from "@shared/FocusChainSettings"
 import { HistoryItem } from "@shared/HistoryItem"
 import { DEFAULT_MCP_DISPLAY_MODE, McpDisplayMode } from "@shared/McpDisplayMode"
@@ -25,7 +25,7 @@ import { type BlobStoreSettings } from "./types"
 //
 // Property definitions with types, default values, and metadata
 // NOTE: When adding a new field, the scripts/generate-state-proto.mjs will be
-// executed automatically to regenerate the proto/cline/state.proto file with the
+// executed automatically to regenerate the proto/nodus/state.proto file with the
 // new fields once the file is staged and committed.
 // ============================================================================
 
@@ -65,8 +65,8 @@ const REMOTE_CONFIG_EXTRA_FIELDS = {
 } satisfies FieldDefinitions
 
 const GLOBAL_STATE_FIELDS = {
-	clineVersion: { default: undefined as string | undefined },
-	"cline.generatedMachineId": { default: undefined as string | undefined }, // Note, distinctId reads/writes this directly from/to StorageContext before StateManager is initialized.
+	nodusVersion: { default: undefined as string | undefined },
+	"nodus.generatedMachineId": { default: undefined as string | undefined }, // Note, distinctId reads/writes this directly from/to StorageContext before StateManager is initialized.
 	lastShownAnnouncementId: { default: undefined as string | undefined },
 	taskHistory: { default: [] as HistoryItem[], isAsync: true },
 	userInfo: { default: undefined as UserInfo | undefined },
@@ -88,11 +88,11 @@ const GLOBAL_STATE_FIELDS = {
 	lastDismissedModelBannerVersion: { default: 0 as number },
 	lastDismissedCliBannerVersion: { default: 0 as number },
 	nativeToolCallEnabled: { default: true as boolean },
-	remoteRulesToggles: { default: {} as ClineRulesToggles },
-	remoteWorkflowToggles: { default: {} as ClineRulesToggles },
-	remoteSkillsToggles: { default: {} as ClineRulesToggles },
+	remoteRulesToggles: { default: {} as NodusRulesToggles },
+	remoteWorkflowToggles: { default: {} as NodusRulesToggles },
+	remoteSkillsToggles: { default: {} as NodusRulesToggles },
 	dismissedBanners: { default: [] as Array<{ bannerId: string; dismissedAt: number }> },
-	// Path to worktree that should auto-open Cline sidebar when launched
+	// Path to worktree that should auto-open Nodus sidebar when launched
 	worktreeAutoOpenPath: { default: undefined as string | undefined },
 } satisfies FieldDefinitions
 
@@ -155,8 +155,8 @@ const API_HANDLER_SETTINGS_FIELDS = {
 	planModeAwsBedrockCustomModelBaseId: { default: undefined as string | undefined },
 	planModeOpenRouterModelId: { default: undefined as string | undefined },
 	planModeOpenRouterModelInfo: { default: undefined as ModelInfo | undefined },
-	planModeClineModelId: { default: undefined as string | undefined },
-	planModeClineModelInfo: { default: undefined as ModelInfo | undefined },
+	planModeNodusModelId: { default: undefined as string | undefined },
+	planModeNodusModelInfo: { default: undefined as ModelInfo | undefined },
 	planModeOpenAiModelId: { default: undefined as string | undefined },
 	planModeOpenAiModelInfo: { default: undefined as OpenAiCompatibleModelInfo | undefined },
 	planModeOllamaModelId: { default: undefined as string | undefined },
@@ -199,8 +199,8 @@ const API_HANDLER_SETTINGS_FIELDS = {
 	actModeAwsBedrockCustomModelBaseId: { default: undefined as string | undefined },
 	actModeOpenRouterModelId: { default: undefined as string | undefined },
 	actModeOpenRouterModelInfo: { default: undefined as ModelInfo | undefined },
-	actModeClineModelId: { default: undefined as string | undefined },
-	actModeClineModelInfo: { default: undefined as ModelInfo | undefined },
+	actModeNodusModelId: { default: undefined as string | undefined },
+	actModeNodusModelInfo: { default: undefined as ModelInfo | undefined },
 	actModeOpenAiModelId: { default: undefined as string | undefined },
 	actModeOpenAiModelInfo: { default: undefined as OpenAiCompatibleModelInfo | undefined },
 	actModeOllamaModelId: { default: undefined as string | undefined },
@@ -246,8 +246,8 @@ const USER_SETTINGS_FIELDS = {
 	autoApprovalSettings: {
 		default: DEFAULT_AUTO_APPROVAL_SETTINGS as AutoApprovalSettings,
 	},
-	globalClineRulesToggles: { default: {} as ClineRulesToggles },
-	globalWorkflowToggles: { default: {} as ClineRulesToggles },
+	globalNodusRulesToggles: { default: {} as NodusRulesToggles },
+	globalWorkflowToggles: { default: {} as NodusRulesToggles },
 	globalSkillsToggles: { default: {} as Record<string, boolean> },
 	browserSettings: {
 		default: DEFAULT_BROWSER_SETTINGS as BrowserSettings,
@@ -266,7 +266,7 @@ const USER_SETTINGS_FIELDS = {
 	autoApproveAllToggled: { default: false as boolean },
 	useAutoCondense: { default: false as boolean },
 	subagentsEnabled: { default: false as boolean },
-	clineWebToolsEnabled: { default: true as boolean },
+	nodusWebToolsEnabled: { default: true as boolean },
 	worktreesEnabled: { default: false as boolean },
 	preferredLanguage: { default: "English" as string },
 	mode: { default: "act" as Mode },
@@ -305,9 +305,9 @@ const GLOBAL_STATE_AND_SETTINGS_FIELDS = { ...GLOBAL_STATE_FIELDS, ...SETTINGS_F
 // Secret keys used in Api Configuration
 const SECRETS_KEYS = [
 	"apiKey",
-	"clineApiKey",
-	"clineAccountId", // Cline Account ID for Firebase
-	"cline:clineAccountId",
+	"nodusApiKey",
+	"nodusAccountId", // Nodus Account ID for Firebase
+	"nodus:nodusAccountId",
 	"openRouterApiKey",
 	"awsAccessKey",
 	"awsSecretKey",
@@ -356,7 +356,7 @@ const SECRETS_KEYS = [
 // WARNING, these are not ALL of the local state keys in practice. For example, FileContextTracker
 // uses dynamic keys like pendingFileContextWarning_${taskId}.
 export const LocalStateKeys = [
-	"localClineRulesToggles",
+	"localNodusRulesToggles",
 	"localCursorRulesToggles",
 	"localWindsurfRulesToggles",
 	"localAgentsRulesToggles",
@@ -384,7 +384,7 @@ export type RemoteConfigFields = GlobalStateAndSettings & RemoteConfigExtra
 // ============================================================================
 
 export type Secrets = { [K in (typeof SecretKeys)[number]]: string | undefined }
-export type LocalState = { [K in (typeof LocalStateKeys)[number]]: ClineRulesToggles }
+export type LocalState = { [K in (typeof LocalStateKeys)[number]]: NodusRulesToggles }
 export type SecretKey = (typeof SecretKeys)[number]
 export type GlobalStateKey = keyof GlobalState
 export type LocalStateKey = keyof LocalState

@@ -2,7 +2,7 @@
  * Lazy Teammate Mode rules content.
  *
  * When the "Lazy Teammate Mode" experimental setting is enabled,
- * this content is injected as additional cline rules instructions,
+ * this content is injected as additional Nodus rules instructions,
  * making the agent behave like an incredibly lazy coworker who
  * always has an excuse for why they can't write code.
  */

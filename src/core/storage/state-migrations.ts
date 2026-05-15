@@ -122,7 +122,7 @@ export async function migrateTaskHistoryToFile(context: vscode.ExtensionContext)
 }
 
 export async function migrateMcpMarketplaceEnableSetting(mcpMarketplaceEnabledRaw: boolean | undefined): Promise<boolean> {
-	const config = vscode.workspace.getConfiguration("cline")
+	const config = vscode.workspace.getConfiguration("Nodus")
 	const mcpMarketplaceEnabled = config.get<boolean>("mcpMarketplace.enabled")
 	if (mcpMarketplaceEnabled !== undefined) {
 		// Remove from VSCode configuration
@@ -134,7 +134,7 @@ export async function migrateMcpMarketplaceEnableSetting(mcpMarketplaceEnabledRa
 }
 
 export async function migrateEnableCheckpointsSetting(enableCheckpointsSettingRaw: boolean | undefined): Promise<boolean> {
-	const config = vscode.workspace.getConfiguration("cline")
+	const config = vscode.workspace.getConfiguration("Nodus")
 	const enableCheckpoints = config.get<boolean>("enableCheckpoints")
 	if (enableCheckpoints !== undefined) {
 		// Remove from VSCode configuration
@@ -149,9 +149,9 @@ export async function migrateCustomInstructionsToGlobalRules(context: vscode.Ext
 		const customInstructions = (await context.globalState.get("customInstructions")) as string | undefined
 
 		if (customInstructions?.trim()) {
-			Logger.log("Migrating custom instructions to global Cline rules...")
+			Logger.log("Migrating custom instructions to global Nodus rules...")
 
-			// Create global .clinerules directory if it doesn't exist
+			// Create global .nodusrules directory if it doesn't exist
 			const globalRulesDir = await ensureRulesDirectoryExists()
 
 			// Use a fixed filename for custom instructions
@@ -181,7 +181,7 @@ export async function migrateCustomInstructionsToGlobalRules(context: vscode.Ext
 
 			// Remove customInstructions from global state only after successful file creation
 			await context.globalState.update("customInstructions", undefined)
-			Logger.log("Successfully migrated custom instructions to global Cline rules")
+			Logger.log("Successfully migrated custom instructions to global Nodus rules")
 		}
 	} catch (error) {
 		Logger.error("Failed to migrate custom instructions to global rules:", error)
@@ -569,7 +569,7 @@ export async function migrateWelcomeViewCompleted(context: vscode.ExtensionConte
 			// Fetch API keys directly from secrets
 			const apiKey = await context.secrets.get("apiKey")
 			const openRouterApiKey = await context.secrets.get("openRouterApiKey")
-			const clineAccountId = await context.secrets.get("clineAccountId")
+			const NodusAccountId = await context.secrets.get("NodusAccountId")
 			const openAiApiKey = await context.secrets.get("openAiApiKey")
 			const ollamaApiKey = await context.secrets.get("ollamaApiKey")
 			const liteLlmApiKey = await context.secrets.get("liteLlmApiKey")
@@ -624,7 +624,7 @@ export async function migrateWelcomeViewCompleted(context: vscode.ExtensionConte
 				mistralApiKey,
 				planModeVsCodeLmModelSelector,
 				actModeVsCodeLmModelSelector,
-				clineAccountId,
+				NodusAccountId,
 				asksageApiKey,
 				xaiApiKey,
 				sambanovaApiKey,
@@ -669,8 +669,8 @@ export async function cleanupOldApiKey(context: vscode.ExtensionContext) {
 		// Old API Keys were introduced in March 2025 and later replaced with tokens
 		// Now that we have new API keys that are prefixed with `sk_`,
 		// we need to clean up the old ones to free the secret storage
-		await context.secrets.delete("clineApiKey")
+		await context.secrets.delete("NodusApiKey")
 	} catch (error) {
-		Logger.error("Failed to cleanup old clineApiKey", error)
+		Logger.error("Failed to cleanup old NodusApiKey", error)
 	}
 }

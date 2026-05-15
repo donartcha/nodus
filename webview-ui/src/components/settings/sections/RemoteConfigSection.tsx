@@ -1,8 +1,8 @@
-import { EmptyRequest } from "@shared/proto/index.cline"
+import { EmptyRequest } from "@shared/proto/index.nodus"
 import { VSCodeButton, VSCodeLink } from "@vscode/webview-ui-toolkit/react"
 import { useEffect, useRef, useState } from "react"
 import { RemoteConfigToggle } from "@/components/account/RemoteConfigToggle"
-import { useClineAuth } from "@/context/ClineAuthContext"
+import { useNodusAuth } from "@/context/NodusAuthContext"
 import { useExtensionState } from "@/context/ExtensionStateContext"
 import { StateServiceClient } from "@/services/grpc-client"
 import Section from "../Section"
@@ -270,7 +270,7 @@ function PromptUploadingSection() {
 
 export function RemoteConfigSection({ renderSectionHeader }: RemoteConfigSectionProps) {
 	const { remoteConfigSettings, optOutOfRemoteConfig } = useExtensionState()
-	const { activeOrganization } = useClineAuth()
+	const { activeOrganization } = useNodusAuth()
 
 	if (optOutOfRemoteConfig) {
 		return (
@@ -290,7 +290,7 @@ export function RemoteConfigSection({ renderSectionHeader }: RemoteConfigSection
 				<div className="flex flex-col justify-center gap-4">
 					<h3>
 						You haven't configured remote config yet. Do so through our{" "}
-						<VSCodeLink href="https://app.cline.bot/dashboard/organization?tab=settings">dashboard</VSCodeLink>.
+						<VSCodeLink href="https://app.nodus.bot/dashboard/organization?tab=settings">dashboard</VSCodeLink>.
 					</h3>
 
 					<RefreshButton />

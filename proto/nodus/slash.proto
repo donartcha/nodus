@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package nodus;
+
+import "nodus/common.proto";
+
+option go_package = "github.com/nodus/grpc-go/nodus";
+option java_multiple_files = true;
+option java_package = "bot.nodus.proto";
+
+// SlashService provides methods for managing slash commands
+service SlashService {
+  // Sends button click message
+  rpc ReportBug(StringRequest) returns (Empty);
+  rpc Condense(StringRequest) returns (Empty);
+
+  // Get available slash commands for autocomplete (used by CLI)
+  rpc GetAvailableSlashCommands(EmptyRequest) returns (SlashCommandsResponse);
+}
+
+// Slash command definition for autocomplete
+message SlashCommandInfo {
+  string name = 1; // Command name without slash, e.g., "newtask", "smol"
+  string description = 2; // Human-readable description
+  string section = 3; // "default", "custom", or "cli"
+  bool cli_compatible = 4; // false for VS Code-only commands like explain-changes
+}
+
+// Response containing all available slash commands
+message SlashCommandsResponse {
+  repeated SlashCommandInfo commands = 1;
+}
+
+

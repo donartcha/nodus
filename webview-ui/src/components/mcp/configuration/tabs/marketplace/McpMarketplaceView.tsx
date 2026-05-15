@@ -1,4 +1,4 @@
-import { EmptyRequest } from "@shared/proto/cline/common"
+import { EmptyRequest } from "@shared/proto/nodus/common"
 import {
 	VSCodeButton,
 	VSCodeDropdown,

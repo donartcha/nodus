@@ -1,6 +1,6 @@
 import { findLastIndex } from "@shared/array"
-import type { ClineMessage } from "@shared/ExtensionMessage"
-import type { ClineStorageMessage } from "@shared/messages/content"
+import type { NodusMessage } from "@shared/ExtensionMessage"
+import type { NodusStorageMessage } from "@shared/messages/content"
 import { Logger } from "@/shared/services/Logger"
 import type { ContextManager } from "../context/context-management/ContextManager"
 import type { MessageStateHandler } from "../task/message-state"
@@ -46,7 +46,7 @@ export interface TokenUsage {
  * @param message The API request message to parse
  * @returns Token usage information, or zeros if parsing fails
  */
-export function extractTokenUsageFromMessage(message: ClineMessage | undefined): TokenUsage {
+export function extractTokenUsageFromMessage(message: NodusMessage | undefined): TokenUsage {
 	const defaultUsage: TokenUsage = {
 		tokensIn: 0,
 		tokensOut: 0,
@@ -89,7 +89,7 @@ export interface PreCompactContextFiles {
  */
 export async function writePreCompactContextFiles(
 	taskId: string,
-	currentContext: ClineStorageMessage[],
+	currentContext: NodusStorageMessage[],
 ): Promise<PreCompactContextFiles> {
 	const { writeConversationHistoryJson, writeConversationHistoryText } = await import("../storage/disk")
 
@@ -125,11 +125,11 @@ export interface PreCompactHookParams {
 
 	// Conversation state
 	/** API conversation history */
-	apiConversationHistory: ClineStorageMessage[]
+	apiConversationHistory: NodusStorageMessage[]
 	/** Current deleted range (if any) */
 	conversationHistoryDeletedRange?: [number, number]
-	/** Cline messages for extracting token usage */
-	clineMessages: ClineMessage[]
+	/** Nodus messages for extracting token usage */
+	nodusMessages: NodusMessage[]
 
 	// Services
 	/** Context manager for getting truncated messages */
@@ -204,8 +204,8 @@ export async function executePreCompactHookWithCleanup(params: PreCompactHookPar
 		contextRawPath = contextFiles.contextRawPath
 
 		// Extract token usage from the most recent API request
-		const previousApiReqIndex = findLastIndex(params.clineMessages, (m) => m.say === "api_req_started")
-		const previousRequest = previousApiReqIndex !== -1 ? params.clineMessages[previousApiReqIndex] : undefined
+		const previousApiReqIndex = findLastIndex(params.nodusMessages, (m) => m.say === "api_req_started")
+		const previousRequest = previousApiReqIndex !== -1 ? params.nodusMessages[previousApiReqIndex] : undefined
 		const { tokensIn, tokensOut, tokensInCache, tokensOutCache } = extractTokenUsageFromMessage(previousRequest)
 
 		// Extract truncation range - use provided range or extract from conversationHistoryDeletedRange
@@ -256,7 +256,7 @@ export async function executePreCompactHookWithCleanup(params: PreCompactHookPar
 			// Internalized cancellation state management (replaces handleCancellation callback)
 			// Always save state before cancelling, regardless of cancellation source
 			params.taskState.didFinishAbortingStream = true
-			await params.messageStateHandler.saveClineMessagesAndUpdateHistory()
+			await params.messageStateHandler.savenodusMessagesAndUpdateHistory()
 			await params.messageStateHandler.overwriteApiConversationHistory(
 				params.messageStateHandler.getApiConversationHistory(),
 			)

@@ -25,9 +25,9 @@ function readCadenceOverride(envVarName: string): number | undefined {
 
 // Cadence overrides are read once at module load. Env vars do not change at
 // runtime, and getPresentationCadenceMs is called on every flush (hot path).
-const localCadenceOverride = readCadenceOverride("CLINE_PRESENTATION_CADENCE_MS")
-const remoteCadenceOverride = readCadenceOverride("CLINE_REMOTE_PRESENTATION_CADENCE_MS")
-const schedulingDisabled = readBooleanEnv("CLINE_DISABLE_PRESENTATION_SCHEDULER")
+const localCadenceOverride = readCadenceOverride("NODUS_PRESENTATION_CADENCE_MS")
+const remoteCadenceOverride = readCadenceOverride("NODUS_REMOTE_PRESENTATION_CADENCE_MS")
+const schedulingDisabled = readBooleanEnv("NODUS_DISABLE_PRESENTATION_SCHEDULER")
 
 /**
  * Determines whether the host is connected to a remote workspace.

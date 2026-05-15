@@ -6,7 +6,7 @@ import "should"
 import { parseSourceCodeForDefinitionsTopLevel } from ".."
 
 describe("parseSourceCodeForDefinitionsTopLevel", () => {
-	const tmpDir = path.join(os.tmpdir(), `cline-tree-sitter-test-${Math.random().toString(36).slice(2)}`)
+	const tmpDir = path.join(os.tmpdir(), `Nodus-tree-sitter-test-${Math.random().toString(36).slice(2)}`)
 
 	after(async () => {
 		await fs.rm(tmpDir, { recursive: true, force: true }).catch(() => undefined)

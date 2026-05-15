@@ -1,20 +1,20 @@
-import { String } from "@shared/proto/cline/common"
-import { ClineEnv } from "@/config"
+import { String } from "@shared/proto/nodus/common"
+import { NodusEnv } from "@/config"
 import { Controller } from "@/core/controller"
 import { setWelcomeViewCompleted } from "@/core/controller/state/setWelcomeViewCompleted"
 import { WebviewProvider } from "@/core/webview"
-import { CLINE_API_ENDPOINT } from "@/shared/cline/api"
+import { NODUS_API_ENDPOINT } from "@/shared/nodus/api"
 import { fetch } from "@/shared/net"
 import { Logger } from "@/shared/services/Logger"
 import { BannerService } from "../banner/BannerService"
-import { buildBasicClineHeaders } from "../EnvUtils"
+import { buildBasicNodusHeaders } from "../EnvUtils"
 import { AuthService } from "./AuthService"
 
 export class AuthServiceMock extends AuthService {
 	protected constructor(controller: Controller) {
 		super(controller)
 
-		if (process?.env?.CLINE_ENVIRONMENT !== "local") {
+		if (process?.env?.NODUS_ENVIRONMENT !== "local") {
 			throw new Error("AuthServiceMock should only be used in local environment for testing purposes.")
 		}
 
@@ -41,25 +41,25 @@ export class AuthServiceMock extends AuthService {
 	}
 
 	override async getAuthToken(): Promise<string | null> {
-		if (!this._clineAuthInfo) {
+		if (!this._NodusAuthInfo) {
 			return null
 		}
-		return this._clineAuthInfo.idToken
+		return this._NodusAuthInfo.idToken
 	}
 
 	override async createAuthRequest(): Promise<String> {
 		// Use URL object for more graceful query construction
-		const authUrl = new URL(ClineEnv.config().apiBaseUrl)
+		const authUrl = new URL(NodusEnv.config().apiBaseUrl)
 		const authUrlString = authUrl.toString()
 		// Call the parent implementation
-		if (this._authenticated && this._clineAuthInfo) {
+		if (this._authenticated && this._NodusAuthInfo) {
 			Logger.log("Already authenticated with mock server")
 			return String.create({ value: authUrlString })
 		}
 
 		try {
-			// Use token exchange endpoint like ClineAuthProvider
-			const tokenExchangeUri = new URL(CLINE_API_ENDPOINT.TOKEN_EXCHANGE, ClineEnv.config().apiBaseUrl)
+			// Use token exchange endpoint like NodusAuthProvider
+			const tokenExchangeUri = new URL(NODUS_API_ENDPOINT.TOKEN_EXCHANGE, NodusEnv.config().apiBaseUrl)
 			const tokenType = "personal"
 			const testCode = `test-${tokenType}-token`
 
@@ -67,7 +67,7 @@ export class AuthServiceMock extends AuthService {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
-					...(await buildBasicClineHeaders()),
+					...(await buildBasicNodusHeaders()),
 				},
 				body: JSON.stringify({
 					code: testCode,
@@ -87,18 +87,18 @@ export class AuthServiceMock extends AuthService {
 
 			const authData = responseData.data
 
-			// Convert to ClineAuthInfo format matching ClineAuthProvider
-			this._clineAuthInfo = {
+			// Convert to NodusAuthInfo format matching NodusAuthProvider
+			this._NodusAuthInfo = {
 				idToken: authData.accessToken,
 				refreshToken: authData.refreshToken,
 				expiresAt: new Date(authData.expiresAt).getTime() / 1000,
 				userInfo: {
-					id: authData.userInfo.clineUserId || authData.userInfo.subject,
+					id: authData.userInfo.NodusUserId || authData.userInfo.subject,
 					email: authData.userInfo.email,
 					displayName: authData.userInfo.name,
 					createdAt: new Date().toISOString(),
 					organizations: authData.organizations,
-					appBaseUrl: ClineEnv.config().appBaseUrl,
+					appBaseUrl: NodusEnv.config().appBaseUrl,
 					subject: authData.userInfo.subject,
 				},
 				provider: this._provider?.name || "mock",
@@ -115,7 +115,7 @@ export class AuthServiceMock extends AuthService {
 		} catch (error) {
 			Logger.error("Error signing in with mock server:", error)
 			this._authenticated = false
-			this._clineAuthInfo = null
+			this._NodusAuthInfo = null
 			throw error
 		}
 
@@ -135,18 +135,18 @@ export class AuthServiceMock extends AuthService {
 
 	override async restoreRefreshTokenAndRetrieveAuthInfo(): Promise<void> {
 		try {
-			if (this._clineAuthInfo) {
+			if (this._NodusAuthInfo) {
 				this._authenticated = true
 				await this.sendAuthStatusUpdate()
 			} else {
 				Logger.warn("No user found after restoring auth token")
 				this._authenticated = false
-				this._clineAuthInfo = null
+				this._NodusAuthInfo = null
 			}
 		} catch (error) {
 			Logger.error("Error restoring auth token:", error)
 			this._authenticated = false
-			this._clineAuthInfo = null
+			this._NodusAuthInfo = null
 			return
 		}
 	}

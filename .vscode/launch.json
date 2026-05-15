@@ -6,6 +6,24 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
+			"name": "Run Extension (Nodus - Quick)",
+			"type": "extensionHost",
+			"request": "launch",
+			"args": [
+				"--extensionDevelopmentPath=${workspaceFolder}",
+				"--disable-workspace-trust",
+				"${workspaceFolder}"
+			],
+			"outFiles": [
+				"${workspaceFolder}/dist/**/*.js"
+			],
+			"env": {
+				"IS_DEV": "true",
+				"DEV_WORKSPACE_FOLDER": "${workspaceFolder}",
+				"CLINE_ENVIRONMENT": "local"
+			}
+		},
+		{
 			"name": "Run Extension (production)",
 			"type": "extensionHost",
 			"request": "launch",

@@ -1,5 +1,5 @@
-import type { EmptyRequest } from "@shared/proto/cline/common"
-import { McpMarketplaceCatalog } from "@shared/proto/cline/mcp"
+import type { EmptyRequest } from "@shared/proto/nodus/common"
+import { McpMarketplaceCatalog } from "@shared/proto/nodus/mcp"
 import { Logger } from "@/shared/services/Logger"
 import type { Controller } from "../index"
 

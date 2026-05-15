@@ -1,6 +1,6 @@
 import { ModelFamily } from "@/shared/prompts"
-import { ClineDefaultTool } from "@/shared/tools"
-import type { ClineToolSpec } from "../spec"
+import { NodusDefaultTool } from "@/shared/tools"
+import type { NodusToolSpec } from "../spec"
 
 /**
  * ## load_mcp_documentation
@@ -11,9 +11,9 @@ Usage:
 </load_mcp_documentation>
  */
 
-const id = ClineDefaultTool.MCP_DOCS
+const id = NodusDefaultTool.MCP_DOCS
 
-const generic: ClineToolSpec = {
+const generic: NodusToolSpec = {
 	id,
 	variant: ModelFamily.GENERIC,
 	name: "load_mcp_documentation",

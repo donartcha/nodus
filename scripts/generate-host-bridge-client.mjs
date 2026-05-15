@@ -12,6 +12,10 @@ const EXTERNAL_CLIENT_FILE = path.resolve("src/generated/hosts/standalone/host-b
 // Contains the handler map for the external host bridge clients (using the custom service registry).
 const VSCODE_CLIENT_FILE = path.resolve("src/generated/hosts/vscode/hostbridge-grpc-service-config.ts")
 
+function lowerFirst(name) {
+	return name.charAt(0).toLowerCase() + name.slice(1)
+}
+
 /**
  * Main function to generate the host bridge client
  */
@@ -55,15 +59,16 @@ function generateClientInterfaceType(serviceName, serviceDefinition) {
 	// Get the methods from the service definition
 	const methods = Object.entries(serviceDefinition.service)
 		.map(([methodName, methodDef]) => {
+			const clientMethodName = lowerFirst(methodName)
 			const requestType = getFqn(methodDef.requestType.type.name)
 			const responseType = getFqn(methodDef.responseType.type.name)
 
 			if (!methodDef.responseStream) {
 				// Generate unary method signature.
-				return `	${methodName}(request: ${requestType}): Promise<${responseType}>;`
+				return `	${clientMethodName}(request: ${requestType}): Promise<${responseType}>;`
 			}
 			// Generate streaming method signature.
-			return `	${methodName}(request: ${requestType}, callbacks: StreamingCallbacks<${responseType}>): () => void;`
+			return `	${clientMethodName}(request: ${requestType}, callbacks: StreamingCallbacks<${responseType}>): () => void;`
 		})
 		.join("\n\n")
 
@@ -116,24 +121,25 @@ function generateExternalClientSetup(serviceName, serviceDefinition) {
 	// Get the methods from the service definition
 	const methods = Object.entries(serviceDefinition.service)
 		.map(([methodName, methodDef]) => {
+			const clientMethodName = lowerFirst(methodName)
 			// Get fully qualified type names
 			const requestType = getFqn(methodDef.requestType.type.name)
 			const responseType = getFqn(methodDef.responseType.type.name)
 			const isStreamingResponse = methodDef.responseStream
 
 			if (!isStreamingResponse) {
-				return `    ${methodName}(request: ${requestType}): Promise<${responseType}> {
-      return this.makeRequest((client) => client.${methodName}(request))
+				return `    ${clientMethodName}(request: ${requestType}): Promise<${responseType}> {
+      return this.makeRequest((client) => client.${clientMethodName}(request))
     }`
 			} else {
 				// Generate streaming method
-				return `  ${methodName}(
+				return `  ${clientMethodName}(
 		request: ${requestType},
 		callbacks: StreamingCallbacks<${responseType}>,
 	): () => void {
 		const client = this.getClient()
 		const abortController = new AbortController()
-		const stream: AsyncIterable<${responseType}> = client.${methodName}(request, {
+		const stream: AsyncIterable<${responseType}> = client.${clientMethodName}(request, {
 			signal: abortController.signal,
 		})
 		const wrappedCallbacks: StreamingCallbacks<${responseType}> = {
@@ -180,7 +186,8 @@ async function generateVscodeClientFile(hostServices) {
 	for (const [serviceName, serviceDefinition] of Object.entries(hostServices)) {
 		const name = serviceName.replace(/Service$/, "").toLowerCase()
 		for (const [methodName, _methodDef] of Object.entries(serviceDefinition.service)) {
-			imports.push(`import { ${methodName} } from "@/hosts/vscode/hostbridge/${name}/${methodName}"`)
+			const handlerName = lowerFirst(methodName)
+			imports.push(`import { ${handlerName} } from "@/hosts/vscode/hostbridge/${name}/${handlerName}"`)
 		}
 		imports.push("")
 
@@ -218,12 +225,13 @@ function generateVscodeClientImplementation(serviceName, serviceDefinition) {
 
 	const methods = Object.entries(serviceDefinition.service)
 		.map(([methodName, methodDef]) => {
+			const handlerName = lowerFirst(methodName)
 			// Get fully qualified type names
 			const isStreamingResponse = methodDef.responseStream
 			if (!isStreamingResponse) {
-				return `${name}ServiceRegistry.registerMethod("${methodName}", ${methodName})`
+				return `${name}ServiceRegistry.registerMethod("${handlerName}", ${handlerName})`
 			} else {
-				return `${name}ServiceRegistry.registerMethod("${methodName}", ${methodName}, { isStreaming: true })`
+				return `${name}ServiceRegistry.registerMethod("${handlerName}", ${handlerName}, { isStreaming: true })`
 			}
 		})
 		.join("\n")

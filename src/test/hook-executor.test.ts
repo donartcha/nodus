@@ -10,7 +10,7 @@ import { executeHook } from "../core/hooks/hook-executor"
 import { StateManager } from "../core/storage/StateManager"
 import { MessageStateHandler } from "../core/task/message-state"
 import { TaskState } from "../core/task/TaskState"
-import { ClineMessage } from "../shared/ExtensionMessage"
+import { NodusMessage } from "../shared/ExtensionMessage"
 
 /**
  * Unit tests for the hook-executor module
@@ -22,7 +22,7 @@ describe("Hook Executor", () => {
 	let tempDir: string
 	let baseTempDir: string // Store base directory for cleanup
 	let testHandler: MessageStateHandler
-	let mockMessages: ClineMessage[]
+	let mockMessages: NodusMessage[]
 	let stateManagerStub: sinon.SinonStub
 
 	/**
@@ -71,14 +71,14 @@ setTimeout(() => {
 
 		// Create temporary directory for test hooks
 		baseTempDir = await fs.mkdtemp(path.join(os.tmpdir(), "hook-test-"))
-		// Create .clinerules/hooks subdirectory structure
-		tempDir = path.join(baseTempDir, ".clinerules", "hooks")
+		// Create .nodusrules/hooks subdirectory structure
+		tempDir = path.join(baseTempDir, ".nodusrules", "hooks")
 		await fs.mkdir(tempDir, { recursive: true })
 		testHandler = createTestHandler()
 		mockMessages = []
 
 		// Mock StateManager to return baseTempDir as workspace root
-		// This allows HookFactory to find hooks in baseTempDir/.clinerules/hooks/
+		// This allows HookFactory to find hooks in baseTempDir/.nodusrules/hooks/
 		stateManagerStub = sinon.stub(StateManager, "get").returns({
 			getGlobalStateKey: (key: string) => {
 				if (key === "workspaceRoots") {
@@ -358,14 +358,14 @@ setTimeout(() => {
 
 			await createHookScript("TaskStart", {}, 1) // Exit with error
 
-			const messages: ClineMessage[] = []
+			const messages: NodusMessage[] = []
 			const mockHandler = {
 				...testHandler,
-				getClineMessages: () => messages,
-				addToClineMessages: async (msg: ClineMessage) => {
+				getnodusMessages: () => messages,
+				addTonodusMessages: async (msg: NodusMessage) => {
 					messages.push(msg)
 				},
-				updateClineMessage: async (index: number, updates: Partial<ClineMessage>) => {
+				updateNodusMessage: async (index: number, updates: Partial<NodusMessage>) => {
 					if (messages[index]) {
 						Object.assign(messages[index], updates)
 					}
@@ -385,7 +385,7 @@ setTimeout(() => {
 				},
 				isCancellable: true,
 				say: async (type: any, text?: string) => {
-					const msg: ClineMessage = {
+					const msg: NodusMessage = {
 						ts: Date.now(),
 						type: "say",
 						say: type,
@@ -412,7 +412,7 @@ setTimeout(() => {
 				cancel: false,
 			})
 
-			const messages: ClineMessage[] = []
+			const messages: NodusMessage[] = []
 
 			await executeHook({
 				hookName: "TaskStart",
@@ -427,7 +427,7 @@ setTimeout(() => {
 				},
 				isCancellable: true,
 				say: async (type: any, text?: string) => {
-					const msg: ClineMessage = {
+					const msg: NodusMessage = {
 						ts: Date.now(),
 						type: "say",
 						say: type,
@@ -454,11 +454,11 @@ setTimeout(() => {
 				cancel: false,
 			})
 
-			const messages: ClineMessage[] = []
+			const messages: NodusMessage[] = []
 			const mockHandler = {
 				...testHandler,
-				getClineMessages: () => messages,
-				updateClineMessage: async (index: number, updates: Partial<ClineMessage>) => {
+				getnodusMessages: () => messages,
+				updateNodusMessage: async (index: number, updates: Partial<NodusMessage>) => {
 					if (messages[index]) {
 						Object.assign(messages[index], updates)
 					}
@@ -478,7 +478,7 @@ setTimeout(() => {
 				},
 				isCancellable: true,
 				say: async (type: any, text?: string) => {
-					const msg: ClineMessage = {
+					const msg: NodusMessage = {
 						ts: Date.now(),
 						type: "say",
 						say: type,

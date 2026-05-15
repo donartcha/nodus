@@ -1,6 +1,6 @@
 import { resolveWorkspacePath } from "@core/workspace"
 import { isMultiRootEnabled } from "@core/workspace/multi-root-utils"
-import { ClineDefaultTool } from "@shared/tools"
+import { NodusDefaultTool } from "@shared/tools"
 import { StateManager } from "@/core/storage/StateManager"
 import { HostProvider } from "@/hosts/host-provider"
 import { getCwd, getDesktopDir, isLocatedInPath, isLocatedInWorkspace } from "@/utils/path"
@@ -39,48 +39,48 @@ export class AutoApprove {
 
 	// Check if the tool should be auto-approved based on the settings
 	// Returns bool for most tools, and tuple for tools with nested settings
-	shouldAutoApproveTool(toolName: ClineDefaultTool): boolean | [boolean, boolean] {
+	shouldAutoApproveTool(toolName: NodusDefaultTool): boolean | [boolean, boolean] {
 		if (this.stateManager.getGlobalSettingsKey("yoloModeToggled")) {
 			switch (toolName) {
-				case ClineDefaultTool.FILE_READ:
-				case ClineDefaultTool.LIST_FILES:
-				case ClineDefaultTool.LIST_CODE_DEF:
-				case ClineDefaultTool.SEARCH:
-				case ClineDefaultTool.NEW_RULE:
-				case ClineDefaultTool.FILE_NEW:
-				case ClineDefaultTool.FILE_EDIT:
-				case ClineDefaultTool.APPLY_PATCH:
-				case ClineDefaultTool.BASH:
-				case ClineDefaultTool.USE_SUBAGENTS:
+				case NodusDefaultTool.FILE_READ:
+				case NodusDefaultTool.LIST_FILES:
+				case NodusDefaultTool.LIST_CODE_DEF:
+				case NodusDefaultTool.SEARCH:
+				case NodusDefaultTool.NEW_RULE:
+				case NodusDefaultTool.FILE_NEW:
+				case NodusDefaultTool.FILE_EDIT:
+				case NodusDefaultTool.APPLY_PATCH:
+				case NodusDefaultTool.BASH:
+				case NodusDefaultTool.USE_SUBAGENTS:
 					return [true, true]
 
-				case ClineDefaultTool.BROWSER:
-				case ClineDefaultTool.WEB_FETCH:
-				case ClineDefaultTool.WEB_SEARCH:
-				case ClineDefaultTool.MCP_ACCESS:
-				case ClineDefaultTool.MCP_USE:
+				case NodusDefaultTool.BROWSER:
+				case NodusDefaultTool.WEB_FETCH:
+				case NodusDefaultTool.WEB_SEARCH:
+				case NodusDefaultTool.MCP_ACCESS:
+				case NodusDefaultTool.MCP_USE:
 					return true
 			}
 		}
 
 		if (this.stateManager.getGlobalSettingsKey("autoApproveAllToggled")) {
 			switch (toolName) {
-				case ClineDefaultTool.FILE_READ:
-				case ClineDefaultTool.LIST_FILES:
-				case ClineDefaultTool.LIST_CODE_DEF:
-				case ClineDefaultTool.SEARCH:
-				case ClineDefaultTool.NEW_RULE:
-				case ClineDefaultTool.FILE_NEW:
-				case ClineDefaultTool.FILE_EDIT:
-				case ClineDefaultTool.APPLY_PATCH:
-				case ClineDefaultTool.BASH:
-				case ClineDefaultTool.USE_SUBAGENTS:
+				case NodusDefaultTool.FILE_READ:
+				case NodusDefaultTool.LIST_FILES:
+				case NodusDefaultTool.LIST_CODE_DEF:
+				case NodusDefaultTool.SEARCH:
+				case NodusDefaultTool.NEW_RULE:
+				case NodusDefaultTool.FILE_NEW:
+				case NodusDefaultTool.FILE_EDIT:
+				case NodusDefaultTool.APPLY_PATCH:
+				case NodusDefaultTool.BASH:
+				case NodusDefaultTool.USE_SUBAGENTS:
 					return [true, true]
-				case ClineDefaultTool.BROWSER:
-				case ClineDefaultTool.WEB_FETCH:
-				case ClineDefaultTool.WEB_SEARCH:
-				case ClineDefaultTool.MCP_ACCESS:
-				case ClineDefaultTool.MCP_USE:
+				case NodusDefaultTool.BROWSER:
+				case NodusDefaultTool.WEB_FETCH:
+				case NodusDefaultTool.WEB_SEARCH:
+				case NodusDefaultTool.MCP_ACCESS:
+				case NodusDefaultTool.MCP_USE:
 					return true
 			}
 		}
@@ -88,29 +88,29 @@ export class AutoApprove {
 		const autoApprovalSettings = this.stateManager.getGlobalSettingsKey("autoApprovalSettings")
 
 		switch (toolName) {
-			case ClineDefaultTool.FILE_READ:
-			case ClineDefaultTool.LIST_FILES:
-			case ClineDefaultTool.LIST_CODE_DEF:
-			case ClineDefaultTool.SEARCH:
-			case ClineDefaultTool.USE_SUBAGENTS:
+			case NodusDefaultTool.FILE_READ:
+			case NodusDefaultTool.LIST_FILES:
+			case NodusDefaultTool.LIST_CODE_DEF:
+			case NodusDefaultTool.SEARCH:
+			case NodusDefaultTool.USE_SUBAGENTS:
 				return [autoApprovalSettings.actions.readFiles, autoApprovalSettings.actions.readFilesExternally ?? false]
-			case ClineDefaultTool.NEW_RULE:
-			case ClineDefaultTool.FILE_NEW:
-			case ClineDefaultTool.FILE_EDIT:
-			case ClineDefaultTool.APPLY_PATCH:
+			case NodusDefaultTool.NEW_RULE:
+			case NodusDefaultTool.FILE_NEW:
+			case NodusDefaultTool.FILE_EDIT:
+			case NodusDefaultTool.APPLY_PATCH:
 				return [autoApprovalSettings.actions.editFiles, autoApprovalSettings.actions.editFilesExternally ?? false]
-			case ClineDefaultTool.BASH:
+			case NodusDefaultTool.BASH:
 				return [
 					autoApprovalSettings.actions.executeSafeCommands ?? false,
 					autoApprovalSettings.actions.executeAllCommands ?? false,
 				]
-			case ClineDefaultTool.BROWSER:
+			case NodusDefaultTool.BROWSER:
 				return autoApprovalSettings.actions.useBrowser
-			case ClineDefaultTool.WEB_FETCH:
-			case ClineDefaultTool.WEB_SEARCH:
+			case NodusDefaultTool.WEB_FETCH:
+			case NodusDefaultTool.WEB_SEARCH:
 				return autoApprovalSettings.actions.useBrowser
-			case ClineDefaultTool.MCP_ACCESS:
-			case ClineDefaultTool.MCP_USE:
+			case NodusDefaultTool.MCP_ACCESS:
+			case NodusDefaultTool.MCP_USE:
 				return autoApprovalSettings.actions.useMcp
 		}
 		return false
@@ -120,7 +120,7 @@ export class AutoApprove {
 	// and the path of the action. Returns true if the tool should be auto-approved
 	// based on the user's settings and the path of the action.
 	async shouldAutoApproveToolWithPath(
-		blockname: ClineDefaultTool,
+		blockname: NodusDefaultTool,
 		autoApproveActionpath: string | undefined,
 	): Promise<boolean> {
 		if (this.stateManager.getGlobalSettingsKey("yoloModeToggled")) {

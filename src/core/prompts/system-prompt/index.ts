@@ -1,7 +1,7 @@
 import { PromptRegistry } from "./registry/PromptRegistry"
 import type { SystemPromptContext } from "./types"
 
-export { ClineToolSet } from "./registry/ClineToolSet"
+export { NodusToolSet } from "./registry/NodusToolSet"
 export { PromptBuilder } from "./registry/PromptBuilder"
 export { PromptRegistry } from "./registry/PromptRegistry"
 export * from "./templates/placeholders"
