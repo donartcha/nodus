@@ -7,15 +7,15 @@ import { formatResponse } from "@core/prompts/responses"
 import { PromptRegistry } from "@core/prompts/system-prompt"
 import type { SystemPromptContext } from "@core/prompts/system-prompt/types"
 import { StreamResponseHandler } from "@core/task/StreamResponseHandler"
-import { ClineAssistantToolUseBlock, ClineStorageMessage, ClineTextContentBlock, ClineUserContent } from "@shared/messages"
+import { NodusAssistantToolUseBlock, NodusStorageMessage, NodusTextContentBlock, NodusUserContent } from "@shared/messages"
 import { Logger } from "@shared/services/Logger"
-import { ClineDefaultTool, ClineTool } from "@shared/tools"
+import { NodusDefaultTool, NodusTool } from "@shared/tools"
 import { ContextManager } from "@/core/context/context-management/ContextManager"
 import { checkContextWindowExceededError } from "@/core/context/context-management/context-error-handling"
 import { getContextWindowInfo } from "@/core/context/context-management/context-window-utils"
 import { HostRegistryInfo } from "@/registry"
-import { ClineError, ClineErrorType } from "@/services/error"
-import { ApiFormat } from "@/shared/proto/cline/models"
+import { NodusError, NodusErrorType } from "@/services/error"
+import { ApiFormat } from "@/shared/proto/Nodus/models"
 import { calculateApiCostAnthropic } from "@/utils/cost"
 import { isNextGenModelFamily } from "@/utils/model-utils"
 import { TaskState } from "../../TaskState"
@@ -182,7 +182,7 @@ function resolveToolUseId(call: { id?: string; call_id?: string; name?: string }
 	return fallbackId
 }
 
-function toAssistantToolUseBlock(call: SubagentToolCall): ClineAssistantToolUseBlock {
+function toAssistantToolUseBlock(call: SubagentToolCall): NodusAssistantToolUseBlock {
 	return {
 		type: "tool_use",
 		id: call.toolUseId,
@@ -229,7 +229,7 @@ function pushSubagentToolResultBlock(toolResultBlocks: any[], call: SubagentTool
 export class SubagentRunner {
 	private readonly agent: SubagentBuilder
 	private readonly apiHandler: ApiHandler
-	private readonly allowedTools: ClineDefaultTool[]
+	private readonly allowedTools: NodusDefaultTool[]
 	private activeApiAbort: (() => void) | undefined
 	private abortRequested = false
 	private activeCommandExecutions = 0
@@ -390,14 +390,14 @@ export class SubagentRunner {
 				return { status: "failed", error, stats }
 			}
 
-			const conversation: ClineStorageMessage[] = [
+			const conversation: NodusStorageMessage[] = [
 				{
 					role: "user",
 					content: [
 						{
 							type: "text",
 							text: prompt,
-						} as ClineTextContentBlock,
+						} as NodusTextContentBlock,
 						// Server-side task loop checks require workspace metadata to be present in the
 						// initial user message of subagent runs.
 						...(workspaceMetadataEnvironmentBlock
@@ -405,7 +405,7 @@ export class SubagentRunner {
 									{
 										type: "text",
 										text: workspaceMetadataEnvironmentBlock,
-									} as ClineTextContentBlock,
+									} as NodusTextContentBlock,
 								]
 							: []),
 					],
@@ -605,12 +605,12 @@ export class SubagentRunner {
 				}
 				emptyAssistantResponseRetries = 0
 
-				const toolResultBlocks = [] as ClineUserContent[]
+				const toolResultBlocks = [] as NodusUserContent[]
 				for (const call of finalizedToolCalls) {
-					const toolName = call.name as ClineDefaultTool
+					const toolName = call.name as NodusDefaultTool
 					const toolCallParams = toToolUseParams(call.input)
 
-					if (toolName === ClineDefaultTool.ATTEMPT) {
+					if (toolName === NodusDefaultTool.ATTEMPT) {
 						const completionResult = toolCallParams.result?.trim()
 						if (!completionResult) {
 							const missingResultError = formatResponse.missingToolParameterError("result")
@@ -695,7 +695,7 @@ export class SubagentRunner {
 	private createSubagentTaskConfig(state: TaskState): TaskConfig {
 		const baseCallbacks = this.baseConfig.callbacks
 		const coordinator = new ToolExecutorCoordinator()
-		const validator = new ToolValidator(this.baseConfig.services.clineIgnoreController)
+		const validator = new ToolValidator(this.baseConfig.services.NodusIgnoreController)
 
 		for (const tool of this.allowedTools) {
 			coordinator.registerByName(tool, validator)
@@ -730,9 +730,9 @@ export class SubagentRunner {
 
 	private shouldRetryInitialStreamError(error: unknown, providerId: string, modelId: string): boolean {
 		// Mirror main loop behavior: do not auto-retry auth/balance failures.
-		const parsedError = ClineError.transform(error, modelId, providerId)
-		const isAuthError = parsedError.isErrorType(ClineErrorType.Auth)
-		const isBalanceError = parsedError.isErrorType(ClineErrorType.Balance)
+		const parsedError = NodusError.transform(error, modelId, providerId)
+		const isAuthError = parsedError.isErrorType(NodusErrorType.Auth)
+		const isBalanceError = parsedError.isErrorType(NodusErrorType.Balance)
 
 		if (isAuthError || isBalanceError) {
 			return false
@@ -743,7 +743,7 @@ export class SubagentRunner {
 
 	private compactConversationForContextWindow(
 		contextManager: ContextManager,
-		conversation: ClineStorageMessage[],
+		conversation: NodusStorageMessage[],
 		conversationHistoryDeletedRange: [number, number] | undefined,
 	): {
 		didCompact: boolean
@@ -789,7 +789,7 @@ export class SubagentRunner {
 
 	private optimizeConversationForContextWindow(
 		contextManager: ContextManager,
-		conversation: ClineStorageMessage[],
+		conversation: NodusStorageMessage[],
 	): {
 		didOptimize: boolean
 		needToTruncate: boolean
@@ -801,7 +801,7 @@ export class SubagentRunner {
 		}
 
 		const optimizedConversation = optimizationResult.optimizedConversationHistory.map(
-			(message) => message as ClineStorageMessage,
+			(message) => message as NodusStorageMessage,
 		)
 		conversation.splice(0, conversation.length, ...optimizedConversation)
 		return { didOptimize: true, needToTruncate: optimizationResult.needToTruncate }
@@ -827,8 +827,8 @@ export class SubagentRunner {
 	private async *createMessageWithInitialChunkRetry(
 		api: ReturnType<typeof buildApiHandler>,
 		systemPrompt: string,
-		fullConversation: ClineStorageMessage[],
-		nativeTools: ClineTool[] | undefined,
+		fullConversation: NodusStorageMessage[],
+		nativeTools: NodusTool[] | undefined,
 		providerId: string,
 		modelId: string,
 		contextManager: ContextManager,
@@ -837,7 +837,7 @@ export class SubagentRunner {
 		for (let attempt = 1; attempt <= MAX_INITIAL_STREAM_ATTEMPTS; attempt += 1) {
 			const truncatedConversation = contextManager
 				.getTruncatedMessages(fullConversation, contextState.conversationHistoryDeletedRange)
-				.map((message) => message as ClineStorageMessage)
+				.map((message) => message as NodusStorageMessage)
 			const stream = api.createMessage(systemPrompt, truncatedConversation, nativeTools)
 			const iterator = stream[Symbol.asyncIterator]()
 

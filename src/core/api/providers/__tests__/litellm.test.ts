@@ -4,7 +4,7 @@ import { liteLlmModelInfoSaneDefaults } from "@shared/api" // used in getModel t
 import { expect } from "chai"
 import sinon from "sinon"
 import { StateManager } from "@/core/storage/StateManager" // used in getModel tests
-import { ClineStorageMessage } from "@/shared/messages/content"
+import { NodusStorageMessage } from "@/shared/messages/content"
 import { mockFetchForTesting } from "@/shared/net"
 
 const fakeClient = {
@@ -113,7 +113,7 @@ describe("LiteLlmHandler", () => {
 
 			it("sends the system prompt and messages with the openai format", async () => {
 				const systemPrompt = "Test System Prompt"
-				const messages: ClineStorageMessage[] = [
+				const messages: NodusStorageMessage[] = [
 					{
 						role: "user",
 						content: "first message",
@@ -165,7 +165,7 @@ describe("LiteLlmHandler", () => {
 
 			it("inserts the cache control in the system prompt and the last two user messages", async () => {
 				const systemPrompt = "Test System Prompt"
-				const messages: ClineStorageMessage[] = [
+				const messages: NodusStorageMessage[] = [
 					{
 						role: "user",
 						content: "first message",

@@ -1,5 +1,5 @@
-import { Empty } from "@shared/proto/cline/common"
-import { PlanActMode, UpdateTaskSettingsRequest } from "@shared/proto/cline/state"
+import { Empty } from "@shared/proto/nodus/common"
+import { PlanActMode, UpdateTaskSettingsRequest } from "@shared/proto/nodus/state"
 import { convertProtoToApiProvider } from "@shared/proto-conversions/models/api-configuration-conversion"
 import { Mode } from "@/shared/storage/types"
 import { Controller } from ".."

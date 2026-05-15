@@ -1,11 +1,11 @@
 import { ModelFamily } from "@/shared/prompts"
-import { ClineDefaultTool } from "@/shared/tools"
-import type { ClineToolSpec } from "../spec"
+import { NodusDefaultTool } from "@/shared/tools"
+import type { NodusToolSpec } from "../spec"
 import { TASK_PROGRESS_PARAMETER } from "../types"
 
-const id = ClineDefaultTool.LIST_FILES
+const id = NodusDefaultTool.LIST_FILES
 
-const generic: ClineToolSpec = {
+const generic: NodusToolSpec = {
 	variant: ModelFamily.GENERIC,
 	id,
 	name: "list_files",
@@ -30,7 +30,7 @@ const generic: ClineToolSpec = {
 	],
 }
 
-const NATIVE_GPT_5: ClineToolSpec = {
+const NATIVE_GPT_5: NodusToolSpec = {
 	variant: ModelFamily.NATIVE_GPT_5,
 	id,
 	name: "list_files",
@@ -52,7 +52,7 @@ const NATIVE_GPT_5: ClineToolSpec = {
 	],
 }
 
-const NATIVE_NEXT_GEN: ClineToolSpec = {
+const NATIVE_NEXT_GEN: NodusToolSpec = {
 	...NATIVE_GPT_5,
 	variant: ModelFamily.NATIVE_NEXT_GEN,
 }

@@ -1,7 +1,7 @@
 import { HeroUIProvider } from "@heroui/react"
 import { DEFAULT_AUTO_APPROVAL_SETTINGS } from "@shared/AutoApprovalSettings"
 import { type ApiConfiguration, bedrockModels } from "@shared/api"
-import type { ClineMessage, ClineSayTool } from "@shared/ExtensionMessage"
+import type { NodusMessage, NodusSayTool } from "@shared/ExtensionMessage"
 import type { HistoryItem } from "@shared/HistoryItem"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import { useEffect, useMemo, useState } from "react"
@@ -42,7 +42,7 @@ const meta: Meta<typeof MockApp> = {
 		docs: {
 			description: {
 				component: `
-The ChatView component is the main interface for interacting with Cline. It provides a comprehensive chat experience with AI assistance, task management, and various tools.
+The ChatView component is the main interface for interacting with Nodus. It provides a comprehensive chat experience with AI assistance, task management, and various tools.
 
 **Key Features:**
 - **Task Management**: Create, resume, and manage AI-assisted tasks
@@ -139,11 +139,11 @@ const mockTaskHistory: HistoryItem[] = [
 
 const createMessage = (
 	minutesAgo: number,
-	type: ClineMessage["type"],
-	say: ClineMessage["say"],
+	type: NodusMessage["type"],
+	say: NodusMessage["say"],
 	text: string,
-	overrides: Partial<ClineMessage> = {},
-): ClineMessage => ({
+	overrides: Partial<NodusMessage> = {},
+): NodusMessage => ({
 	ts: Date.now() - minutesAgo * 60000,
 	type,
 	say,
@@ -153,9 +153,9 @@ const createMessage = (
 
 const createSayToolMessage = (
 	minutesAgo: number,
-	sayTool: ClineSayTool,
-	overrides: Partial<ClineMessage> = {},
-): ClineMessage => ({
+	sayTool: NodusSayTool,
+	overrides: Partial<NodusMessage> = {},
+): NodusMessage => ({
 	ts: Date.now() - minutesAgo * 60000,
 	type: "say",
 	say: "tool",
@@ -183,7 +183,7 @@ const createApiReqMessage = (minutesAgo: number, request: string, metrics: any =
 		}),
 	)
 
-const mockActiveMessages: ClineMessage[] = [
+const mockActiveMessages: NodusMessage[] = [
 	createMessage(5, "say", "task", "Help me create a responsive navigation component for a React application"),
 	createApiReqMessage(4.9, "Initial analysis request"),
 	createMessage(
@@ -219,7 +219,7 @@ const mockActiveMessages: ClineMessage[] = [
 	),
 ]
 
-const mockStreamingMessages: ClineMessage[] = [
+const mockStreamingMessages: NodusMessage[] = [
 	...mockActiveMessages,
 	createMessage(
 		0.17,
@@ -237,7 +237,7 @@ const createMockState = (overrides: any = {}) => ({
 	version: "0.0.1-stories",
 	welcomeViewCompleted: true,
 	showWelcome: false,
-	clineMessages: mockActiveMessages,
+	nodusMessages: mockActiveMessages,
 	taskHistory: mockTaskHistory,
 	apiConfiguration: mockApiConfiguration,
 	onboardingModels: undefined,
@@ -263,7 +263,7 @@ const createStoryDecorator =
 	}
 
 export const Welcome: Story = {
-	decorators: [createStoryDecorator({ welcomeViewCompleted: false, showWelcome: true, clineMessages: [] })],
+	decorators: [createStoryDecorator({ welcomeViewCompleted: false, showWelcome: true, nodusMessages: [] })],
 	parameters: {
 		docs: {
 			description: {
@@ -291,7 +291,7 @@ export const Onboarding: Story = {
 		createStoryDecorator({
 			welcomeViewCompleted: false,
 			showWelcome: true,
-			clineMessages: [],
+			nodusMessages: [],
 		}),
 	],
 	parameters: {
@@ -306,7 +306,7 @@ export const Onboarding: Story = {
 		const canvas = within(canvasElement)
 
 		// Step 0: User type selection should be visible
-		const title = canvas.getByText("How will you use Cline?")
+		const title = canvas.getByText("How will you use Nodus?")
 		await expect(title).toBeInTheDocument()
 		const freeUserOption = canvas.getByText("Absolutely Free")
 		const powerUserOption = canvas.getByText("Frontier Model")
@@ -353,7 +353,7 @@ export const Onboarding: Story = {
 		await userEvent.click(backButton)
 
 		// Should be back to user type selection
-		await expect(canvas.getByText("How will you use Cline?")).toBeInTheDocument()
+		await expect(canvas.getByText("How will you use Nodus?")).toBeInTheDocument()
 
 		// Test power user flow
 		await userEvent.click(powerUserOption)
@@ -368,7 +368,7 @@ export const Onboarding: Story = {
 }
 
 export const EmptyState: Story = {
-	decorators: [createStoryDecorator({ clineMessages: [], taskHistory: [], isNewUser: true, showAnnouncement: true })],
+	decorators: [createStoryDecorator({ nodusMessages: [], taskHistory: [], isNewUser: true, showAnnouncement: true })],
 	parameters: {
 		docs: {
 			description: {
@@ -380,7 +380,7 @@ export const EmptyState: Story = {
 
 export const ReturnUser: Story = {
 	decorators: [
-		createStoryDecorator({ clineMessages: [], taskHistory: mockTaskHistory, isNewUser: true, showAnnouncement: false }),
+		createStoryDecorator({ nodusMessages: [], taskHistory: mockTaskHistory, isNewUser: true, showAnnouncement: false }),
 	],
 	parameters: {
 		docs: {
@@ -396,14 +396,14 @@ export const ActiveConversation: Story = {
 	parameters: {
 		docs: {
 			description: {
-				story: "An active conversation showing a typical interaction with Cline, including task creation, tool usage, and AI responses.",
+				story: "An active conversation showing a typical interaction with Nodus, including task creation, tool usage, and AI responses.",
 			},
 		},
 	},
 }
 
 export const StreamingResponse: Story = {
-	decorators: [createStoryDecorator({ clineMessages: mockStreamingMessages })],
+	decorators: [createStoryDecorator({ nodusMessages: mockStreamingMessages })],
 	parameters: {
 		docs: {
 			description: {
@@ -413,7 +413,7 @@ export const StreamingResponse: Story = {
 	},
 }
 
-const createLongMessages = (): ClineMessage[] => [
+const createLongMessages = (): NodusMessage[] => [
 	createMessage(30, "say", "task", "Help me build a complete e-commerce application with React, Node.js, and MongoDB"),
 	createMessage(
 		29.7,
@@ -468,7 +468,7 @@ const createLongMessages = (): ClineMessage[] => [
 ]
 
 export const LongConversation: Story = {
-	decorators: [createStoryDecorator({ clineMessages: createLongMessages() })],
+	decorators: [createStoryDecorator({ nodusMessages: createLongMessages() })],
 	parameters: {
 		docs: {
 			description: {
@@ -514,11 +514,11 @@ const createAskMessage = (type: string, text: string, streamingFailedMessage?: s
 })
 
 export const ErrorState: Story = {
-	decorators: [createStoryDecorator({ clineMessages: createErrorMessages() })],
+	decorators: [createStoryDecorator({ nodusMessages: createErrorMessages() })],
 	parameters: {
 		docs: {
 			description: {
-				story: "Shows how Cline handles and displays error messages, helping users understand and resolve issues.",
+				story: "Shows how Nodus handles and displays error messages, helping users understand and resolve issues.",
 			},
 		},
 	},
@@ -536,7 +536,7 @@ export const AutoApprovalEnabled: Story = {
 	parameters: {
 		docs: {
 			description: {
-				story: "Shows the interface with auto-approval enabled, allowing Cline to execute certain actions automatically without user confirmation.",
+				story: "Shows the interface with auto-approval enabled, allowing Nodus to execute certain actions automatically without user confirmation.",
 			},
 		},
 	},
@@ -561,7 +561,7 @@ const createPlanModeMessages = () => [
 export const PlanMode: Story = {
 	decorators: [
 		createStoryDecorator({
-			clineMessages: createPlanModeMessages(),
+			nodusMessages: createPlanModeMessages(),
 			apiConfiguration: mockApiConfigurationPlan,
 			mode: "plan" as const,
 		}),
@@ -569,7 +569,7 @@ export const PlanMode: Story = {
 	parameters: {
 		docs: {
 			description: {
-				story: "Shows Cline in Plan mode, where it focuses on creating detailed plans and discussing approaches before implementation.",
+				story: "Shows Nodus in Plan mode, where it focuses on creating detailed plans and discussing approaches before implementation.",
 			},
 		},
 	},
@@ -601,11 +601,11 @@ const createBrowserMessages = () => [
 ]
 
 export const BrowserAutomation: Story = {
-	decorators: [createStoryDecorator({ clineMessages: createBrowserMessages() })],
+	decorators: [createStoryDecorator({ nodusMessages: createBrowserMessages() })],
 	parameters: {
 		docs: {
 			description: {
-				story: "Shows Cline performing browser automation tasks, including launching browsers, clicking elements, and testing web applications.",
+				story: "Shows Nodus performing browser automation tasks, including launching browsers, clicking elements, and testing web applications.",
 			},
 		},
 	},
@@ -619,7 +619,7 @@ const createToolApprovalMessages = () => [
 ]
 
 export const ToolApproval: Story = {
-	decorators: [createStoryDecorator({ clineMessages: createToolApprovalMessages() })],
+	decorators: [createStoryDecorator({ nodusMessages: createToolApprovalMessages() })],
 	parameters: {
 		docs: {
 			description: {
@@ -632,7 +632,7 @@ export const ToolApproval: Story = {
 export const ToolSave: Story = {
 	decorators: [
 		createStoryDecorator({
-			clineMessages: [
+			nodusMessages: [
 				createMessage(5, "say", "task", "Update the README file with new instructions"),
 				createMessage(4.7, "say", "text", "I'll update your README file with the new instructions."),
 				createAskMessage("tool", JSON.stringify({ tool: "editedExistingFile", path: "README.md" })),
@@ -658,7 +658,7 @@ const quickStory = (
 ): Story => ({
 	decorators: [
 		createStoryDecorator({
-			clineMessages: [
+			nodusMessages: [
 				...createLongMessages(),
 				createMessage(6, "say", "task", `Help with ${name.toLowerCase()}`),
 				createMessage(5, "say", "reasoning", `Thinking about helping user with ${name.toLowerCase()}`),
@@ -680,7 +680,7 @@ export const CommandExecution: Story = quickStory(
 export const CommandOutput: Story = {
 	decorators: [
 		createStoryDecorator({
-			clineMessages: [
+			nodusMessages: [
 				createAskMessage("command", "npm install"),
 				createAskMessage("command_output", "Installing packages... This may take a few minutes."),
 			],
@@ -730,7 +730,7 @@ export const Followup = quickStory(
 	"Follow-up",
 	"followup",
 	"What would you like me to work on next?",
-	"Shows followup question state where Cline asks for next steps.",
+	"Shows followup question state where Nodus asks for next steps.",
 )
 export const ResumeTask = quickStory(
 	"Resume Task",
@@ -747,7 +747,7 @@ export const NewTaskWithContext = quickStory(
 export const ApiRequestActive: Story = {
 	decorators: [
 		createStoryDecorator({
-			clineMessages: [
+			nodusMessages: [
 				createMessage(5, "say", "text", "Processing your request...", { partial: true }),
 				createApiReqMessage(4.7, "Making API request to generate response", { partial: true }),
 			],
@@ -759,7 +759,7 @@ export const PlanModeResponse = quickStory(
 	"Plan Mode Response",
 	"plan_mode_respond",
 	"Here's my comprehensive plan for refactoring your React application with TypeScript migration and performance optimization phases.\n\n\n\n\nPhase 1: TypeScript Migration\n1. Set up TypeScript in the project\n2. Rename .js files to .tsx/.ts\n3. Add type definitions for components and props\n4. Fix type errors and ensure type safety\n\nPhase 2: Performance Optimization\n1. Analyze current performance bottlenecks\n2. Implement code-splitting and lazy loading\n3. Optimize rendering with React.memo and useCallback\n4. Minimize bundle size with tree-shaking and minification\n5. Test performance improvements using profiling tools",
-	"Shows plan mode response where Cline presents a detailed plan for user approval.",
+	"Shows plan mode response where Nodus presents a detailed plan for user approval.",
 )
 export const CondenseConversation = quickStory(
 	"Condense Conversation",
@@ -771,8 +771,8 @@ export const ReportBug = quickStory(
 	"Report Bug",
 	"report_bug",
 	JSON.stringify({
-		steps_to_reproduce: "1. Open Cline\n2. Start a new task\n3. Observe the error",
-		what_happened: "Cline crashes unexpectedly",
+		steps_to_reproduce: "1. Open Nodus\n2. Start a new task\n3. Observe the error",
+		what_happened: "Nodus crashes unexpectedly",
 	}),
 	"Shows utility action to report bugs to the GitHub repository.",
 )
@@ -786,7 +786,7 @@ export const ResumeCompletedTask = quickStory(
 export const ShellIntegrationWarningWithSuggestion: Story = {
 	decorators: [
 		createStoryDecorator({
-			clineMessages: [
+			nodusMessages: [
 				createMessage(5, "say", "task", "Run a command"),
 				createMessage(4.7, "say", "text", "I'll run the command for you."),
 				createMessage(4.5, "say", "shell_integration_warning_with_suggestion", ""),
@@ -806,7 +806,7 @@ export const ShellIntegrationWarningWithSuggestion: Story = {
 export const ShellIntegrationWarningBackgroundEnabled: Story = {
 	decorators: [
 		createStoryDecorator({
-			clineMessages: [
+			nodusMessages: [
 				createMessage(5, "say", "task", "Run a command"),
 				createMessage(4.7, "say", "text", "I'll run the command for you."),
 				createMessage(4.5, "say", "shell_integration_warning_with_suggestion", ""),
@@ -826,7 +826,7 @@ export const ShellIntegrationWarningBackgroundEnabled: Story = {
 export const ShellIntegrationWarning: Story = {
 	decorators: [
 		createStoryDecorator({
-			clineMessages: [
+			nodusMessages: [
 				createMessage(5, "say", "task", "Run a command"),
 				createMessage(4.7, "say", "text", "I'll run the command for you."),
 				createMessage(4.5, "say", "shell_integration_warning", ""),
@@ -845,7 +845,7 @@ export const ShellIntegrationWarning: Story = {
 export const ErrorRetryInProgress: Story = {
 	decorators: [
 		createStoryDecorator({
-			clineMessages: [
+			nodusMessages: [
 				createMessage(5, "say", "task", "Process a request"),
 				createMessage(4.7, "say", "text", "Attempting to process your request."),
 				createMessage(
@@ -869,7 +869,7 @@ export const ErrorRetryInProgress: Story = {
 export const ErrorRetryFailed: Story = {
 	decorators: [
 		createStoryDecorator({
-			clineMessages: [
+			nodusMessages: [
 				createMessage(5, "say", "task", "Process a request"),
 				createMessage(4.7, "say", "text", "Attempting to process your request."),
 				createMessage(
@@ -893,7 +893,7 @@ export const ErrorRetryFailed: Story = {
 export const GenerateExplanationInProgress: Story = {
 	decorators: [
 		createStoryDecorator({
-			clineMessages: [
+			nodusMessages: [
 				createMessage(5, "say", "task", "Explain my recent changes"),
 				createMessage(4.7, "say", "text", "I'll generate an explanation of your changes."),
 				createMessage(
@@ -922,7 +922,7 @@ export const GenerateExplanationInProgress: Story = {
 export const GenerateExplanationComplete: Story = {
 	decorators: [
 		createStoryDecorator({
-			clineMessages: [
+			nodusMessages: [
 				createMessage(5, "say", "task", "Explain my recent changes"),
 				createMessage(4.7, "say", "text", "I'll generate an explanation of your changes."),
 				createMessage(
@@ -951,7 +951,7 @@ export const GenerateExplanationComplete: Story = {
 export const GenerateExplanationError: Story = {
 	decorators: [
 		createStoryDecorator({
-			clineMessages: [
+			nodusMessages: [
 				createMessage(5, "say", "task", "Explain my recent changes"),
 				createMessage(4.7, "say", "text", "I'll generate an explanation of your changes."),
 				createMessage(
@@ -981,7 +981,7 @@ export const GenerateExplanationError: Story = {
 export const GenerateExplanationCancelled: Story = {
 	decorators: [
 		createStoryDecorator({
-			clineMessages: [
+			nodusMessages: [
 				createMessage(5, "say", "task", "Explain my recent changes"),
 				createMessage(4.7, "say", "text", "I'll generate an explanation of your changes."),
 				createMessage(
@@ -1056,7 +1056,7 @@ const createNewFormatMultiFileMessages = () => [
 ]
 
 export const DiffEditNewFormat: Story = {
-	decorators: [createStoryDecorator({ backgroundEditEnabled: true, clineMessages: createNewFormatMultiFileMessages() })],
+	decorators: [createStoryDecorator({ backgroundEditEnabled: true, nodusMessages: createNewFormatMultiFileMessages() })],
 	parameters: {
 		docs: {
 			description: {
@@ -1069,11 +1069,11 @@ export const DiffEditNewFormat: Story = {
 export const DiffEditNewFormatStreaming: Story = {
 	decorators: [
 		(Story) => {
-			const [messages, setMessages] = useState<ClineMessage[]>([
+			const [messages, setMessages] = useState<NodusMessage[]>([
 				createMessage(5, "say", "task", "Add TypeScript types to the user module"),
 				createMessage(4.7, "say", "text", "I'll add TypeScript types to improve type safety."),
 			])
-			const mockState = useMemo(() => createMockState({ backgroundEditEnabled: true, clineMessages: messages }), [messages])
+			const mockState = useMemo(() => createMockState({ backgroundEditEnabled: true, nodusMessages: messages }), [messages])
 
 			useEffect(() => {
 				// Simulate streaming: progressively add more content
@@ -1100,7 +1100,7 @@ export const DiffEditNewFormatStreaming: Story = {
 
 				// Add initial partial message
 				const timer1 = setTimeout(() => {
-					setMessages((prev: ClineMessage[]) => [
+					setMessages((prev: NodusMessage[]) => [
 						...prev,
 						createSayToolMessage(
 							4.3,
@@ -1116,7 +1116,7 @@ export const DiffEditNewFormatStreaming: Story = {
 
 				// Add more content
 				const timer2 = setTimeout(() => {
-					setMessages((prev: ClineMessage[]) => {
+					setMessages((prev: NodusMessage[]) => {
 						const updated = [...prev]
 						updated[updated.length - 1] = createSayToolMessage(
 							4.3,
@@ -1133,7 +1133,7 @@ export const DiffEditNewFormatStreaming: Story = {
 
 				// Complete the patch
 				const timer3 = setTimeout(() => {
-					setMessages((prev: ClineMessage[]) => {
+					setMessages((prev: NodusMessage[]) => {
 						const updated = [...prev]
 						updated[updated.length - 1] = createSayToolMessage(
 							4.3,
@@ -1196,7 +1196,7 @@ function validateEmail(email: string): boolean {
 ]
 
 export const DiffEditReplaceDiffFormat: Story = {
-	decorators: [createStoryDecorator({ backgroundEditEnabled: true, clineMessages: createReplaceDiffFormatPatchMessages() })],
+	decorators: [createStoryDecorator({ backgroundEditEnabled: true, nodusMessages: createReplaceDiffFormatPatchMessages() })],
 	parameters: {
 		docs: {
 			description: {
@@ -1209,11 +1209,11 @@ export const DiffEditReplaceDiffFormat: Story = {
 export const DiffEditReplaceDiffFormatStreaming: Story = {
 	decorators: [
 		(Story) => {
-			const [messages, setMessages] = useState<ClineMessage[]>([
+			const [messages, setMessages] = useState<NodusMessage[]>([
 				createMessage(5, "say", "task", "Update error handling"),
 				createMessage(4.7, "say", "text", "I'll improve the error handling in the API client."),
 			])
-			const mockState = useMemo(() => createMockState({ backgroundEditEnabled: true, clineMessages: messages }), [messages])
+			const mockState = useMemo(() => createMockState({ backgroundEditEnabled: true, nodusMessages: messages }), [messages])
 
 			useEffect(() => {
 				const completePatch = `------- SEARCH
@@ -1245,7 +1245,7 @@ try {
 						return
 					}
 
-					setMessages((prev: ClineMessage[]) => {
+					setMessages((prev: NodusMessage[]) => {
 						const updated = [...prev]
 						updated[updated.length - 1] = createSayToolMessage(
 							4.3,
@@ -1331,7 +1331,7 @@ async function login(username: string, password: string): Promise<AuthResult> {
 ]
 
 export const DiffEditMixedFormats: Story = {
-	decorators: [createStoryDecorator({ clineMessages: createMixedFormatMessages() })],
+	decorators: [createStoryDecorator({ nodusMessages: createMixedFormatMessages() })],
 	parameters: {
 		docs: {
 			description: {

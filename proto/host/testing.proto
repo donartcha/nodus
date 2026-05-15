@@ -2,13 +2,13 @@ syntax = "proto3";
 
 package host;
 
-option go_package = "github.com/cline/grpc-go/host";
+option go_package = "github.com/nodus/grpc-go/host";
 option java_multiple_files = true;
-option java_package = "bot.cline.host.proto";
+option java_package = "bot.nodus.host.proto";
 
 // This is for use in integration tests to get the contents of the webview.
 service TestingService {
-  rpc getWebviewHtml(GetWebviewHtmlRequest) returns (GetWebviewHtmlResponse);
+  rpc GetWebviewHtml(GetWebviewHtmlRequest) returns (GetWebviewHtmlResponse);
 }
 
 message GetWebviewHtmlRequest {}
@@ -16,3 +16,5 @@ message GetWebviewHtmlRequest {}
 message GetWebviewHtmlResponse {
   optional string html = 1;
 }
+
+

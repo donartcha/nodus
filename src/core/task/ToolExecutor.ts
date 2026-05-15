@@ -2,17 +2,17 @@ import { ApiHandler } from "@core/api"
 import { FileContextTracker } from "@core/context/context-tracking/FileContextTracker"
 import { getHookModelContext } from "@core/hooks/hook-model-context"
 import { getHooksEnabledSafe } from "@core/hooks/hooks-utils"
-import { ClineIgnoreController } from "@core/ignore/ClineIgnoreController"
+import { NodusIgnoreController } from "@core/ignore/NodusIgnoreController"
 import { CommandPermissionController } from "@core/permissions"
 import { DiffViewProvider } from "@integrations/editor/DiffViewProvider"
 import type { CommandExecutionOptions } from "@integrations/terminal"
 import { BrowserSession } from "@services/browser/BrowserSession"
 import { UrlContentFetcher } from "@services/browser/UrlContentFetcher"
 import { McpHub } from "@services/mcp/McpHub"
-import { ClineAsk, ClineSay } from "@shared/ExtensionMessage"
-import { ClineContent } from "@shared/messages/content"
-import { ClineDefaultTool, toolUseNames } from "@shared/tools"
-import { ClineAskResponse } from "@shared/WebviewMessage"
+import { NodusAsk, NodusSay } from "@shared/ExtensionMessage"
+import { NodusContent } from "@shared/messages/content"
+import { NodusDefaultTool, toolUseNames } from "@shared/tools"
+import { NodusAskResponse } from "@shared/WebviewMessage"
 import { isParallelToolCallingEnabled, modelDoesntSupportWebp } from "@/utils/model-utils"
 import { ToolUse } from "../assistant-message"
 import { ContextManager } from "../context/context-management/ContextManager"
@@ -32,7 +32,7 @@ import { ToolDisplayUtils } from "./tools/utils/ToolDisplayUtils"
 import { ToolResultUtils } from "./tools/utils/ToolResultUtils"
 
 export function canonicalizeAttemptCompletionParams(block: ToolUse): boolean {
-	if (block.name === ClineDefaultTool.ATTEMPT && !block.params?.result && typeof block.params?.response === "string") {
+	if (block.name === NodusDefaultTool.ATTEMPT && !block.params?.result && typeof block.params?.response === "string") {
 		block.params.result = block.params.response
 		return true
 	}
@@ -45,12 +45,12 @@ export class ToolExecutor {
 	private coordinator: ToolExecutorCoordinator
 
 	// Auto-approval methods using the AutoApprove class
-	private shouldAutoApproveTool(toolName: ClineDefaultTool): boolean | [boolean, boolean] {
+	private shouldAutoApproveTool(toolName: NodusDefaultTool): boolean | [boolean, boolean] {
 		return this.autoApprover.shouldAutoApproveTool(toolName)
 	}
 
 	private async shouldAutoApproveToolWithPath(
-		blockname: ClineDefaultTool,
+		blockname: NodusDefaultTool,
 		autoApproveActionpath: string | undefined,
 	): Promise<boolean> {
 		return this.autoApprover.shouldAutoApproveToolWithPath(blockname, autoApproveActionpath)
@@ -66,7 +66,7 @@ export class ToolExecutor {
 		private diffViewProvider: DiffViewProvider,
 		private mcpHub: McpHub,
 		private fileContextTracker: FileContextTracker,
-		private clineIgnoreController: ClineIgnoreController,
+		private NodusIgnoreController: NodusIgnoreController,
 		private commandPermissionController: CommandPermissionController,
 		private contextManager: ContextManager,
 		private stateManager: StateManager,
@@ -84,25 +84,25 @@ export class ToolExecutor {
 
 		// Callbacks to the Task (Entity)
 		private say: (
-			type: ClineSay,
+			type: NodusSay,
 			text?: string,
 			images?: string[],
 			files?: string[],
 			partial?: boolean,
 		) => Promise<number | undefined>,
 		private ask: (
-			type: ClineAsk,
+			type: NodusAsk,
 			text?: string,
 			partial?: boolean,
 		) => Promise<{
-			response: ClineAskResponse
+			response: NodusAskResponse
 			text?: string
 			images?: string[]
 			files?: string[]
 		}>,
 		private saveCheckpoint: (isAttemptCompletionMessage?: boolean, completionMessageTs?: number) => Promise<void>,
-		private sayAndCreateMissingParamError: (toolName: ClineDefaultTool, paramName: string, relPath?: string) => Promise<any>,
-		private removeLastPartialMessageIfExistsWithType: (type: "ask" | "say", askOrSay: ClineAsk | ClineSay) => Promise<void>,
+		private sayAndCreateMissingParamError: (toolName: NodusDefaultTool, paramName: string, relPath?: string) => Promise<any>,
+		private removeLastPartialMessageIfExistsWithType: (type: "ask" | "say", askOrSay: NodusAsk | NodusSay) => Promise<void>,
 		private executeCommandTool: (
 			command: string,
 			timeoutSeconds: number | undefined,
@@ -119,7 +119,7 @@ export class ToolExecutor {
 		private clearActiveHookExecution: () => Promise<void>,
 		private getActiveHookExecution: () => Promise<typeof taskState.activeHookExecution>,
 		private runUserPromptSubmitHook: (
-			userContent: ClineContent[],
+			userContent: NodusContent[],
 			context: "initial_task" | "resume" | "feedback",
 		) => Promise<{ cancel?: boolean; wasCancelled?: boolean; contextModification?: string; errorMessage?: string }>,
 	) {
@@ -159,7 +159,7 @@ export class ToolExecutor {
 				urlContentFetcher: this.urlContentFetcher,
 				diffViewProvider: this.diffViewProvider,
 				fileContextTracker: this.fileContextTracker,
-				clineIgnoreController: this.clineIgnoreController,
+				NodusIgnoreController: this.NodusIgnoreController,
 				commandPermissionController: this.commandPermissionController,
 				contextManager: this.contextManager,
 				stateManager: this.stateManager,
@@ -199,7 +199,7 @@ export class ToolExecutor {
 	 * Register all tool handlers with the coordinator
 	 */
 	private registerToolHandlers(): void {
-		const validator = new ToolValidator(this.clineIgnoreController)
+		const validator = new ToolValidator(this.NodusIgnoreController)
 		// Register all tools via toolUseNames
 		for (const tool of toolUseNames) {
 			this.coordinator.registerByName(tool, validator)
@@ -288,11 +288,11 @@ export class ToolExecutor {
 	/**
 	 * Tools that are restricted in plan mode and can only be used in act mode
 	 */
-	private static readonly PLAN_MODE_RESTRICTED_TOOLS: ClineDefaultTool[] = [
-		ClineDefaultTool.FILE_NEW,
-		ClineDefaultTool.FILE_EDIT,
-		ClineDefaultTool.NEW_RULE,
-		ClineDefaultTool.APPLY_PATCH,
+	private static readonly PLAN_MODE_RESTRICTED_TOOLS: NodusDefaultTool[] = [
+		NodusDefaultTool.FILE_NEW,
+		NodusDefaultTool.FILE_EDIT,
+		NodusDefaultTool.NEW_RULE,
+		NodusDefaultTool.APPLY_PATCH,
 	]
 
 	/**
@@ -385,7 +385,7 @@ export class ToolExecutor {
 	 * @param toolName The name of the tool to check
 	 * @returns true if the tool is restricted in plan mode, false otherwise
 	 */
-	private isPlanModeToolRestricted(toolName: ClineDefaultTool): boolean {
+	private isPlanModeToolRestricted(toolName: NodusDefaultTool): boolean {
 		return ToolExecutor.PLAN_MODE_RESTRICTED_TOOLS.includes(toolName)
 	}
 

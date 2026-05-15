@@ -5,7 +5,7 @@ import { e2e } from "./utils/helpers"
 e2e("Views - can set up API keys and navigate to Settings from Chat", async ({ sidebar }) => {
 	// Use the page object to interact with editor outside the sidebar
 	// Verify initial state
-	await expect(sidebar.getByRole("button", { name: "Login to Cline" })).toBeVisible()
+	await expect(sidebar.getByRole("button", { name: "Login to Nodus" })).toBeVisible()
 	await expect(sidebar.getByText("Bring my own API key")).toBeVisible()
 
 	// Navigate to API key setup
@@ -17,12 +17,12 @@ e2e("Views - can set up API keys and navigate to Settings from Chat", async ({ s
 	// Verify provider selector is visible
 	await expect(providerSelectorInput).toBeVisible()
 
-	// Test Cline provider option
+	// Test Nodus provider option
 	await providerSelectorInput.click({ delay: 100 })
-	// Wait for dropdown to appear and find Cline option
-	await expect(sidebar.getByTestId("provider-option-cline")).toBeVisible()
-	await sidebar.getByTestId("provider-option-cline").click({ delay: 100 })
-	await expect(sidebar.getByRole("button", { name: "Sign Up with Cline" })).toBeVisible()
+	// Wait for dropdown to appear and find Nodus option
+	await expect(sidebar.getByTestId("provider-option-Nodus")).toBeVisible()
+	await sidebar.getByTestId("provider-option-Nodus").click({ delay: 100 })
+	await expect(sidebar.getByRole("button", { name: "Sign Up with Nodus" })).toBeVisible()
 
 	// Switch to OpenRouter and complete setup
 	await providerSelectorInput.click({ delay: 100 })
@@ -36,7 +36,7 @@ e2e("Views - can set up API keys and navigate to Settings from Chat", async ({ s
 	await apiKeyInput.click({ delay: 100 })
 	await sidebar.getByRole("button", { name: "Continue" }).click()
 
-	await expect(sidebar.getByRole("button", { name: "Login to Cline" })).not.toBeVisible()
+	await expect(sidebar.getByRole("button", { name: "Login to Nodus" })).not.toBeVisible()
 
 	// Verify start up page is no longer visible
 	await expect(apiKeyInput).not.toBeVisible()
@@ -45,7 +45,7 @@ e2e("Views - can set up API keys and navigate to Settings from Chat", async ({ s
 	// New installs may first show the Kanban launch modal, which blocks the
 	// update announcement modal until it has been dismissed.
 	const kanbanDialog = sidebar.getByRole("heading", {
-		name: "Introducing Cline Kanban",
+		name: "Introducing Nodus Kanban",
 	})
 	try {
 		await kanbanDialog.waitFor({ state: "visible", timeout: 5_000 })
@@ -56,9 +56,9 @@ e2e("Views - can set up API keys and navigate to Settings from Chat", async ({ s
 	}
 
 	// Verify you are now in the chat page after setup was completed.
-	// cline logo container
-	const clineLogo = sidebar.locator(".size-20")
-	await expect(clineLogo).toBeVisible()
+	// Nodus logo container
+	const NodusLogo = sidebar.locator(".size-20")
+	await expect(NodusLogo).toBeVisible()
 	const chatInputBox = sidebar.getByTestId("chat-input")
 	await expect(chatInputBox).toBeVisible()
 })

@@ -1,6 +1,6 @@
 import { ModelFamily } from "@/shared/prompts"
-import { ClineDefaultTool } from "@/shared/tools"
-import type { ClineToolSpec } from "../spec"
+import { NodusDefaultTool } from "@/shared/tools"
+import type { NodusToolSpec } from "../spec"
 
 /**
  * ## new_task
@@ -19,9 +19,9 @@ Usage:
 </new_task>
  */
 
-const id = ClineDefaultTool.NEW_TASK
+const id = NodusDefaultTool.NEW_TASK
 
-const generic: ClineToolSpec = {
+const generic: NodusToolSpec = {
 	variant: ModelFamily.GENERIC,
 	id,
 	name: "new_task",

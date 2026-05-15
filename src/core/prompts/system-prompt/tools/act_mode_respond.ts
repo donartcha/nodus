@@ -1,6 +1,6 @@
 import { ModelFamily } from "@/shared/prompts"
-import { ClineDefaultTool } from "@/shared/tools"
-import type { ClineToolSpec } from "../spec"
+import { NodusDefaultTool } from "@/shared/tools"
+import type { NodusToolSpec } from "../spec"
 
 /**
  * ## act_mode_respond
@@ -20,9 +20,9 @@ Usage:
 </act_mode_respond>
  */
 
-const id = ClineDefaultTool.ACT_MODE
+const id = NodusDefaultTool.ACT_MODE
 
-const NATIVE_GPT_5: ClineToolSpec = {
+const NATIVE_GPT_5: NodusToolSpec = {
 	variant: ModelFamily.NATIVE_GPT_5,
 	id,
 	name: "act_mode_respond",
@@ -56,12 +56,12 @@ CRITICAL CONSTRAINT: You MUST NOT call this tool more than once in a row. After 
 	],
 }
 
-const NATIVE_NEXT_GEN: ClineToolSpec = {
+const NATIVE_NEXT_GEN: NodusToolSpec = {
 	...NATIVE_GPT_5,
 	variant: ModelFamily.NATIVE_NEXT_GEN,
 }
 
-const GEMINI_3: ClineToolSpec = {
+const GEMINI_3: NodusToolSpec = {
 	...NATIVE_GPT_5,
 	variant: ModelFamily.GEMINI_3,
 }

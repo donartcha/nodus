@@ -1,8 +1,8 @@
 import { buildApiHandler } from "@core/api"
 import { PromptRegistry } from "@core/prompts/system-prompt"
-import { ClineToolSet } from "@core/prompts/system-prompt/registry/ClineToolSet"
+import { NodusToolSet } from "@core/prompts/system-prompt/registry/NodusToolSet"
 import type { SystemPromptContext } from "@core/prompts/system-prompt/types"
-import { ClineDefaultTool } from "@shared/tools"
+import { NodusDefaultTool } from "@shared/tools"
 import { ApiProvider } from "@/shared/api"
 import { getProviderModelIdKey } from "@/shared/storage/provider-keys"
 import type { TaskConfig } from "../types/TaskConfig"
@@ -11,14 +11,14 @@ import { AgentConfigLoader } from "./AgentConfigLoader"
 
 export type AgentConfig = Partial<AgentBaseConfig>
 
-export const SUBAGENT_DEFAULT_ALLOWED_TOOLS: ClineDefaultTool[] = [
-	ClineDefaultTool.FILE_READ,
-	ClineDefaultTool.LIST_FILES,
-	ClineDefaultTool.SEARCH,
-	ClineDefaultTool.LIST_CODE_DEF,
-	ClineDefaultTool.BASH,
-	ClineDefaultTool.USE_SKILL,
-	ClineDefaultTool.ATTEMPT,
+export const SUBAGENT_DEFAULT_ALLOWED_TOOLS: NodusDefaultTool[] = [
+	NodusDefaultTool.FILE_READ,
+	NodusDefaultTool.LIST_FILES,
+	NodusDefaultTool.SEARCH,
+	NodusDefaultTool.LIST_CODE_DEF,
+	NodusDefaultTool.BASH,
+	NodusDefaultTool.USE_SKILL,
+	NodusDefaultTool.ATTEMPT,
 ]
 
 export const SUBAGENT_SYSTEM_SUFFIX = `\n\n# Subagent Execution Mode
@@ -37,7 +37,7 @@ Do not include line numbers, summaries, or per-file explanations unless explicit
 
 export class SubagentBuilder {
 	private readonly agentConfig: AgentConfig = {}
-	private readonly allowedTools: ClineDefaultTool[]
+	private readonly allowedTools: NodusDefaultTool[]
 	private readonly apiHandler: ReturnType<typeof buildApiHandler>
 
 	constructor(
@@ -62,7 +62,7 @@ export class SubagentBuilder {
 		return this.apiHandler
 	}
 
-	getAllowedTools(): ClineDefaultTool[] {
+	getAllowedTools(): NodusDefaultTool[] {
 		return this.allowedTools
 	}
 
@@ -78,7 +78,7 @@ export class SubagentBuilder {
 
 	buildNativeTools(context: SystemPromptContext) {
 		const family = PromptRegistry.getInstance().getModelFamily(context)
-		const toolSets = ClineToolSet.getToolsForVariantWithFallback(family, this.allowedTools)
+		const toolSets = NodusToolSet.getToolsForVariantWithFallback(family, this.allowedTools)
 		const filteredToolSpecs = toolSets
 			.map((toolSet) => toolSet.config)
 			.filter(
@@ -87,13 +87,13 @@ export class SubagentBuilder {
 					(!toolSpec.contextRequirements || toolSpec.contextRequirements(context)),
 			)
 
-		const converter = ClineToolSet.getNativeConverter(context.providerInfo.providerId, context.providerInfo.model.id)
+		const converter = NodusToolSet.getNativeConverter(context.providerInfo.providerId, context.providerInfo.model.id)
 		return filteredToolSpecs.map((tool) => converter(tool, context))
 	}
 
-	private resolveAllowedTools(configuredTools?: ClineDefaultTool[]): ClineDefaultTool[] {
+	private resolveAllowedTools(configuredTools?: NodusDefaultTool[]): NodusDefaultTool[] {
 		const sourceTools = configuredTools && configuredTools.length > 0 ? configuredTools : SUBAGENT_DEFAULT_ALLOWED_TOOLS
-		return Array.from(new Set([...sourceTools, ClineDefaultTool.ATTEMPT]))
+		return Array.from(new Set([...sourceTools, NodusDefaultTool.ATTEMPT]))
 	}
 
 	private buildAgentIdentitySystemPrefix(): string {

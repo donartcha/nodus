@@ -1,5 +1,5 @@
-import { Empty, EmptyRequest } from "@shared/proto/cline/common"
-import { OpenRouterCompatibleModelInfo } from "@shared/proto/cline/models"
+import { Empty, EmptyRequest } from "@shared/proto/nodus/common"
+import { OpenRouterCompatibleModelInfo } from "@shared/proto/nodus/models"
 import { readMcpMarketplaceCatalogFromCache } from "@/core/storage/disk"
 import { telemetryService } from "@/services/telemetry"
 import { Logger } from "@/shared/services/Logger"
@@ -7,7 +7,7 @@ import { GlobalStateAndSettings } from "@/shared/storage/state-keys"
 import type { Controller } from "../index"
 import { sendMcpMarketplaceCatalogEvent } from "../mcp/subscribeToMcpMarketplaceCatalog"
 import { refreshBasetenModels } from "../models/refreshBasetenModels"
-import { refreshClineModels } from "../models/refreshClineModels"
+import { refreshnodusModels } from "../models/refreshnodusModels"
 import { refreshGroqModels } from "../models/refreshGroqModels"
 import { refreshHicapModels } from "../models/refreshHicapModels"
 import { refreshLiteLlmModels } from "../models/refreshLiteLlmModels"
@@ -71,17 +71,17 @@ export async function initializeWebview(controller: Controller, _request: EmptyR
 			}
 		})
 
-		refreshClineModels(controller).then(async (models) => {
+		refreshnodusModels(controller).then(async (models) => {
 			if (models && Object.keys(models).length > 0) {
-				// Update model info in state for Cline (this needs to be done here since we don't want to update state while settings is open, and we may refresh models there)
+				// Update model info in state for Nodus (this needs to be done here since we don't want to update state while settings is open, and we may refresh models there)
 				const apiConfiguration = controller.stateManager.getApiConfiguration()
 				const planActSeparateModelsSetting = controller.stateManager.getGlobalSettingsKey("planActSeparateModelsSetting")
 				const currentMode = controller.stateManager.getGlobalSettingsKey("mode")
 
 				if (planActSeparateModelsSetting) {
 					// Separate models: update only current mode
-					const modelIdField = currentMode === "plan" ? "planModeClineModelId" : "actModeClineModelId"
-					const modelInfoField = currentMode === "plan" ? "planModeClineModelInfo" : "actModeClineModelInfo"
+					const modelIdField = currentMode === "plan" ? "planModeNodusModelId" : "actModeNodusModelId"
+					const modelInfoField = currentMode === "plan" ? "planModeNodusModelInfo" : "actModeNodusModelInfo"
 					const modelId = apiConfiguration[modelIdField]
 
 					if (modelId && models[modelId]) {
@@ -90,18 +90,18 @@ export async function initializeWebview(controller: Controller, _request: EmptyR
 					}
 				} else {
 					// Shared models: update both plan and act modes
-					const planModelId = apiConfiguration.planModeClineModelId
-					const actModelId = apiConfiguration.actModeClineModelId
+					const planModelId = apiConfiguration.planModeNodusModelId
+					const actModelId = apiConfiguration.actModeNodusModelId
 					const updates: Partial<GlobalStateAndSettings> = {}
 
 					// Update plan mode model info if we have a model ID
 					if (planModelId && models[planModelId]) {
-						updates.planModeClineModelInfo = models[planModelId]
+						updates.planModeNodusModelInfo = models[planModelId]
 					}
 
 					// Update act mode model info if we have a model ID
 					if (actModelId && models[actModelId]) {
-						updates.actModeClineModelInfo = models[actModelId]
+						updates.actModeNodusModelInfo = models[actModelId]
 					}
 
 					// Post state update if we updated any model info

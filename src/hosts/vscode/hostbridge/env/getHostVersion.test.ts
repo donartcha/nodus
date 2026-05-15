@@ -3,7 +3,7 @@ import { afterEach, describe, it } from "mocha"
 import * as sinon from "sinon"
 import * as vscode from "vscode"
 import { ExtensionRegistryInfo } from "@/registry"
-import { ClineClient } from "@/shared/cline"
+import { NodusClient } from "@/shared/Nodus"
 import { getHostVersion } from "./getHostVersion"
 
 describe("Hostbridge - Env - getHostVersion", () => {
@@ -24,8 +24,8 @@ describe("Hostbridge - Env - getHostVersion", () => {
 
 			assert.strictEqual(response.platform, vscode.env.appName)
 			assert.strictEqual(response.version, vscode.version)
-			assert.strictEqual(response.clineType, ClineClient.VSCode)
-			assert.strictEqual(response.clineVersion, ExtensionRegistryInfo.version)
+			assert.strictEqual(response.NodusType, NodusClient.VSCode)
+			assert.strictEqual(response.NodusVersion, ExtensionRegistryInfo.version)
 			assert.strictEqual(response.remoteName, remoteName)
 
 			remoteNameStub.restore()

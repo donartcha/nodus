@@ -1,14 +1,14 @@
 import { ModelFamily } from "@/shared/prompts"
-import { ClineDefaultTool } from "@/shared/tools"
-import type { ClineToolSpec } from "../spec"
+import { NodusDefaultTool } from "@/shared/tools"
+import type { NodusToolSpec } from "../spec"
 import { TASK_PROGRESS_PARAMETER } from "../types"
 
-const id = ClineDefaultTool.FILE_READ
+const id = NodusDefaultTool.FILE_READ
 
 const READ_FILE_DESCRIPTION =
 	"Request to read the contents of a file at the specified path. Use this when you need to examine the contents of an existing file you do not know the contents of, for example to analyze code, review text files, or extract information from configuration files. Returned text lines are prefixed with line labels (e.g. `1 |`, `2 |`). These labels are metadata, not part of the file content. For large files, output is automatically limited to 1000 lines. Use start_line and end_line to read specific sections. Automatically extracts raw text from PDF and DOCX files. May not be suitable for other types of binary files, as it returns the raw content as a string. Do NOT use this tool to list the contents of a directory. Only use this tool on files."
 
-const READ_FILE_PARAMETERS: ClineToolSpec["parameters"] = [
+const READ_FILE_PARAMETERS: NodusToolSpec["parameters"] = [
 	{
 		name: "path",
 		required: true,
@@ -33,7 +33,7 @@ const READ_FILE_PARAMETERS: ClineToolSpec["parameters"] = [
 	TASK_PROGRESS_PARAMETER,
 ]
 
-const generic: ClineToolSpec = {
+const generic: NodusToolSpec = {
 	variant: ModelFamily.GENERIC,
 	id,
 	name: "read_file",
@@ -41,7 +41,7 @@ const generic: ClineToolSpec = {
 	parameters: READ_FILE_PARAMETERS,
 }
 
-const NATIVE_GPT_5: ClineToolSpec = {
+const NATIVE_GPT_5: NodusToolSpec = {
 	variant: ModelFamily.NATIVE_GPT_5,
 	id,
 	name: "read_file",
@@ -49,7 +49,7 @@ const NATIVE_GPT_5: ClineToolSpec = {
 	parameters: READ_FILE_PARAMETERS,
 }
 
-const NATIVE_NEXT_GEN: ClineToolSpec = {
+const NATIVE_NEXT_GEN: NodusToolSpec = {
 	...NATIVE_GPT_5,
 	variant: ModelFamily.NATIVE_NEXT_GEN,
 }

@@ -17,18 +17,18 @@ interface EndpointsFileSchema {
 }
 
 /**
- * Error thrown when the Cline configuration file exists but is invalid.
- * This error prevents Cline from starting to avoid misconfiguration in enterprise environments.
+ * Error thrown when the Nodus configuration file exists but is invalid.
+ * This error prevents Nodus from starting to avoid misconfiguration in enterprise environments.
  */
-export class ClineConfigurationError extends Error {
+export class NodusConfigurationError extends Error {
 	constructor(message: string) {
 		super(message)
-		this.name = "ClineConfigurationError"
+		this.name = "NodusConfigurationError"
 	}
 }
 
-class ClineEndpoint {
-	private static _instance: ClineEndpoint | null = null
+class NodusEndpoint {
+	private static _instance: NodusEndpoint | null = null
 	private static _initialized = false
 	private static _extensionFsPath: string
 
@@ -40,56 +40,56 @@ class ClineEndpoint {
 
 	private constructor() {
 		// Set environment at module load. Use override if provided.
-		const _env = process?.env?.CLINE_ENVIRONMENT_OVERRIDE || process?.env?.CLINE_ENVIRONMENT
+		const _env = process?.env?.Nodus_ENVIRONMENT_OVERRIDE || process?.env?.Nodus_ENVIRONMENT
 		if (_env && Object.values(Environment).includes(_env as Environment)) {
 			this.environment = _env as Environment
 		}
 	}
 
 	/**
-	 * Initializes the ClineEndpoint singleton.
+	 * Initializes the NodusEndpoint singleton.
 	 * Must be called before any other methods.
 	 * Reads the endpoints.json file if it exists and validates its schema.
 	 *
 	 * @param extensionFsPath Path to the extension installation directory (for checking bundled endpoints.json)
-	 * @throws ClineConfigurationError if the endpoints.json file exists but is invalid
+	 * @throws NodusConfigurationError if the endpoints.json file exists but is invalid
 	 */
 	public static async initialize(extensionFsPath: string): Promise<void> {
-		if (ClineEndpoint._initialized) {
+		if (NodusEndpoint._initialized) {
 			return
 		}
 
-		ClineEndpoint._extensionFsPath = extensionFsPath
-		ClineEndpoint._instance = new ClineEndpoint()
+		NodusEndpoint._extensionFsPath = extensionFsPath
+		NodusEndpoint._instance = new NodusEndpoint()
 
 		// Try to load on-premise config from file
-		const endpointsConfig = await ClineEndpoint.loadEndpointsFile()
+		const endpointsConfig = await NodusEndpoint.loadEndpointsFile()
 		if (endpointsConfig) {
-			ClineEndpoint._instance.onPremiseConfig = endpointsConfig
-			Logger.log("Cline running in self-hosted mode with custom endpoints")
+			NodusEndpoint._instance.onPremiseConfig = endpointsConfig
+			Logger.log("Nodus running in self-hosted mode with custom endpoints")
 		}
 
-		ClineEndpoint._initialized = true
+		NodusEndpoint._initialized = true
 	}
 
 	/**
-	 * Returns true if the ClineEndpoint has been initialized.
+	 * Returns true if the NodusEndpoint has been initialized.
 	 */
 	public static isInitialized(): boolean {
-		return ClineEndpoint._initialized
+		return NodusEndpoint._initialized
 	}
 
 	/**
-	 * Checks if Cline is running in self-hosted/on-premise mode.
+	 * Checks if Nodus is running in self-hosted/on-premise mode.
 	 * @returns true if in selfHosted mode, or true if not initialized (safety fallback to prevent accidental external calls)
 	 */
 	public static isSelfHosted(): boolean {
 		// Safety fallback: if not initialized, treat as selfHosted
 		// to prevent accidental external service calls before configuration is loaded
-		if (!ClineEndpoint._initialized) {
+		if (!NodusEndpoint._initialized) {
 			return true
 		}
-		return ClineEndpoint.config.environment === Environment.selfHosted
+		return NodusEndpoint.config.environment === Environment.selfHosted
 	}
 
 	/**
@@ -98,21 +98,21 @@ class ClineEndpoint {
 	 * @throws Error if not initialized
 	 */
 	public static isBundledConfig(): boolean {
-		if (!ClineEndpoint._initialized || !ClineEndpoint._instance) {
-			throw new Error("ClineEndpoint not initialized. Call ClineEndpoint.initialize() first.")
+		if (!NodusEndpoint._initialized || !NodusEndpoint._instance) {
+			throw new Error("NodusEndpoint not initialized. Call NodusEndpoint.initialize() first.")
 		}
-		return ClineEndpoint._instance.isBundled
+		return NodusEndpoint._instance.isBundled
 	}
 
 	/**
 	 * Returns the singleton instance.
 	 * @throws Error if not initialized
 	 */
-	public static get instance(): ClineEndpoint {
-		if (!ClineEndpoint._initialized || !ClineEndpoint._instance) {
-			throw new Error("ClineEndpoint not initialized. Call ClineEndpoint.initialize() first.")
+	public static get instance(): NodusEndpoint {
+		if (!NodusEndpoint._initialized || !NodusEndpoint._instance) {
+			throw new Error("NodusEndpoint not initialized. Call NodusEndpoint.initialize() first.")
 		}
-		return ClineEndpoint._instance
+		return NodusEndpoint._instance
 	}
 
 	/**
@@ -120,15 +120,15 @@ class ClineEndpoint {
 	 * @throws Error if not initialized
 	 */
 	public static get config(): EnvironmentConfig {
-		return ClineEndpoint.instance.config()
+		return NodusEndpoint.instance.config()
 	}
 
 	/**
 	 * Returns the path to the endpoints.json configuration file.
-	 * Located at ~/.cline/endpoints.json
+	 * Located at ~/.Nodus/endpoints.json
 	 */
 	private static getEndpointsFilePath(): string {
-		return path.join(os.homedir(), ".cline", "endpoints.json")
+		return path.join(os.homedir(), ".nodus", "endpoints.json")
 	}
 
 	/**
@@ -136,19 +136,19 @@ class ClineEndpoint {
 	 * Located in the extension installation directory.
 	 */
 	private static getBundledEndpointsFilePath(): string {
-		return path.join(ClineEndpoint._extensionFsPath, "endpoints.json")
+		return path.join(NodusEndpoint._extensionFsPath, "endpoints.json")
 	}
 
 	/**
 	 * Loads and validates the endpoints.json file.
 	 * Checks bundled location first, then falls back to user directory.
-	 * Priority: bundled endpoints.json → ~/.cline/endpoints.json → null (standard mode)
+	 * Priority: bundled endpoints.json → ~/.Nodus/endpoints.json → null (standard mode)
 	 * @returns The validated endpoints config, or null if no file exists
-	 * @throws ClineConfigurationError if a file exists but is invalid
+	 * @throws NodusConfigurationError if a file exists but is invalid
 	 */
 	private static async loadEndpointsFile(): Promise<EndpointsFileSchema | null> {
 		// 1. Try bundled file
-		const bundledPath = ClineEndpoint.getBundledEndpointsFilePath()
+		const bundledPath = NodusEndpoint.getBundledEndpointsFilePath()
 		try {
 			await fs.access(bundledPath)
 			// File exists, load and validate it
@@ -158,24 +158,24 @@ class ClineEndpoint {
 			try {
 				data = JSON.parse(fileContent)
 			} catch (parseError) {
-				throw new ClineConfigurationError(
+				throw new NodusConfigurationError(
 					`Invalid JSON in bundled endpoints configuration file (${bundledPath}): ${parseError instanceof Error ? parseError.message : String(parseError)}`,
 				)
 			}
 
-			const config = ClineEndpoint.validateEndpointsSchema(data, bundledPath)
+			const config = NodusEndpoint.validateEndpointsSchema(data, bundledPath)
 			// Mark as bundled enterprise distribution
-			ClineEndpoint._instance!.isBundled = true
+			NodusEndpoint._instance!.isBundled = true
 			return config
 		} catch (error) {
-			if (error instanceof ClineConfigurationError) {
+			if (error instanceof NodusConfigurationError) {
 				throw error
 			}
 			// Bundled file doesn't exist or is not accessible, try user file
 		}
 
-		// 2. Try ~/.cline/endpoints.json
-		const userPath = ClineEndpoint.getEndpointsFilePath()
+		// 2. Try ~/.Nodus/endpoints.json
+		const userPath = NodusEndpoint.getEndpointsFilePath()
 		try {
 			await fs.access(userPath)
 		} catch {
@@ -191,17 +191,17 @@ class ClineEndpoint {
 			try {
 				data = JSON.parse(fileContent)
 			} catch (parseError) {
-				throw new ClineConfigurationError(
+				throw new NodusConfigurationError(
 					`Invalid JSON in user endpoints configuration file (${userPath}): ${parseError instanceof Error ? parseError.message : String(parseError)}`,
 				)
 			}
 
-			return ClineEndpoint.validateEndpointsSchema(data, userPath)
+			return NodusEndpoint.validateEndpointsSchema(data, userPath)
 		} catch (error) {
-			if (error instanceof ClineConfigurationError) {
+			if (error instanceof NodusConfigurationError) {
 				throw error
 			}
-			throw new ClineConfigurationError(
+			throw new NodusConfigurationError(
 				`Failed to read user endpoints configuration file (${userPath}): ${error instanceof Error ? error.message : String(error)}`,
 			)
 		}
@@ -214,11 +214,11 @@ class ClineEndpoint {
 	 * @param data The parsed JSON data to validate
 	 * @param filePath The path to the file (for error messages)
 	 * @returns The validated EndpointsFileSchema
-	 * @throws ClineConfigurationError if validation fails
+	 * @throws NodusConfigurationError if validation fails
 	 */
 	private static validateEndpointsSchema(data: unknown, filePath: string): EndpointsFileSchema {
 		if (typeof data !== "object" || data === null) {
-			throw new ClineConfigurationError(`Endpoints configuration file (${filePath}) must contain a JSON object`)
+			throw new NodusConfigurationError(`Endpoints configuration file (${filePath}) must contain a JSON object`)
 		}
 
 		const obj = data as Record<string, unknown>
@@ -229,19 +229,19 @@ class ClineEndpoint {
 			const value = obj[field]
 
 			if (value === undefined || value === null) {
-				throw new ClineConfigurationError(
+				throw new NodusConfigurationError(
 					`Missing required field "${field}" in endpoints configuration file (${filePath})`,
 				)
 			}
 
 			if (typeof value !== "string") {
-				throw new ClineConfigurationError(
+				throw new NodusConfigurationError(
 					`Field "${field}" in endpoints configuration file (${filePath}) must be a string`,
 				)
 			}
 
 			if (!value.trim()) {
-				throw new ClineConfigurationError(
+				throw new NodusConfigurationError(
 					`Field "${field}" in endpoints configuration file (${filePath}) cannot be empty`,
 				)
 			}
@@ -250,7 +250,7 @@ class ClineEndpoint {
 			try {
 				new URL(value)
 			} catch {
-				throw new ClineConfigurationError(
+				throw new NodusConfigurationError(
 					`Field "${field}" in endpoints configuration file (${filePath}) must be a valid URL. Got: "${value}"`,
 				)
 			}
@@ -274,7 +274,7 @@ class ClineEndpoint {
 	 */
 	public setEnvironment(env: string) {
 		if (this.onPremiseConfig) {
-			throw new Error("Cannot change environment in on-premise mode. Endpoints are configured via ~/.cline/endpoints.json")
+			throw new Error("Cannot change environment in on-premise mode. Endpoints are configured via ~/.nodus/endpoints.json")
 		}
 
 		switch (env.toLowerCase()) {
@@ -310,23 +310,23 @@ class ClineEndpoint {
 			case Environment.staging:
 				return {
 					environment: Environment.staging,
-					appBaseUrl: "https://staging-app.cline.bot",
-					apiBaseUrl: "https://core-api.staging.int.cline.bot",
-					mcpBaseUrl: "https://core-api.staging.int.cline.bot/v1/mcp",
+					appBaseUrl: "https://staging-app.nodus.bot",
+					apiBaseUrl: "https://core-api.staging.int.nodus.bot",
+					mcpBaseUrl: "https://core-api.staging.int.nodus.bot/v1/mcp",
 				}
 			case Environment.local:
 				return {
 					environment: Environment.local,
 					appBaseUrl: "http://localhost:3000",
 					apiBaseUrl: "http://localhost:7777",
-					mcpBaseUrl: "https://api.cline.bot/v1/mcp",
+					mcpBaseUrl: "https://api.nodus.bot/v1/mcp",
 				}
 			default:
 				return {
 					environment: Environment.production,
-					appBaseUrl: "https://app.cline.bot",
-					apiBaseUrl: "https://api.cline.bot",
-					mcpBaseUrl: "https://api.cline.bot/v1/mcp",
+					appBaseUrl: "https://app.nodus.bot",
+					apiBaseUrl: "https://api.nodus.bot",
+					mcpBaseUrl: "https://api.nodus.bot/v1/mcp",
 				}
 		}
 	}
@@ -335,16 +335,16 @@ class ClineEndpoint {
 /**
  * Singleton instance to access the current environment configuration.
  * Usage:
- * - ClineEnv.config() to get the current config.
- * - ClineEnv.setEnvironment(Environment.local) to change the environment.
+ * - NodusEnv.config() to get the current config.
+ * - NodusEnv.setEnvironment(Environment.local) to change the environment.
  *
- * IMPORTANT: ClineEndpoint.initialize() must be called before using ClineEnv.
+ * IMPORTANT: NodusEndpoint.initialize() must be called before using NodusEnv.
  */
-export const ClineEnv = {
-	config: () => ClineEndpoint.config,
-	setEnvironment: (env: string) => ClineEndpoint.instance.setEnvironment(env),
-	getEnvironment: () => ClineEndpoint.instance.getEnvironment(),
+export const NodusEnv = {
+	config: () => NodusEndpoint.config,
+	setEnvironment: (env: string) => NodusEndpoint.instance.setEnvironment(env),
+	getEnvironment: () => NodusEndpoint.instance.getEnvironment(),
 }
 
 // Export the class for initialization
-export { ClineEndpoint }
+export { NodusEndpoint }

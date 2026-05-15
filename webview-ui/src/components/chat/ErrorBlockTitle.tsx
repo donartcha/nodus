@@ -1,5 +1,5 @@
 import React from "react"
-import { ClineError, ClineErrorType } from "../../../../src/services/error/ClineError"
+import { NodusError, NodusErrorType } from "../../../../src/services/error/NodusError"
 import { ProgressIndicator } from "./ChatRow"
 
 interface ErrorBlockTitleProps {
@@ -57,10 +57,10 @@ export const ErrorBlockTitle = ({
 			details.classNames.push("text-(--vscode-foreground)")
 		} else if (apiRequestFailedMessage) {
 			// Handle failed request
-			const clineError = ClineError.parse(apiRequestFailedMessage)
-			const titleText = clineError?.isErrorType(ClineErrorType.Balance)
+			const NodusError = NodusError.parse(apiRequestFailedMessage)
+			const titleText = NodusError?.isErrorType(NodusErrorType.Balance)
 				? "Credit Limit Reached"
-				: clineError?.isErrorType(ClineErrorType.SpendLimit)
+				: NodusError?.isErrorType(NodusErrorType.SpendLimit)
 					? "Spend Limit Reached"
 					: "API Request Failed"
 			details.title = titleText

@@ -1,13 +1,13 @@
-import type { UsageTransaction as ClineAccountUsageTransaction, PaymentTransaction } from "@shared/ClineAccount"
-import { isClineInternalTester } from "@shared/internal/account"
-import type { UserOrganization } from "@shared/proto/cline/account"
-import { EmptyRequest } from "@shared/proto/cline/common"
+import type { UsageTransaction as NodusAccountUsageTransaction, PaymentTransaction } from "@shared/NodusAccount"
+import { isNodusInternalTester } from "@shared/internal/account"
+import type { UserOrganization } from "@shared/proto/nodus/account"
+import { EmptyRequest } from "@shared/proto/nodus/common"
 import { VSCodeButton, VSCodeDivider, VSCodeDropdown, VSCodeOption, VSCodeTag } from "@vscode/webview-ui-toolkit/react"
 import deepEqual from "fast-deep-equal"
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useInterval } from "react-use"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
-import { type ClineUser, handleSignOut } from "@/context/ClineAuthContext"
+import { type NodusUser, handleSignOut } from "@/context/NodusAuthContext"
 import { useExtensionState } from "@/context/ExtensionStateContext"
 import { AccountServiceClient } from "@/services/grpc-client"
 import ViewHeader from "../common/ViewHeader"
@@ -16,45 +16,45 @@ import { updateSetting } from "../settings/utils/settingsHandlers"
 import { AccountWelcomeView } from "./AccountWelcomeView"
 import { CreditBalance } from "./CreditBalance"
 import CreditsHistoryTable from "./CreditsHistoryTable"
-import { convertProtoUsageTransactions, getClineUris, getMainRole } from "./helpers"
+import { convertProtoUsageTransactions, getNodusUris, getMainRole } from "./helpers"
 import { RemoteConfigToggle } from "./RemoteConfigToggle"
 
 type AccountViewProps = {
-	clineUser: ClineUser | null
+	NodusUser: NodusUser | null
 	organizations: UserOrganization[] | null
 	activeOrganization: UserOrganization | null
 	onDone: () => void
 }
 
-type ClineAccountViewProps = {
-	clineUser: ClineUser
+type NodusAccountViewProps = {
+	NodusUser: NodusUser
 	userOrganizations: UserOrganization[] | null
 	activeOrganization: UserOrganization | null
-	clineEnv: "Production" | "Staging" | "Local"
+	NodusEnv: "Production" | "Staging" | "Local"
 }
 
 type CachedData = {
 	balance: number | null
-	usageData: ClineAccountUsageTransaction[]
+	usageData: NodusAccountUsageTransaction[]
 	paymentsData: PaymentTransaction[]
 	lastFetchTime: number
 }
 
-const ClineEnvOptions = ["Production", "Staging", "Local"] as const
+const NodusEnvOptions = ["Production", "Staging", "Local"] as const
 
-const AccountView = ({ onDone, clineUser, organizations, activeOrganization }: AccountViewProps) => {
+const AccountView = ({ onDone, NodusUser, organizations, activeOrganization }: AccountViewProps) => {
 	const { environment } = useExtensionState()
 
 	return (
 		<div className="fixed inset-0 flex flex-col overflow-hidden">
 			<ViewHeader environment={environment} onDone={onDone} showEnvironmentSuffix title="Account" />
 			<div className="grow flex flex-col px-5 overflow-y-auto">
-				{clineUser?.uid ? (
-					<ClineAccountView
+				{NodusUser?.uid ? (
+					<NodusAccountView
 						activeOrganization={activeOrganization}
-						clineEnv={environment === "local" ? "Local" : environment === "staging" ? "Staging" : "Production"}
-						clineUser={clineUser}
-						key={clineUser.uid}
+						NodusEnv={environment === "local" ? "Local" : environment === "staging" ? "Staging" : "Production"}
+						NodusUser={NodusUser}
+						key={NodusUser.uid}
 						userOrganizations={organizations}
 					/>
 				) : (
@@ -65,8 +65,8 @@ const AccountView = ({ onDone, clineUser, organizations, activeOrganization }: A
 	)
 }
 
-export const ClineAccountView = ({ clineUser, userOrganizations, activeOrganization, clineEnv }: ClineAccountViewProps) => {
-	const { email, displayName, appBaseUrl, uid } = clineUser
+export const NodusAccountView = ({ NodusUser, userOrganizations, activeOrganization, NodusEnv }: NodusAccountViewProps) => {
+	const { email, displayName, appBaseUrl, uid } = NodusUser
 	const { remoteConfigSettings, environment } = useExtensionState()
 
 	// Determine if dropdown should be locked by remote config
@@ -82,7 +82,7 @@ export const ClineAccountView = ({ clineUser, userOrganizations, activeOrganizat
 
 	// Current displayed data
 	const [balance, setBalance] = useState<number | null>(null)
-	const [usageData, setUsageData] = useState<ClineAccountUsageTransaction[]>([])
+	const [usageData, setUsageData] = useState<NodusAccountUsageTransaction[]>([])
 	const [paymentsData, setPaymentsData] = useState<PaymentTransaction[]>([])
 	const [lastFetchTime, setLastFetchTime] = useState<number>(Date.now())
 
@@ -120,7 +120,7 @@ export const ClineAccountView = ({ clineUser, userOrganizations, activeOrganizat
 	// Track if initial mount fetch has completed to avoid duplicate fetches
 	const initialFetchCompleteRef = useRef<boolean>(false)
 
-	const isClineTester = useMemo(() => (email ? isClineInternalTester(email) : false), [email])
+	const isNodusTester = useMemo(() => (email ? isNodusInternalTester(email) : false), [email])
 
 	const fetchUserCredit = useCallback(async () => {
 		try {
@@ -229,7 +229,7 @@ export const ClineAccountView = ({ clineUser, userOrganizations, activeOrganizat
 		fetchCreditBalance(dropdownValue)
 	}, 60000)
 
-	const clineUrl = appBaseUrl || "https://app.cline.bot"
+	const NodusUrl = appBaseUrl || "https://app.nodus.bot"
 
 	// Fetch balance on mount
 	useEffect(() => {
@@ -356,7 +356,7 @@ export const ClineAccountView = ({ clineUser, userOrganizations, activeOrganizat
 
 				<div className="w-full flex gap-2 flex-col min-[225px]:flex-row">
 					<div className="w-full min-[225px]:w-1/2">
-						<VSCodeButtonLink appearance="primary" className="w-full" href={getClineUris(clineUrl, "dashboard").href}>
+						<VSCodeButtonLink appearance="primary" className="w-full" href={getNodusUris(NodusUrl, "dashboard").href}>
 							Dashboard
 						</VSCodeButtonLink>
 					</div>
@@ -369,7 +369,7 @@ export const ClineAccountView = ({ clineUser, userOrganizations, activeOrganizat
 
 				<CreditBalance
 					balance={balance}
-					creditUrl={getClineUris(clineUrl, "credits", dropdownValue === uid ? "account" : "organization")}
+					creditUrl={getNodusUris(NodusUrl, "credits", dropdownValue === uid ? "account" : "organization")}
 					fetchCreditBalance={() => fetchCreditBalance(dropdownValue)}
 					isLoading={isLoading}
 					lastFetchTime={lastFetchTime}
@@ -387,21 +387,21 @@ export const ClineAccountView = ({ clineUser, userOrganizations, activeOrganizat
 				</div>
 
 				{/* Hide environment switching UI when in self-hosted mode */}
-				{isClineTester && environment !== "selfHosted" && (
+				{isNodusTester && environment !== "selfHosted" && (
 					<div className="w-full gap-1 items-end">
 						<VSCodeDivider className="w-full my-3" />
-						<div className="text-sm font-semibold">Cline Environment</div>
+						<div className="text-sm font-semibold">Nodus Environment</div>
 						<VSCodeDropdown
 							className="w-full mt-1"
-							currentValue={clineEnv}
+							currentValue={NodusEnv}
 							onChange={async (e) => {
 								const target = e.target as HTMLSelectElement
 								if (target?.value) {
 									const value = target.value as "Local" | "Staging" | "Production"
-									updateSetting("clineEnv", value.toLowerCase())
+									updateSetting("NodusEnv", value.toLowerCase())
 								}
 							}}>
-							{ClineEnvOptions.map((env) => (
+							{NodusEnvOptions.map((env) => (
 								<VSCodeOption key={env} value={env}>
 									{env}
 								</VSCodeOption>

@@ -4,8 +4,8 @@ import { FunctionDeclaration as GoogleTool } from "@google/genai"
 import { CLAUDE_SONNET_1M_SUFFIX, ModelInfo, VertexModelId, vertexDefaultModelId, vertexModels } from "@shared/api"
 import { isClaudeOpusAdaptiveThinkingModel, resolveClaudeOpusAdaptiveThinking } from "@shared/utils/reasoning-support"
 import { buildExternalBasicHeaders } from "@/services/EnvUtils"
-import { ClineStorageMessage } from "@/shared/messages/content"
-import { ClineTool } from "@/shared/tools"
+import { NodusStorageMessage } from "@/shared/messages/content"
+import { NodusTool } from "@/shared/tools"
 import { ApiHandler, CommonApiHandlerOptions } from "../"
 import { withRetry } from "../retry"
 import { sanitizeAnthropicMessages } from "../transform/anthropic-format"
@@ -72,7 +72,7 @@ export class VertexHandler implements ApiHandler {
 	}
 
 	@withRetry()
-	async *createMessage(systemPrompt: string, messages: ClineStorageMessage[], tools?: ClineTool[]): ApiStream {
+	async *createMessage(systemPrompt: string, messages: NodusStorageMessage[], tools?: NodusTool[]): ApiStream {
 		const model = this.getModel()
 		const rawModelId = model.id
 		const modelId = rawModelId.endsWith(CLAUDE_SONNET_1M_SUFFIX)

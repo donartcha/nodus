@@ -1,6 +1,6 @@
-import { AuthState, UserInfo } from "@shared/proto/cline/account"
-import { type EmptyRequest, String } from "@shared/proto/cline/common"
-import { ClineEnv } from "@/config"
+import { AuthState, UserInfo } from "@shared/proto/nodus/account"
+import { type EmptyRequest, String } from "@shared/proto/nodus/common"
+import { NodusEnv } from "@/config"
 import { Controller } from "@/core/controller"
 import { getRequestRegistry, type StreamingResponseHandler } from "@/core/controller/grpc-handler"
 import { setWelcomeViewCompleted } from "@/core/controller/state/setWelcomeViewCompleted"
@@ -9,9 +9,9 @@ import { telemetryService } from "@/services/telemetry"
 import { Logger } from "@/shared/services/Logger"
 import { openExternal } from "@/utils/env"
 import { BannerService } from "../banner/BannerService"
-import { AuthInvalidTokenError, AuthNetworkError } from "../error/ClineError"
+import { AuthInvalidTokenError, AuthNetworkError } from "../error/NodusError"
 import { featureFlagsService } from "../feature-flags"
-import { ClineAuthProvider } from "./providers/ClineAuthProvider"
+import { NodusAuthProvider } from "./providers/NodusAuthProvider"
 import { LogoutReason } from "./types"
 
 export type ServiceConfig = {
@@ -19,7 +19,7 @@ export type ServiceConfig = {
 	[key: string]: any
 }
 
-export interface ClineAuthInfo {
+export interface NodusAuthInfo {
 	/**
 	 * accessToken
 	 */
@@ -33,19 +33,19 @@ export interface ClineAuthInfo {
 	 * When expired, the access token needs to be refreshed using the refresh token.
 	 */
 	expiresAt?: number
-	userInfo: ClineAccountUserInfo
+	userInfo: NodusAccountUserInfo
 	provider: string
 	startedAt?: number
 }
 
-export interface ClineAccountUserInfo {
+export interface NodusAccountUserInfo {
 	createdAt: string
 	displayName: string
 	email: string
 	id: string
-	organizations: ClineAccountOrganization[]
+	organizations: NodusAccountOrganization[]
 	/**
-	 * Cline app base URL, used for webview UI and other client-side operations
+	 * Nodus app base URL, used for webview UI and other client-side operations
 	 */
 	appBaseUrl?: string
 	/**
@@ -54,7 +54,7 @@ export interface ClineAccountUserInfo {
 	subject?: string
 }
 
-export interface ClineAccountOrganization {
+export interface NodusAccountOrganization {
 	active: boolean
 	memberId: string
 	name: string
@@ -65,8 +65,8 @@ export interface ClineAccountOrganization {
 export class AuthService {
 	protected static instance: AuthService | null = null
 	protected _authenticated = false
-	protected _clineAuthInfo: ClineAuthInfo | null = null
-	protected _provider: ClineAuthProvider
+	protected _NodusAuthInfo: NodusAuthInfo | null = null
+	protected _provider: NodusAuthProvider
 	protected _activeAuthStatusUpdateHandlers = new Set<StreamingResponseHandler<AuthState>>()
 	protected _handlerToController = new Map<StreamingResponseHandler<AuthState>, Controller>()
 	protected _controller: Controller
@@ -77,7 +77,7 @@ export class AuthService {
 	 * @param controller - Optional reference to the Controller instance.
 	 */
 	protected constructor(controller: Controller) {
-		this._provider = new ClineAuthProvider()
+		this._provider = new NodusAuthProvider()
 		this._controller = controller
 	}
 
@@ -137,10 +137,10 @@ export class AuthService {
 	 * @returns The active organization ID, or null if no active organization exists
 	 */
 	getActiveOrganizationId(): string | null {
-		if (!this._clineAuthInfo?.userInfo?.organizations) {
+		if (!this._NodusAuthInfo?.userInfo?.organizations) {
 			return null
 		}
-		const activeOrg = this._clineAuthInfo.userInfo.organizations.find((org) => org.active)
+		const activeOrg = this._NodusAuthInfo.userInfo.organizations.find((org) => org.active)
 		return activeOrg?.organizationId ?? null
 	}
 
@@ -148,20 +148,20 @@ export class AuthService {
 	 * Gets all organizations from the authenticated user's info
 	 * @returns Array of organizations, or undefined if not available
 	 */
-	getUserOrganizations(): ClineAccountOrganization[] | undefined {
-		return this._clineAuthInfo?.userInfo?.organizations
+	getUserOrganizations(): NodusAccountOrganization[] | undefined {
+		return this._NodusAuthInfo?.userInfo?.organizations
 	}
 
-	private async internalGetAuthToken(provider: ClineAuthProvider): Promise<string | null> {
+	private async internalGetAuthToken(provider: NodusAuthProvider): Promise<string | null> {
 		try {
-			let clineAccountAuthToken = this._clineAuthInfo?.idToken
-			if (!this._clineAuthInfo || !clineAccountAuthToken || this._clineAuthInfo.provider !== provider.name) {
+			let NodusAccountAuthToken = this._NodusAuthInfo?.idToken
+			if (!this._NodusAuthInfo || !NodusAccountAuthToken || this._NodusAuthInfo.provider !== provider.name) {
 				// Not authenticated
 				return null
 			}
 
 			// Check if token has expired
-			if (await provider.shouldRefreshIdToken(clineAccountAuthToken, this._clineAuthInfo.expiresAt)) {
+			if (await provider.shouldRefreshIdToken(NodusAccountAuthToken, this._NodusAuthInfo.expiresAt)) {
 				// If a refresh is already in progress, wait for it to complete
 				if (this._refreshPromise) {
 					Logger.info("Token refresh already in progress, waiting for completion")
@@ -174,18 +174,18 @@ export class AuthService {
 					let authStatusChanged = false
 
 					try {
-						const updatedAuthInfo = await provider.retrieveClineAuthInfo(this._controller)
+						const updatedAuthInfo = await provider.retrieveNodusAuthInfo(this._controller)
 						if (updatedAuthInfo) {
-							this._clineAuthInfo = updatedAuthInfo
+							this._NodusAuthInfo = updatedAuthInfo
 							this._authenticated = true
-							clineAccountAuthToken = updatedAuthInfo.idToken
+							NodusAccountAuthToken = updatedAuthInfo.idToken
 							authStatusChanged = true
 						}
 					} catch (error) {
 						// Only log out for permanent auth failures, not network issues
 						if (error instanceof AuthInvalidTokenError) {
 							Logger.error("Token is invalid or expired:", error)
-							this._clineAuthInfo = null
+							this._NodusAuthInfo = null
 							this._authenticated = false
 							telemetryService.captureAuthLoggedOut(this._provider.name, LogoutReason.ERROR_RECOVERY)
 							authStatusChanged = true
@@ -208,13 +208,13 @@ export class AuthService {
 						})
 					}
 
-					return clineAccountAuthToken
+					return NodusAccountAuthToken
 				})()
 
-				clineAccountAuthToken = await this._refreshPromise
+				NodusAccountAuthToken = await this._refreshPromise
 			}
 
-			return clineAccountAuthToken || null
+			return NodusAccountAuthToken || null
 		} catch (error) {
 			Logger.error("Error getting auth token:", error)
 			return null
@@ -223,18 +223,18 @@ export class AuthService {
 
 	/**
 	 * Gets the provider name for the current authentication
-	 * @returns The provider name (e.g., "cline", "firebase"), or null if not authenticated
+	 * @returns The provider name (e.g., "Nodus", "firebase"), or null if not authenticated
 	 */
 	getProviderName(): string | null {
-		return this._clineAuthInfo?.provider ?? null
+		return this._NodusAuthInfo?.provider ?? null
 	}
 
 	getInfo(): AuthState {
 		// TODO: this logic should be cleaner, but this will determine the authentication state for the webview -- if a user object is returned then the webview assumes authenticated, otherwise it assumes logged out (we previously returned a UserInfo object with empty fields, and this represented a broken logged in state)
 		let user: any = null
-		if (this._clineAuthInfo && this._authenticated) {
-			const userInfo = this._clineAuthInfo.userInfo
-			this._clineAuthInfo.userInfo.appBaseUrl = ClineEnv.config()?.appBaseUrl
+		if (this._NodusAuthInfo && this._authenticated) {
+			const userInfo = this._NodusAuthInfo.userInfo
+			this._NodusAuthInfo.userInfo.appBaseUrl = NodusEnv.config()?.appBaseUrl
 
 			user = UserInfo.create({
 				// TODO: create proto for new user info type
@@ -271,7 +271,7 @@ export class AuthService {
 	async handleDeauth(reason: LogoutReason = LogoutReason.UNKNOWN): Promise<void> {
 		try {
 			telemetryService.captureAuthLoggedOut(this._provider.name, reason)
-			this._clineAuthInfo = null
+			this._NodusAuthInfo = null
 			this._authenticated = false
 			this.destroyTokens()
 			this.sendAuthStatusUpdate()
@@ -283,8 +283,8 @@ export class AuthService {
 
 	async handleAuthCallback(authorizationCode: string, provider: string): Promise<void> {
 		try {
-			this._clineAuthInfo = await this._provider.signIn(this._controller, authorizationCode, provider)
-			this._authenticated = this._clineAuthInfo?.idToken !== undefined
+			this._NodusAuthInfo = await this._provider.signIn(this._controller, authorizationCode, provider)
+			this._authenticated = this._NodusAuthInfo?.idToken !== undefined
 
 			telemetryService.captureAuthSucceeded(this._provider.name)
 			await setWelcomeViewCompleted(this._controller, { value: true })
@@ -312,33 +312,33 @@ export class AuthService {
 	 */
 	async restoreRefreshTokenAndRetrieveAuthInfo(): Promise<void> {
 		try {
-			this._clineAuthInfo = await this.retrieveAuthInfo()
-			if (this._clineAuthInfo) {
+			this._NodusAuthInfo = await this.retrieveAuthInfo()
+			if (this._NodusAuthInfo) {
 				this._authenticated = true
 				await this.sendAuthStatusUpdate()
 			} else {
 				Logger.warn("No user found after restoring auth token")
 				this._authenticated = false
-				this._clineAuthInfo = null
+				this._NodusAuthInfo = null
 				telemetryService.captureAuthLoggedOut(this._provider.name, LogoutReason.ERROR_RECOVERY)
 			}
 		} catch (error) {
 			Logger.error("Error restoring auth token:", error)
 			this._authenticated = false
-			this._clineAuthInfo = null
+			this._NodusAuthInfo = null
 			telemetryService.captureAuthLoggedOut(this._provider.name, LogoutReason.ERROR_RECOVERY)
 			return
 		}
 	}
 
-	private async retrieveAuthInfo(): Promise<ClineAuthInfo | null> {
+	private async retrieveAuthInfo(): Promise<NodusAuthInfo | null> {
 		// If a refresh is already in progress, wait for it to complete
 		if (this._refreshPromise) {
 			Logger.info("Token refresh already in progress, waiting for completion")
 			await this._refreshPromise
 		}
 
-		return this._provider.retrieveClineAuthInfo(this._controller)
+		return this._provider.retrieveNodusAuthInfo(this._controller)
 	}
 
 	/**
@@ -408,17 +408,17 @@ export class AuthService {
 		await Promise.all(streamSends)
 
 		// Identify the user in telemetry if available
-		if (this._clineAuthInfo?.userInfo?.id) {
-			telemetryService.identifyAccount(this._clineAuthInfo.userInfo)
+		if (this._NodusAuthInfo?.userInfo?.id) {
+			telemetryService.identifyAccount(this._NodusAuthInfo.userInfo)
 			// Poll feature flags immediately for authenticated users to ensure cache is populated
-			await featureFlagsService.poll(this._clineAuthInfo.userInfo?.id)
+			await featureFlagsService.poll(this._NodusAuthInfo.userInfo?.id)
 		} else {
 			// Poll feature flags for unauthenticated state
 			await featureFlagsService.poll(null)
 		}
 
 		// Update banners based on new auth token
-		BannerService.onAuthUpdate(this._clineAuthInfo?.userInfo?.id || null).catch((error) => {
+		BannerService.onAuthUpdate(this._NodusAuthInfo?.userInfo?.id || null).catch((error) => {
 			Logger.error("[AuthService] Banner update failed", error)
 		})
 
@@ -427,7 +427,7 @@ export class AuthService {
 	}
 
 	private destroyTokens() {
-		this._controller.stateManager.setSecret("clineAccountId", undefined)
-		this._controller.stateManager.setSecret("cline:clineAccountId", undefined)
+		// this._controller.stateManager.setSecret("NodusAccountId", undefined)
+		this._controller.stateManager.setSecret("nodus:nodusAccountId", undefined)
 	}
 }

@@ -1,6 +1,6 @@
-import type { ClineMessage } from "@shared/ExtensionMessage"
-import { EmptyRequest, StringRequest } from "@shared/proto/cline/common"
-import { AskResponseRequest, NewTaskRequest } from "@shared/proto/cline/task"
+import type { NodusMessage } from "@shared/ExtensionMessage"
+import { EmptyRequest, StringRequest } from "@shared/proto/nodus/common"
+import { AskResponseRequest, NewTaskRequest } from "@shared/proto/nodus/task"
 import { useCallback, useRef } from "react"
 import { useExtensionState } from "@/context/ExtensionStateContext"
 import { SlashServiceClient, TaskServiceClient } from "@/services/grpc-client"
@@ -11,7 +11,7 @@ import type { ChatState, MessageHandlers } from "../types/chatTypes"
  * Custom hook for managing message handlers
  * Handles sending messages, button clicks, and task management
  */
-export function useMessageHandlers(messages: ClineMessage[], chatState: ChatState): MessageHandlers {
+export function useMessageHandlers(messages: NodusMessage[], chatState: ChatState): MessageHandlers {
 	const { backgroundCommandRunning } = useExtensionState()
 	const {
 		setInputValue,
@@ -21,7 +21,7 @@ export function useMessageHandlers(messages: ClineMessage[], chatState: ChatStat
 		setSelectedFiles,
 		setSendingDisabled,
 		setEnableButtons,
-		clineAsk,
+		NodusAsk,
 		lastMessage,
 	} = chatState
 	const cancelInFlightRef = useRef(false)
@@ -53,10 +53,10 @@ export function useMessageHandlers(messages: ClineMessage[], chatState: ChatStat
 						}),
 					)
 					messageSent = true
-				} else if (clineAsk) {
+				} else if (NodusAsk) {
 					// For resume_task and resume_completed_task, use yesButtonClicked to match Resume button behavior
 					// This ensures Enter key and Resume button work identically
-					if (clineAsk === "resume_task" || clineAsk === "resume_completed_task") {
+					if (NodusAsk === "resume_task" || NodusAsk === "resume_completed_task") {
 						await TaskServiceClient.askResponse(
 							AskResponseRequest.create({
 								responseType: "yesButtonClicked",
@@ -68,7 +68,7 @@ export function useMessageHandlers(messages: ClineMessage[], chatState: ChatStat
 						messageSent = true
 					} else {
 						// All other ask types use messageResponse
-						switch (clineAsk) {
+						switch (NodusAsk) {
 							case "followup":
 							case "plan_mode_respond":
 							case "tool":
@@ -96,7 +96,7 @@ export function useMessageHandlers(messages: ClineMessage[], chatState: ChatStat
 						}
 					}
 				} else if (messages.length > 0) {
-					// No clineAsk set - check if task is actively running
+					// No NodusAsk set - check if task is actively running
 					// If so, allow interrupting it with feedback
 					const lastMessage = messages[messages.length - 1]
 					const isTaskRunning =
@@ -134,7 +134,7 @@ export function useMessageHandlers(messages: ClineMessage[], chatState: ChatStat
 		},
 		[
 			messages.length,
-			clineAsk,
+			NodusAsk,
 			activeQuote,
 			setInputValue,
 			setActiveQuote,
@@ -237,7 +237,7 @@ export function useMessageHandlers(messages: ClineMessage[], chatState: ChatStat
 					break
 
 				case "new_task":
-					if (clineAsk === "new_task") {
+					if (NodusAsk === "new_task") {
 						await TaskServiceClient.newTask(
 							NewTaskRequest.create({
 								text: lastMessage?.text,
@@ -274,7 +274,7 @@ export function useMessageHandlers(messages: ClineMessage[], chatState: ChatStat
 				}
 
 				case "utility":
-					switch (clineAsk) {
+					switch (NodusAsk) {
 						case "condense":
 							await SlashServiceClient.condense(StringRequest.create({ value: lastMessage?.text })).catch((err) =>
 								console.error(err),
@@ -294,7 +294,7 @@ export function useMessageHandlers(messages: ClineMessage[], chatState: ChatStat
 			}
 		},
 		[
-			clineAsk,
+			NodusAsk,
 			lastMessage,
 			messages,
 			clearInputState,

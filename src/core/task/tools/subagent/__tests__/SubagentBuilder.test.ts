@@ -1,11 +1,11 @@
 import { strict as assert } from "node:assert"
 import * as api from "@core/api"
 import { PromptRegistry } from "@core/prompts/system-prompt"
-import { ClineToolSet } from "@core/prompts/system-prompt/registry/ClineToolSet"
+import { NodusToolSet } from "@core/prompts/system-prompt/registry/NodusToolSet"
 import type { TaskConfig } from "@core/task/tools/types/TaskConfig"
 import { afterEach, describe, it } from "mocha"
 import sinon from "sinon"
-import { ClineDefaultTool } from "@/shared/tools"
+import { NodusDefaultTool } from "@/shared/tools"
 import { AgentConfigLoader } from "../AgentConfigLoader"
 import { SUBAGENT_DEFAULT_ALLOWED_TOOLS, SUBAGENT_SYSTEM_SUFFIX, SubagentBuilder } from "../SubagentBuilder"
 
@@ -40,7 +40,7 @@ describe("SubagentBuilder", () => {
 					? {
 							name: "cached-agent",
 							description: "cached description",
-							tools: [ClineDefaultTool.LIST_FILES],
+							tools: [NodusDefaultTool.LIST_FILES],
 							modelId: "gpt-5",
 							systemPrompt: "cached system prompt",
 						}
@@ -59,7 +59,7 @@ describe("SubagentBuilder", () => {
 		assert.equal((effectiveApiConfig as Record<string, unknown>).actModeOpenAiModelId, "gpt-5")
 		assert.equal((effectiveApiConfig as Record<string, unknown>).actModeApiModelId, "act-default")
 
-		assert.deepEqual(builder.getAllowedTools(), [ClineDefaultTool.LIST_FILES, ClineDefaultTool.ATTEMPT])
+		assert.deepEqual(builder.getAllowedTools(), [NodusDefaultTool.LIST_FILES, NodusDefaultTool.ATTEMPT])
 		const prompt = builder.buildSystemPrompt("generated system prompt")
 		assert.match(prompt, /# Agent Profile/)
 		assert.match(prompt, /Name: cached-agent/)
@@ -88,7 +88,7 @@ describe("SubagentBuilder", () => {
 					? {
 							name: "openrouter-agent",
 							description: "openrouter plan agent",
-							tools: [ClineDefaultTool.FILE_READ],
+							tools: [NodusDefaultTool.FILE_READ],
 							modelId: "openrouter/custom-model",
 							systemPrompt: "plan system",
 						}
@@ -116,7 +116,7 @@ describe("SubagentBuilder", () => {
 					? {
 							name: "tools-agent",
 							description: "tool-limited",
-							tools: [ClineDefaultTool.LIST_FILES],
+							tools: [NodusDefaultTool.LIST_FILES],
 							modelId: "sonnet",
 							systemPrompt: "tool prompt",
 						}
@@ -125,28 +125,28 @@ describe("SubagentBuilder", () => {
 		sinon.stub(api, "buildApiHandler").returns({ getModel: sinon.stub(), createMessage: sinon.stub() } as never)
 
 		const getModelFamilyStub = sinon.stub(PromptRegistry.getInstance(), "getModelFamily").returns("test-family" as never)
-		const getToolsStub = sinon.stub(ClineToolSet, "getToolsForVariantWithFallback").returns([
+		const getToolsStub = sinon.stub(NodusToolSet, "getToolsForVariantWithFallback").returns([
 			{
 				config: {
-					id: ClineDefaultTool.LIST_FILES,
+					id: NodusDefaultTool.LIST_FILES,
 					contextRequirements: () => true,
 				},
 			},
 			{
 				config: {
-					id: ClineDefaultTool.SEARCH,
+					id: NodusDefaultTool.SEARCH,
 					contextRequirements: () => true,
 				},
 			},
 			{
 				config: {
-					id: ClineDefaultTool.ATTEMPT,
+					id: NodusDefaultTool.ATTEMPT,
 					contextRequirements: () => false,
 				},
 			},
 		] as never)
 		const converter = sinon.stub().callsFake((tool: { id: string }) => ({ converted: tool.id }))
-		const getConverterStub = sinon.stub(ClineToolSet, "getNativeConverter").returns(converter as never)
+		const getConverterStub = sinon.stub(NodusToolSet, "getNativeConverter").returns(converter as never)
 
 		const builder = new SubagentBuilder(createTaskConfig("act", "anthropic"), "tools-agent")
 
@@ -161,6 +161,6 @@ describe("SubagentBuilder", () => {
 		assert.equal(getModelFamilyStub.callCount, 1)
 		assert.equal(getToolsStub.callCount, 1)
 		assert.equal(getConverterStub.callCount, 1)
-		assert.deepEqual(result, [{ converted: ClineDefaultTool.LIST_FILES }])
+		assert.deepEqual(result, [{ converted: NodusDefaultTool.LIST_FILES }])
 	})
 })

@@ -1,9 +1,9 @@
 import type { ToolUse } from "@core/assistant-message"
 import { formatResponse } from "@core/prompts/responses"
-import { ClineAsk, ClineAskUseMcpServer } from "@shared/ExtensionMessage"
+import { NodusAsk, NodusAskUseMcpServer } from "@shared/ExtensionMessage"
 import { telemetryService } from "@/services/telemetry"
 import { truncateContent } from "@/shared/content-limits"
-import { ClineDefaultTool } from "@/shared/tools"
+import { NodusDefaultTool } from "@/shared/tools"
 import type { ToolResponse } from "../../index"
 import { showNotificationForApproval } from "../../utils"
 import type { IFullyManagedTool } from "../ToolExecutorCoordinator"
@@ -12,7 +12,7 @@ import type { StronglyTypedUIHelpers } from "../types/UIHelpers"
 import { ToolResultUtils } from "../utils/ToolResultUtils"
 
 export class UseMcpToolHandler implements IFullyManagedTool {
-	readonly name = ClineDefaultTool.MCP_USE
+	readonly name = NodusDefaultTool.MCP_USE
 
 	getDescription(block: ToolUse): string {
 		return `[${block.name} for '${block.params.server_name}']`
@@ -28,7 +28,7 @@ export class UseMcpToolHandler implements IFullyManagedTool {
 			serverName: uiHelpers.removeClosingTag(block, "server_name", server_name),
 			toolName: uiHelpers.removeClosingTag(block, "tool_name", tool_name),
 			arguments: uiHelpers.removeClosingTag(block, "arguments", mcp_arguments),
-		} satisfies ClineAskUseMcpServer)
+		} satisfies NodusAskUseMcpServer)
 
 		// Check if tool should be auto-approved using MCP-specific logic
 		const config = uiHelpers.getConfig()
@@ -39,7 +39,7 @@ export class UseMcpToolHandler implements IFullyManagedTool {
 			await uiHelpers.say("use_mcp_server" as any, partialMessage, undefined, undefined, block.partial)
 		} else {
 			await uiHelpers.removeLastPartialMessageIfExistsWithType("say", "use_mcp_server")
-			await uiHelpers.ask("use_mcp_server" as ClineAsk, partialMessage, block.partial).catch(() => {})
+			await uiHelpers.ask("use_mcp_server" as NodusAsk, partialMessage, block.partial).catch(() => {})
 		}
 	}
 
@@ -71,7 +71,7 @@ export class UseMcpToolHandler implements IFullyManagedTool {
 				parsedArguments = JSON.parse(mcp_arguments)
 			} catch (_error) {
 				config.taskState.consecutiveMistakeCount++
-				await config.callbacks.say("error", `Cline tried to use ${tool_name} with an invalid JSON argument. Retrying...`)
+				await config.callbacks.say("error", `Nodus tried to use ${tool_name} with an invalid JSON argument. Retrying...`)
 				return formatResponse.toolError(formatResponse.invalidMcpToolArgumentError(server_name, tool_name))
 			}
 		}
@@ -84,7 +84,7 @@ export class UseMcpToolHandler implements IFullyManagedTool {
 			serverName: server_name,
 			toolName: tool_name,
 			arguments: mcp_arguments,
-		} satisfies ClineAskUseMcpServer)
+		} satisfies NodusAskUseMcpServer)
 
 		const isToolAutoApproved = config.services.mcpHub.connections
 			?.find((conn: any) => conn.server.name === server_name)
@@ -108,7 +108,7 @@ export class UseMcpToolHandler implements IFullyManagedTool {
 			)
 		} else {
 			// Manual approval flow
-			const notificationMessage = `Cline wants to use ${tool_name || "unknown tool"} on ${server_name || "unknown server"}`
+			const notificationMessage = `Nodus wants to use ${tool_name || "unknown tool"} on ${server_name || "unknown server"}`
 
 			// Show notification
 			showNotificationForApproval(notificationMessage, config.autoApprovalSettings.enableNotifications)

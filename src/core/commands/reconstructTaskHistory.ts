@@ -1,6 +1,6 @@
-import { getSavedClineMessages, getTaskMetadata, readTaskHistoryFromState, writeTaskHistoryToState } from "@core/storage/disk"
+import { getSavednodusMessages, getTaskMetadata, readTaskHistoryFromState, writeTaskHistoryToState } from "@core/storage/disk"
 import { HostProvider } from "@hosts/host-provider"
-import { ClineMessage } from "@shared/ExtensionMessage"
+import { NodusMessage } from "@shared/ExtensionMessage"
 import { HistoryItem } from "@shared/HistoryItem"
 import { ShowMessageType } from "@shared/proto/host/window"
 import { fileExistsAtPath } from "@utils/fs"
@@ -165,8 +165,8 @@ async function scanTaskDirectories(tasksDir: string): Promise<string[]> {
 async function reconstructTaskHistoryItem(taskId: string): Promise<HistoryItem | null> {
 	try {
 		// Load UI messages to extract task info
-		const clineMessages = await getSavedClineMessages(taskId)
-		if (clineMessages.length === 0) {
+		const nodusMessages = await getSavednodusMessages(taskId)
+		if (nodusMessages.length === 0) {
 			return null // Skip empty tasks
 		}
 
@@ -174,7 +174,7 @@ async function reconstructTaskHistoryItem(taskId: string): Promise<HistoryItem |
 		const metadata = await getTaskMetadata(taskId)
 
 		// Extract task information
-		const taskInfo = extractTaskInformation(clineMessages, metadata)
+		const taskInfo = extractTaskInformation(nodusMessages, metadata)
 
 		// Create HistoryItem
 		const historyItem: HistoryItem = {
@@ -212,12 +212,12 @@ interface TaskInfo {
 	conversationHistoryDeletedRange?: [number, number]
 }
 
-function extractTaskInformation(clineMessages: ClineMessage[], metadata: any): TaskInfo {
+function extractTaskInformation(nodusMessages: NodusMessage[], metadata: any): TaskInfo {
 	// Find the first user message (task description)
-	const firstUserMessage = clineMessages.find((msg) => msg.type === "say" && msg.say === "text" && msg.text)
+	const firstUserMessage = nodusMessages.find((msg) => msg.type === "say" && msg.say === "text" && msg.text)
 
 	// Extract timestamp from first message or use task ID as fallback
-	const timestamp = clineMessages.length > 0 ? clineMessages[0].ts : Date.now()
+	const timestamp = nodusMessages.length > 0 ? nodusMessages[0].ts : Date.now()
 
 	// Extract task description
 	let taskDescription = "Untitled Task"
@@ -242,7 +242,7 @@ function extractTaskInformation(clineMessages: ClineMessage[], metadata: any): T
 	let totalCost = 0
 
 	// Look for usage-carrying messages with token info
-	const apiReqMessages = clineMessages.filter(
+	const apiReqMessages = nodusMessages.filter(
 		(msg) => msg.type === "say" && (msg.say === "api_req_started" || msg.say === "subagent_usage") && msg.text,
 	)
 
@@ -288,7 +288,7 @@ function extractTaskInformation(clineMessages: ClineMessage[], metadata: any): T
 	}
 
 	// Calculate approximate size (rough estimate)
-	const messageSize = JSON.stringify(clineMessages).length
+	const messageSize = JSON.stringify(nodusMessages).length
 	const size = Math.floor(messageSize / 1024) // KB
 
 	return {

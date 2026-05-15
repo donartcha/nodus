@@ -1,10 +1,10 @@
 import { Logger } from "@/shared/services/Logger"
-import { ClineError } from "./ClineError"
+import { NodusError } from "./NodusError"
 import { ErrorProviderFactory } from "./ErrorProviderFactory"
 import { IErrorProvider } from "./providers/IErrorProvider"
 
 /**
- * ErrorService handles error logging and tracking for the Cline extension
+ * ErrorService handles error logging and tracking for the Nodus extension
  * Uses an abstracted error provider to support multiple error tracking backends
  * Respects user privacy settings and VSCode's global telemetry configuration
  */
@@ -40,11 +40,11 @@ export class ErrorService {
 		this.provider = provider
 	}
 
-	captureException(error: Error | ClineError, properties?: Record<string, unknown>) {
+	captureException(error: Error | NodusError, properties?: Record<string, unknown>) {
 		return this.provider.captureException(error, properties)
 	}
 
-	public logException(error: Error | ClineError, properties?: Record<string, unknown>): void {
+	public logException(error: Error | NodusError, properties?: Record<string, unknown>): void {
 		this.provider.logException(error, properties)
 		Logger.error("[ErrorService] Logging exception", JSON.stringify(error))
 	}
@@ -57,8 +57,8 @@ export class ErrorService {
 		this.provider.logMessage(message, level, properties)
 	}
 
-	public toClineError(rawError: unknown, modelId?: string, providerId?: string): ClineError {
-		const transformed = ClineError.transform(rawError, modelId, providerId)
+	public toNodusError(rawError: unknown, modelId?: string, providerId?: string): NodusError {
+		const transformed = NodusError.transform(rawError, modelId, providerId)
 		this.logException(transformed, { modelId, providerId })
 		return transformed
 	}

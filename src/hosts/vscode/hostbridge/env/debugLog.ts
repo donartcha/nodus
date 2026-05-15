@@ -1,16 +1,16 @@
-import { Empty, StringRequest } from "@shared/proto/cline/common"
+import { Empty, StringRequest } from "@shared/proto/nodus/common"
 import * as vscode from "vscode"
 
-const CLINE_OUTPUT_CHANNEL = vscode.window.createOutputChannel("Cline")
+const NODUS_OUTPUT_CHANNEL = vscode.window.createOutputChannel("Nodus")
 
-// Appends a log message to all Cline output channels.
+// Appends a log message to all Nodus output channels.
 export async function debugLog(request: StringRequest): Promise<Empty> {
-	CLINE_OUTPUT_CHANNEL.appendLine(request.value)
+	NODUS_OUTPUT_CHANNEL.appendLine(request.value)
 	return Empty.create({})
 }
 
-// Register the Cline output channel within the VSCode extension context.
-export function registerClineOutputChannel(context: vscode.ExtensionContext): vscode.OutputChannel {
-	context.subscriptions.push(CLINE_OUTPUT_CHANNEL)
-	return CLINE_OUTPUT_CHANNEL
+// Register the Nodus output channel within the VSCode extension context.
+export function registerNodusOutputChannel(context: vscode.ExtensionContext): vscode.OutputChannel {
+	context.subscriptions.push(NODUS_OUTPUT_CHANNEL)
+	return NODUS_OUTPUT_CHANNEL
 }

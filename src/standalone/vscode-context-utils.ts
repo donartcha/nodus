@@ -112,7 +112,7 @@ export class JsonKeyValueStore<T> {
 	}
 }
 
-/** This is not used in cline, none of the methods are implemented. */
+/** This is not used in Nodus, none of the methods are implemented. */
 export class EnvironmentVariableCollection implements EnvironmentVariableCollection {
 	persistent: boolean = false
 	description: string | undefined = undefined

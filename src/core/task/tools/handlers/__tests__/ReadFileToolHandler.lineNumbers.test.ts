@@ -1,12 +1,12 @@
 import assert from "node:assert/strict"
-import { ClineDefaultTool } from "@shared/tools"
+import { NodusDefaultTool } from "@shared/tools"
 import { describe, it } from "mocha"
 import { DEFAULT_MAX_LINES, formatFileContentWithLineNumbers, getReadToolDisplayedLineRange } from "../ReadFileToolHandler"
 
 describe("getReadToolDisplayedLineRange", () => {
 	const block = (start?: string, end?: string) => ({
 		type: "tool_use" as const,
-		name: ClineDefaultTool.FILE_READ,
+		name: NodusDefaultTool.FILE_READ,
 		params: {
 			path: "f.txt",
 			...(start !== undefined ? { start_line: start } : {}),

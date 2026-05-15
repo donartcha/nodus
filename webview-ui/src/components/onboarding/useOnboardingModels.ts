@@ -1,8 +1,8 @@
 import type { ModelInfo } from "@shared/api"
-import { CLINE_ONBOARDING_MODELS } from "@shared/cline/onboarding"
-import { EmptyRequest } from "@shared/proto/cline/common"
-import type { ClineRecommendedModel } from "@shared/proto/cline/models"
-import type { OnboardingModel, OnboardingModelGroup } from "@shared/proto/cline/state"
+import { Nodus_ONBOARDING_MODELS } from "@shared/Nodus/onboarding"
+import { EmptyRequest } from "@shared/proto/nodus/common"
+import type { NodusRecommendedModel } from "@shared/proto/nodus/models"
+import type { OnboardingModel, OnboardingModelGroup } from "@shared/proto/nodus/state"
 import { useEffect, useMemo, useState } from "react"
 import { useExtensionState } from "@/context/ExtensionStateContext"
 import { ModelsServiceClient } from "@/services/grpc-client"
@@ -15,7 +15,7 @@ export interface UseOnboardingModelsResult {
 }
 
 function toOnboardingModel(
-	rec: ClineRecommendedModel,
+	rec: NodusRecommendedModel,
 	group: string,
 	fallbackBadge: string,
 	modelCatalog: Record<string, ModelInfo>,
@@ -45,14 +45,14 @@ function toOnboardingModel(
 }
 
 interface RecommendedModelsData {
-	recommended: ClineRecommendedModel[]
-	free: ClineRecommendedModel[]
+	recommended: NodusRecommendedModel[]
+	free: NodusRecommendedModel[]
 }
 
 type FetchState = { status: "loading" } | { status: "success"; data: RecommendedModelsData } | { status: "empty" }
 
 export function useOnboardingModels(): UseOnboardingModelsResult {
-	const { openRouterModels, clineModels, refreshClineModels } = useExtensionState()
+	const { openRouterModels, nodusModels, refreshnodusModels } = useExtensionState()
 	const [fetchState, setFetchState] = useState<FetchState>({ status: "loading" })
 
 	useEffect(() => {
@@ -60,7 +60,7 @@ export function useOnboardingModels(): UseOnboardingModelsResult {
 
 		const refreshRecommendedModels = async () => {
 			try {
-				const response = await ModelsServiceClient.refreshClineRecommendedModelsRpc(EmptyRequest.create({}))
+				const response = await ModelsServiceClient.refreshNodusRecommendedModelsRpc(EmptyRequest.create({}))
 				if (!cancelled) {
 					const recommended = response.recommended ?? []
 					const free = response.free ?? []
@@ -85,17 +85,17 @@ export function useOnboardingModels(): UseOnboardingModelsResult {
 	}, [])
 
 	useEffect(() => {
-		refreshClineModels()
-	}, [refreshClineModels])
+		refreshnodusModels()
+	}, [refreshnodusModels])
 
-	// Merge openRouter and cline models into a single catalog for lookups
+	// Merge openRouter and Nodus models into a single catalog for lookups
 	const modelCatalog = useMemo<Record<string, ModelInfo>>(() => {
-		return { ...openRouterModels, ...(clineModels ?? {}) }
-	}, [openRouterModels, clineModels])
+		return { ...openRouterModels, ...(nodusModels ?? {}) }
+	}, [openRouterModels, nodusModels])
 
 	return useMemo<UseOnboardingModelsResult>(() => {
 		if (fetchState.status !== "success") {
-			return { status: fetchState.status, models: { models: CLINE_ONBOARDING_MODELS } }
+			return { status: fetchState.status, models: { models: Nodus_ONBOARDING_MODELS } }
 		}
 
 		const { data } = fetchState

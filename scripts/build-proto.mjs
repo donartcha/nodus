@@ -18,9 +18,26 @@ const GRPC_TOOLS_PROTOC = path.join(require.resolve("grpc-tools"), "../bin", isW
 // Legacy compatibility: some older/local Windows setups provision protoc into tmp-protoc.
 // Prefer that path when present, but fall back to the grpc-tools bundled binary used by CI/npm installs.
 const LEGACY_WINDOWS_PROTOC = path.resolve("tmp-protoc/bin/protoc.exe")
-const PROTOC = isWindows && fsSync.existsSync(LEGACY_WINDOWS_PROTOC) ? LEGACY_WINDOWS_PROTOC : GRPC_TOOLS_PROTOC
 
-if (!fsSync.existsSync(PROTOC)) {
+function getProtocPath() {
+	if (isWindows && fsSync.existsSync(LEGACY_WINDOWS_PROTOC)) {
+		return LEGACY_WINDOWS_PROTOC
+	}
+	// Try system protoc first on Windows because grpc-tools binary is often broken
+	if (isWindows) {
+		try {
+			execSync("protoc --version", { stdio: "ignore" })
+			return "protoc"
+		} catch (e) {
+			// fallback to grpc-tools
+		}
+	}
+	return GRPC_TOOLS_PROTOC
+}
+
+const PROTOC = getProtocPath()
+
+if (PROTOC !== "protoc" && !fsSync.existsSync(PROTOC)) {
 	const windowsHint = isWindows
 		? ` Neither ${LEGACY_WINDOWS_PROTOC} nor the grpc-tools bundled protoc at ${GRPC_TOOLS_PROTOC} exists.`
 		: ""

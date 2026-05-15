@@ -1,6 +1,6 @@
 import type { ToolUse } from "@core/assistant-message"
-import { CLINE_MCP_TOOL_IDENTIFIER } from "@/shared/mcp"
-import { ClineDefaultTool } from "@/shared/tools"
+import { Nodus_MCP_TOOL_IDENTIFIER } from "@/shared/mcp"
+import { NodusDefaultTool } from "@/shared/tools"
 import type { ToolResponse } from "../index"
 import { AccessMcpResourceHandler } from "./handlers/AccessMcpResourceHandler"
 import { ActModeRespondHandler } from "./handlers/ActModeRespondHandler"
@@ -32,7 +32,7 @@ import type { TaskConfig } from "./types/TaskConfig"
 import type { StronglyTypedUIHelpers } from "./types/UIHelpers"
 
 export interface IToolHandler {
-	readonly name: ClineDefaultTool
+	readonly name: NodusDefaultTool
 	execute(config: TaskConfig, block: ToolUse): Promise<ToolResponse>
 	getDescription(block: ToolUse): string
 }
@@ -51,7 +51,7 @@ export interface IFullyManagedTool extends IToolHandler, IPartialBlockHandler {
  */
 export class SharedToolHandler implements IFullyManagedTool {
 	constructor(
-		public readonly name: ClineDefaultTool,
+		public readonly name: NodusDefaultTool,
 		private baseHandler: IFullyManagedTool,
 	) {}
 
@@ -76,36 +76,36 @@ export class ToolExecutorCoordinator {
 	private handlers = new Map<string, IToolHandler>()
 	private dynamicSubagentHandlers = new Map<string, IToolHandler>()
 
-	private readonly toolHandlersMap: Record<ClineDefaultTool, (v: ToolValidator) => IToolHandler | undefined> = {
-		[ClineDefaultTool.ASK]: (_v: ToolValidator) => new AskFollowupQuestionToolHandler(),
-		[ClineDefaultTool.ATTEMPT]: (_v: ToolValidator) => new AttemptCompletionHandler(),
-		[ClineDefaultTool.BASH]: (v: ToolValidator) => new ExecuteCommandToolHandler(v),
-		[ClineDefaultTool.FILE_EDIT]: (v: ToolValidator) =>
-			new SharedToolHandler(ClineDefaultTool.FILE_EDIT, new WriteToFileToolHandler(v)),
-		[ClineDefaultTool.FILE_READ]: (v: ToolValidator) => new ReadFileToolHandler(v),
-		[ClineDefaultTool.FILE_NEW]: (v: ToolValidator) => new WriteToFileToolHandler(v),
-		[ClineDefaultTool.SEARCH]: (v: ToolValidator) => new SearchFilesToolHandler(v),
-		[ClineDefaultTool.LIST_FILES]: (v: ToolValidator) => new ListFilesToolHandler(v),
-		[ClineDefaultTool.LIST_CODE_DEF]: (v: ToolValidator) => new ListCodeDefinitionNamesToolHandler(v),
-		[ClineDefaultTool.BROWSER]: (_v: ToolValidator) => new BrowserToolHandler(),
-		[ClineDefaultTool.MCP_USE]: (_v: ToolValidator) => new UseMcpToolHandler(),
-		[ClineDefaultTool.MCP_ACCESS]: (_v: ToolValidator) => new AccessMcpResourceHandler(),
-		[ClineDefaultTool.MCP_DOCS]: (_v: ToolValidator) => new LoadMcpDocumentationHandler(),
-		[ClineDefaultTool.NEW_TASK]: (_v: ToolValidator) => new NewTaskHandler(),
-		[ClineDefaultTool.PLAN_MODE]: (_v: ToolValidator) => new PlanModeRespondHandler(),
-		[ClineDefaultTool.ACT_MODE]: (_v: ToolValidator) => new ActModeRespondHandler(),
-		[ClineDefaultTool.TODO]: (_v: ToolValidator) => undefined,
-		[ClineDefaultTool.WEB_FETCH]: (_v: ToolValidator) => new WebFetchToolHandler(),
-		[ClineDefaultTool.WEB_SEARCH]: (_v: ToolValidator) => new WebSearchToolHandler(),
-		[ClineDefaultTool.CONDENSE]: (_v: ToolValidator) => new CondenseHandler(),
-		[ClineDefaultTool.SUMMARIZE_TASK]: (_v: ToolValidator) => new SummarizeTaskHandler(_v),
-		[ClineDefaultTool.REPORT_BUG]: (_v: ToolValidator) => new ReportBugHandler(),
-		[ClineDefaultTool.NEW_RULE]: (v: ToolValidator) =>
-			new SharedToolHandler(ClineDefaultTool.NEW_RULE, new WriteToFileToolHandler(v)),
-		[ClineDefaultTool.APPLY_PATCH]: (_v: ToolValidator) => new ApplyPatchHandler(_v),
-		[ClineDefaultTool.GENERATE_EXPLANATION]: (_v: ToolValidator) => new GenerateExplanationToolHandler(),
-		[ClineDefaultTool.USE_SKILL]: (_v: ToolValidator) => new UseSkillToolHandler(),
-		[ClineDefaultTool.USE_SUBAGENTS]: (_v: ToolValidator) => new UseSubagentsToolHandler(),
+	private readonly toolHandlersMap: Record<NodusDefaultTool, (v: ToolValidator) => IToolHandler | undefined> = {
+		[NodusDefaultTool.ASK]: (_v: ToolValidator) => new AskFollowupQuestionToolHandler(),
+		[NodusDefaultTool.ATTEMPT]: (_v: ToolValidator) => new AttemptCompletionHandler(),
+		[NodusDefaultTool.BASH]: (v: ToolValidator) => new ExecuteCommandToolHandler(v),
+		[NodusDefaultTool.FILE_EDIT]: (v: ToolValidator) =>
+			new SharedToolHandler(NodusDefaultTool.FILE_EDIT, new WriteToFileToolHandler(v)),
+		[NodusDefaultTool.FILE_READ]: (v: ToolValidator) => new ReadFileToolHandler(v),
+		[NodusDefaultTool.FILE_NEW]: (v: ToolValidator) => new WriteToFileToolHandler(v),
+		[NodusDefaultTool.SEARCH]: (v: ToolValidator) => new SearchFilesToolHandler(v),
+		[NodusDefaultTool.LIST_FILES]: (v: ToolValidator) => new ListFilesToolHandler(v),
+		[NodusDefaultTool.LIST_CODE_DEF]: (v: ToolValidator) => new ListCodeDefinitionNamesToolHandler(v),
+		[NodusDefaultTool.BROWSER]: (_v: ToolValidator) => new BrowserToolHandler(),
+		[NodusDefaultTool.MCP_USE]: (_v: ToolValidator) => new UseMcpToolHandler(),
+		[NodusDefaultTool.MCP_ACCESS]: (_v: ToolValidator) => new AccessMcpResourceHandler(),
+		[NodusDefaultTool.MCP_DOCS]: (_v: ToolValidator) => new LoadMcpDocumentationHandler(),
+		[NodusDefaultTool.NEW_TASK]: (_v: ToolValidator) => new NewTaskHandler(),
+		[NodusDefaultTool.PLAN_MODE]: (_v: ToolValidator) => new PlanModeRespondHandler(),
+		[NodusDefaultTool.ACT_MODE]: (_v: ToolValidator) => new ActModeRespondHandler(),
+		[NodusDefaultTool.TODO]: (_v: ToolValidator) => undefined,
+		[NodusDefaultTool.WEB_FETCH]: (_v: ToolValidator) => new WebFetchToolHandler(),
+		[NodusDefaultTool.WEB_SEARCH]: (_v: ToolValidator) => new WebSearchToolHandler(),
+		[NodusDefaultTool.CONDENSE]: (_v: ToolValidator) => new CondenseHandler(),
+		[NodusDefaultTool.SUMMARIZE_TASK]: (_v: ToolValidator) => new SummarizeTaskHandler(_v),
+		[NodusDefaultTool.REPORT_BUG]: (_v: ToolValidator) => new ReportBugHandler(),
+		[NodusDefaultTool.NEW_RULE]: (v: ToolValidator) =>
+			new SharedToolHandler(NodusDefaultTool.NEW_RULE, new WriteToFileToolHandler(v)),
+		[NodusDefaultTool.APPLY_PATCH]: (_v: ToolValidator) => new ApplyPatchHandler(_v),
+		[NodusDefaultTool.GENERATE_EXPLANATION]: (_v: ToolValidator) => new GenerateExplanationToolHandler(),
+		[NodusDefaultTool.USE_SKILL]: (_v: ToolValidator) => new UseSkillToolHandler(),
+		[NodusDefaultTool.USE_SUBAGENTS]: (_v: ToolValidator) => new UseSubagentsToolHandler(),
 	}
 
 	/**
@@ -115,7 +115,7 @@ export class ToolExecutorCoordinator {
 		this.handlers.set(handler.name, handler)
 	}
 
-	registerByName(toolName: ClineDefaultTool, validator: ToolValidator): void {
+	registerByName(toolName: NodusDefaultTool, validator: ToolValidator): void {
 		const handler = this.toolHandlersMap[toolName]?.(validator)
 		if (handler) {
 			this.register(handler)
@@ -134,8 +134,8 @@ export class ToolExecutorCoordinator {
 	 */
 	getHandler(toolName: string): IToolHandler | undefined {
 		// HACK: Normalize MCP tool names to the standard handler
-		if (toolName.includes(CLINE_MCP_TOOL_IDENTIFIER)) {
-			toolName = ClineDefaultTool.MCP_USE
+		if (toolName.includes(Nodus_MCP_TOOL_IDENTIFIER)) {
+			toolName = NodusDefaultTool.MCP_USE
 		}
 
 		const staticHandler = this.handlers.get(toolName)
@@ -148,7 +148,7 @@ export class ToolExecutorCoordinator {
 			if (existingHandler) {
 				return existingHandler
 			}
-			const handler = new SharedToolHandler(toolName as ClineDefaultTool, new UseSubagentsToolHandler())
+			const handler = new SharedToolHandler(toolName as NodusDefaultTool, new UseSubagentsToolHandler())
 			this.dynamicSubagentHandlers.set(toolName, handler)
 			return handler
 		}

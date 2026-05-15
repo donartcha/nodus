@@ -12,9 +12,9 @@ export async function showChangedFilesDiff(
 	seeNewChangesSinceLastTaskCompletion: boolean,
 ) {
 	Logger.log("presentMultifileDiff", messageTs)
-	const clineMessages = messageStateHandler.getClineMessages()
-	const messageIndex = clineMessages.findIndex((m) => m.ts === messageTs)
-	const message = clineMessages[messageIndex]
+	const nodusMessages = messageStateHandler.getnodusMessages()
+	const messageIndex = nodusMessages.findIndex((m) => m.ts === messageTs)
+	const message = nodusMessages[messageIndex]
 	if (!message) {
 		Logger.error("Message not found")
 		return
@@ -96,13 +96,13 @@ async function getChangesSinceLastTaskCompletion(
 ): Promise<ChangedFile[]> {
 	// Get last task completed
 	const lastTaskCompletedMessageCheckpointHash = findLast(
-		messageStateHandler.getClineMessages().slice(0, messageIndex),
+		messageStateHandler.getnodusMessages().slice(0, messageIndex),
 		(m) => m.say === "completion_result",
 	)?.lastCheckpointHash // ask is only used to relinquish control, its the last say we care about
 
 	// This value *should* always exist
 	const firstCheckpointMessageCheckpointHash = messageStateHandler
-		.getClineMessages()
+		.getnodusMessages()
 		.find((m) => m.say === "checkpoint_created")?.lastCheckpointHash
 
 	// either use the diff between the first checkpoint and the task completion, or the diff

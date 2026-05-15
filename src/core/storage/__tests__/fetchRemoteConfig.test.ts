@@ -4,12 +4,12 @@ import * as remoteConfigUtils from "@core/storage/remote-config/utils"
 import * as assert from "assert"
 import { afterEach, beforeEach, describe, it } from "mocha"
 import sinon from "sinon"
-import { ClineAccountService } from "@/services/account/ClineAccountService"
+import { NodusAccountService } from "@/services/account/NodusAccountService"
 import { AuthService } from "@/services/auth/AuthService"
 
 describe("fetchRemoteConfig", () => {
 	let sandbox: sinon.SinonSandbox
-	let accountService: ClineAccountService
+	let accountService: NodusAccountService
 	let authServiceStub: Partial<AuthService>
 	let fetchUserRemoteConfigStub: sinon.SinonStub
 	let isRemoteConfigEnabledStub: sinon.SinonStub
@@ -18,8 +18,8 @@ describe("fetchRemoteConfig", () => {
 		sandbox = sinon.createSandbox()
 		authServiceStub = {}
 		sandbox.stub(AuthService, "getInstance").returns(authServiceStub as AuthService)
-		accountService = new ClineAccountService()
-		sandbox.stub(ClineAccountService, "getInstance").returns(accountService)
+		accountService = new NodusAccountService()
+		sandbox.stub(NodusAccountService, "getInstance").returns(accountService)
 		fetchUserRemoteConfigStub = sandbox.stub(accountService, "fetchUserRemoteConfig")
 		isRemoteConfigEnabledStub = sandbox.stub(remoteConfigUtils, "isRemoteConfigEnabled").returns(true)
 		sandbox.stub(remoteConfigUtils, "applyRemoteConfig").resolves()

@@ -2,52 +2,52 @@ syntax = "proto3";
 
 package host;
 
-import "cline/common.proto";
+import "nodus/common.proto";
 
-option go_package = "github.com/cline/grpc-go/host";
+option go_package = "github.com/nodus/grpc-go/host";
 option java_multiple_files = true;
-option java_package = "bot.cline.host.proto";
+option java_package = "bot.nodus.host.proto";
 
 // Provides methods for working with workspaces/projects.
 service WorkspaceService {
   // Returns a list of the top level directories of the workspace.
-  rpc getWorkspacePaths(GetWorkspacePathsRequest) returns (GetWorkspacePathsResponse);
+  rpc GetWorkspacePaths(GetWorkspacePathsRequest) returns (GetWorkspacePathsResponse);
 
   // Saves an open document if it's open in the editor and has unsaved changes.
   // Returns true if the document was saved, returns false if the document was not found, or did not
   // need to be saved.
-  rpc saveOpenDocumentIfDirty(SaveOpenDocumentIfDirtyRequest) returns (SaveOpenDocumentIfDirtyResponse);
+  rpc SaveOpenDocumentIfDirty(SaveOpenDocumentIfDirtyRequest) returns (SaveOpenDocumentIfDirtyResponse);
 
   // Get diagnostics from the workspace.
-  rpc getDiagnostics(GetDiagnosticsRequest) returns (GetDiagnosticsResponse);
+  rpc GetDiagnostics(GetDiagnosticsRequest) returns (GetDiagnosticsResponse);
 
   // Makes the problems panel/pane visible in the IDE and focuses it.
-  rpc openProblemsPanel(OpenProblemsPanelRequest) returns (OpenProblemsPanelResponse);
+  rpc OpenProblemsPanel(OpenProblemsPanelRequest) returns (OpenProblemsPanelResponse);
 
   // Opens the IDE file explorer panel and selects a file or directory.
-  rpc openInFileExplorerPanel(OpenInFileExplorerPanelRequest) returns (OpenInFileExplorerPanelResponse);
+  rpc OpenInFileExplorerPanel(OpenInFileExplorerPanelRequest) returns (OpenInFileExplorerPanelResponse);
 
-  // Opens and focuses the Cline sidebar panel in the host IDE.
-  rpc openClineSidebarPanel(OpenClineSidebarPanelRequest) returns (OpenClineSidebarPanelResponse);
+  // Opens and focuses the nodus sidebar panel in the host IDE.
+  rpc OpennodusSidebarPanel(OpennodusSidebarPanelRequest) returns (OpennodusSidebarPanelResponse);
 
   // Opens and focuses the terminal panel.
-  rpc openTerminalPanel(OpenTerminalRequest) returns (OpenTerminalResponse);
+  rpc OpenTerminalPanel(OpenTerminalRequest) returns (OpenTerminalResponse);
 
   // Executes a command in a new terminal
-  rpc executeCommandInTerminal(ExecuteCommandInTerminalRequest) returns (ExecuteCommandInTerminalResponse);
+  rpc ExecuteCommandInTerminal(ExecuteCommandInTerminalRequest) returns (ExecuteCommandInTerminalResponse);
 
   // Opens a folder/workspace in the IDE
-  rpc openFolder(OpenFolderRequest) returns (OpenFolderResponse);
+  rpc OpenFolder(OpenFolderRequest) returns (OpenFolderResponse);
 
   // Searches workspace files/folders by name using the host's native index
   // (e.g. IntelliJ FilenameIndex). Hosts that lack a fast index should leave
   // this UNIMPLEMENTED so the caller can fall back to ripgrep.
-  rpc searchWorkspaceItems(SearchWorkspaceItemsRequest) returns (SearchWorkspaceItemsResponse);
+  rpc SearchWorkspaceItems(SearchWorkspaceItemsRequest) returns (SearchWorkspaceItemsResponse);
 }
 
 message GetWorkspacePathsRequest {
   // The unique ID for the workspace/project.
-  // This is currently optional in vscode. It is required in other environments where cline is running at
+  // This is currently optional in vscode. It is required in other environments where nodus is running at
   // the application level, and the user can open multiple projects.
   optional string id = 1;
 }
@@ -67,11 +67,11 @@ message SaveOpenDocumentIfDirtyResponse {
 }
 
 message GetDiagnosticsRequest {
-  optional cline.Metadata metadata = 1;
+  optional nodus.Metadata metadata = 1;
 }
 
 message GetDiagnosticsResponse {
-  repeated cline.FileDiagnostics file_diagnostics = 1;
+  repeated nodus.FileDiagnostics file_diagnostics = 1;
 }
 
 // Request for host-side workspace search (files/folders) used by mentions autocomplete
@@ -107,8 +107,8 @@ message OpenInFileExplorerPanelRequest {
   string path = 1;
 }
 message OpenInFileExplorerPanelResponse {}
-message OpenClineSidebarPanelRequest {}
-message OpenClineSidebarPanelResponse {}
+message OpennodusSidebarPanelRequest {}
+message OpennodusSidebarPanelResponse {}
 message OpenTerminalRequest {}
 message OpenTerminalResponse {}
 
@@ -130,3 +130,5 @@ message OpenFolderRequest {
 message OpenFolderResponse {
   bool success = 1;
 }
+
+

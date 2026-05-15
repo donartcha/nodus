@@ -1,6 +1,6 @@
 import { parseYamlFrontmatter } from "@core/context/instructions/user-instructions/frontmatter"
 import { Logger } from "@shared/services/Logger"
-import { ClineDefaultTool, setDynamicToolUseNames } from "@shared/tools"
+import { NodusDefaultTool, setDynamicToolUseNames } from "@shared/tools"
 import chokidar, { type FSWatcher } from "chokidar"
 import fs from "fs/promises"
 import os from "os"
@@ -8,14 +8,14 @@ import * as path from "path"
 import { z } from "zod"
 import { buildSubagentToolName } from "./SubagentToolName"
 
-/** Default Directory for agent configurations: ~/Documents/Cline/Agents */
+/** Default Directory for agent configurations: ~/Documents/Nodus/Agents */
 export const AGENTS_CONFIG_DIRECTORY_NAME = "Agents"
 const SUBAGENT_DYNAMIC_TOOL_NAMESPACE = "subagent"
 
 const AgentBaseConfigSchema = z.object({
 	name: z.string().trim().min(1),
 	description: z.string().trim().min(1),
-	tools: z.array(z.nativeEnum(ClineDefaultTool)).default([]),
+	tools: z.array(z.nativeEnum(NodusDefaultTool)).default([]),
 	skills: z.array(z.string().trim().min(1)).optional(),
 	modelId: z.string().trim().min(1).optional(),
 	systemPrompt: z.string().trim().min(1),
@@ -31,23 +31,23 @@ const AgentConfigFrontmatterSchema = z.object({
 
 export type AgentBaseConfig = z.infer<typeof AgentBaseConfigSchema>
 
-function normalizeToolName(toolName: string): ClineDefaultTool {
+function normalizeToolName(toolName: string): NodusDefaultTool {
 	const trimmed = toolName.trim()
 	if (!trimmed) {
 		throw new Error("Tool name cannot be empty.")
 	}
 
-	const asDefaultTool = trimmed as ClineDefaultTool
-	if (Object.values(ClineDefaultTool).includes(asDefaultTool)) {
+	const asDefaultTool = trimmed as NodusDefaultTool
+	if (Object.values(NodusDefaultTool).includes(asDefaultTool)) {
 		return asDefaultTool
 	}
 
 	throw new Error(
-		`Unknown tool '${trimmed}'. Expected a ClineDefaultTool value (for example: read_file, list_files, search_files).`,
+		`Unknown tool '${trimmed}'. Expected a NodusDefaultTool value (for example: read_file, list_files, search_files).`,
 	)
 }
 
-function parseTools(tools: string | string[] | undefined): ClineDefaultTool[] {
+function parseTools(tools: string | string[] | undefined): NodusDefaultTool[] {
 	if (!tools) {
 		return []
 	}
@@ -103,7 +103,7 @@ export function parseAgentConfigFromYaml(content: string): AgentBaseConfig {
 }
 
 export function getAgentsConfigPath(homeDir = os.homedir()): string {
-	return path.join(homeDir, "Documents", "Cline", AGENTS_CONFIG_DIRECTORY_NAME)
+	return path.join(homeDir, "Documents", "Nodus", AGENTS_CONFIG_DIRECTORY_NAME)
 }
 
 function normalizeAgentName(name: string): string {

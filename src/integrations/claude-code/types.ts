@@ -38,7 +38,7 @@ type RateLimitEvent = {
 }
 
 // User messages can appear in the stream when Claude Code executes tools
-// and returns tool results. These should be ignored by Cline since we manage
+// and returns tool results. These should be ignored by Nodus since we manage
 // our own tool execution.
 type UserMessage = {
 	type: "user"

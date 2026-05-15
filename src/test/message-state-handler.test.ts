@@ -3,12 +3,12 @@ import "should"
 import should from "should"
 import { MessageStateHandler } from "../core/task/message-state"
 import { TaskState } from "../core/task/TaskState"
-import { ClineMessage } from "../shared/ExtensionMessage"
+import { NodusMessage } from "../shared/ExtensionMessage"
 
 /**
  * Unit tests for MessageStateHandler's mutex protection (RC-4)
  * These tests verify that concurrent operations on message state are properly serialized
- * to prevent race conditions, particularly the TOCTOU bug in addToClineMessages
+ * to prevent race conditions, particularly the TOCTOU bug in addTonodusMessages
  */
 describe("MessageStateHandler Mutex Protection", () => {
 	/**
@@ -25,9 +25,9 @@ describe("MessageStateHandler Mutex Protection", () => {
 	}
 
 	/**
-	 * Helper to create a test ClineMessage
+	 * Helper to create a test NodusMessage
 	 */
-	function createTestMessage(text: string): ClineMessage {
+	function createTestMessage(text: string): NodusMessage {
 		return {
 			ts: Date.now(),
 			type: "say",
@@ -38,7 +38,7 @@ describe("MessageStateHandler Mutex Protection", () => {
 
 	it("should initialize with empty message arrays", () => {
 		const handler = createTestHandler()
-		handler.getClineMessages().length.should.equal(0)
+		handler.getnodusMessages().length.should.equal(0)
 		handler.getApiConversationHistory().length.should.equal(0)
 	})
 
@@ -50,20 +50,20 @@ describe("MessageStateHandler Mutex Protection", () => {
 		handler.getApiConversationHistory().should.deepEqual(testHistory)
 	})
 
-	it("should set and get cline messages", () => {
+	it("should set and get Nodus messages", () => {
 		const handler = createTestHandler()
 		const testMessages = [createTestMessage("test1"), createTestMessage("test2")]
 
-		handler.setClineMessages(testMessages)
-		handler.getClineMessages().should.deepEqual(testMessages)
+		handler.setnodusMessages(testMessages)
+		handler.getnodusMessages().should.deepEqual(testMessages)
 	})
 
 	/**
-	 * CRITICAL TEST: Verify that addToClineMessages is atomic
+	 * CRITICAL TEST: Verify that addTonodusMessages is atomic
 	 * This test simulates the race condition that can occur when multiple
-	 * addToClineMessages calls happen concurrently without proper mutex protection
+	 * addTonodusMessages calls happen concurrently without proper mutex protection
 	 */
-	it("should handle concurrent addToClineMessages atomically", async function () {
+	it("should handle concurrent addTonodusMessages atomically", async function () {
 		// Increase timeout for this test as it involves async operations
 		this.timeout(5000)
 
@@ -79,10 +79,10 @@ describe("MessageStateHandler Mutex Protection", () => {
 
 		// Add initial message to establish baseline
 		const initialMsg = createTestMessage("initial")
-		await handler.addToClineMessages(initialMsg)
+		await handler.addTonodusMessages(initialMsg)
 
 		// Verify initial state
-		const messages = handler.getClineMessages()
+		const messages = handler.getnodusMessages()
 		messages.length.should.equal(1)
 		messages[0].conversationHistoryIndex?.should.equal(2) // length - 1 = 3 - 1 = 2
 
@@ -101,16 +101,16 @@ describe("MessageStateHandler Mutex Protection", () => {
 
 		// Execute concurrent operations
 		const results = await Promise.all([
-			handler.addToClineMessages(msg1),
-			handler.addToClineMessages(msg2),
-			handler.addToClineMessages(msg3),
+			handler.addTonodusMessages(msg1),
+			handler.addTonodusMessages(msg2),
+			handler.addTonodusMessages(msg3),
 		])
 
 		// Verify all operations completed
 		results.length.should.equal(3)
 
 		// Get final state
-		const finalMessages = handler.getClineMessages()
+		const finalMessages = handler.getnodusMessages()
 		finalMessages.length.should.equal(4) // initial + 3 concurrent
 
 		// CRITICAL ASSERTION: Each message should have a valid conversationHistoryIndex
@@ -124,44 +124,44 @@ describe("MessageStateHandler Mutex Protection", () => {
 	})
 
 	/**
-	 * Test that updateClineMessage operations are atomic
+	 * Test that updateNodusMessage operations are atomic
 	 */
-	it("should handle concurrent updateClineMessage atomically", async function () {
+	it("should handle concurrent updateNodusMessage atomically", async function () {
 		this.timeout(5000)
 
 		const handler = createTestHandler()
 
 		// Set up initial messages
 		const msgs = [createTestMessage("msg1"), createTestMessage("msg2"), createTestMessage("msg3")]
-		handler.setClineMessages(msgs)
+		handler.setnodusMessages(msgs)
 
 		// Perform concurrent updates to different messages
 		await Promise.all([
-			handler.updateClineMessage(0, { text: "updated1" }),
-			handler.updateClineMessage(1, { text: "updated2" }),
-			handler.updateClineMessage(2, { text: "updated3" }),
+			handler.updateNodusMessage(0, { text: "updated1" }),
+			handler.updateNodusMessage(1, { text: "updated2" }),
+			handler.updateNodusMessage(2, { text: "updated3" }),
 		])
 
-		const finalMessages = handler.getClineMessages()
+		const finalMessages = handler.getnodusMessages()
 		finalMessages[0]?.text?.should.equal("updated1")
 		finalMessages[1]?.text?.should.equal("updated2")
 		finalMessages[2]?.text?.should.equal("updated3")
 	})
 
 	/**
-	 * Test that deleteClineMessage operations are atomic
+	 * Test that deleteNodusMessage operations are atomic
 	 */
-	it("should handle deleteClineMessage with proper validation", async () => {
+	it("should handle deleteNodusMessage with proper validation", async () => {
 		const handler = createTestHandler()
 
 		// Set up initial messages
 		const msgs = [createTestMessage("msg1"), createTestMessage("msg2"), createTestMessage("msg3")]
-		handler.setClineMessages(msgs)
+		handler.setnodusMessages(msgs)
 
 		// Delete middle message
-		await handler.deleteClineMessage(1)
+		await handler.deleteNodusMessage(1)
 
-		const finalMessages = handler.getClineMessages()
+		const finalMessages = handler.getnodusMessages()
 		finalMessages.length.should.equal(2)
 		finalMessages[0]?.text?.should.equal("msg1")
 		finalMessages[1]?.text?.should.equal("msg3")
@@ -170,12 +170,12 @@ describe("MessageStateHandler Mutex Protection", () => {
 	/**
 	 * Test that invalid indices are rejected
 	 */
-	it("should throw error for invalid message index in updateClineMessage", async () => {
+	it("should throw error for invalid message index in updateNodusMessage", async () => {
 		const handler = createTestHandler()
-		handler.setClineMessages([createTestMessage("msg1")])
+		handler.setnodusMessages([createTestMessage("msg1")])
 
 		try {
-			await handler.updateClineMessage(5, { text: "invalid" })
+			await handler.updateNodusMessage(5, { text: "invalid" })
 			throw new Error("Should have thrown")
 		} catch (error) {
 			if (error instanceof Error) {
@@ -185,14 +185,14 @@ describe("MessageStateHandler Mutex Protection", () => {
 	})
 
 	/**
-	 * Test that invalid indices are rejected in deleteClineMessage
+	 * Test that invalid indices are rejected in deleteNodusMessage
 	 */
-	it("should throw error for invalid message index in deleteClineMessage", async () => {
+	it("should throw error for invalid message index in deleteNodusMessage", async () => {
 		const handler = createTestHandler()
-		handler.setClineMessages([createTestMessage("msg1")])
+		handler.setnodusMessages([createTestMessage("msg1")])
 
 		try {
-			await handler.deleteClineMessage(-1)
+			await handler.deleteNodusMessage(-1)
 			throw new Error("Should have thrown")
 		} catch (error) {
 			if (error instanceof Error) {
@@ -226,17 +226,17 @@ describe("MessageStateHandler Mutex Protection", () => {
 	/**
 	 * Test overwrite operations
 	 */
-	it("should handle overwriteClineMessages atomically", async () => {
+	it("should handle overwritenodusMessages atomically", async () => {
 		const handler = createTestHandler()
 
 		// Set initial messages
-		handler.setClineMessages([createTestMessage("old1"), createTestMessage("old2")])
+		handler.setnodusMessages([createTestMessage("old1"), createTestMessage("old2")])
 
 		// Overwrite with new messages
 		const newMessages = [createTestMessage("new1"), createTestMessage("new2"), createTestMessage("new3")]
-		await handler.overwriteClineMessages(newMessages)
+		await handler.overwritenodusMessages(newMessages)
 
-		const finalMessages = handler.getClineMessages()
+		const finalMessages = handler.getnodusMessages()
 		finalMessages.length.should.equal(3)
 		finalMessages[0]?.text?.should.equal("new1")
 		finalMessages[1]?.text?.should.equal("new2")

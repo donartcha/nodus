@@ -1,8 +1,8 @@
 import { expect } from "chai"
 import { before, describe, it } from "mocha"
 import { ModelFamily } from "@/shared/prompts"
-import { ClineDefaultTool } from "@/shared/tools"
-import { ClineToolSet } from "../registry/ClineToolSet"
+import { NodusDefaultTool } from "@/shared/tools"
+import { NodusToolSet } from "../registry/NodusToolSet"
 import { PromptRegistry } from "../registry/PromptRegistry"
 import { new_task_variants } from "../tools/new_task"
 import type { SystemPromptContext } from "../types"
@@ -45,8 +45,8 @@ describe("new_task tool contextRequirements", () => {
 	})
 
 	it("should follow the same pattern as ask_followup_question", () => {
-		const newTaskTool = ClineToolSet.getToolByNameWithFallback(ClineDefaultTool.NEW_TASK, ModelFamily.GENERIC)
-		const askTool = ClineToolSet.getToolByNameWithFallback(ClineDefaultTool.ASK, ModelFamily.GENERIC)
+		const newTaskTool = NodusToolSet.getToolByNameWithFallback(NodusDefaultTool.NEW_TASK, ModelFamily.GENERIC)
+		const askTool = NodusToolSet.getToolByNameWithFallback(NodusDefaultTool.ASK, ModelFamily.GENERIC)
 
 		expect(newTaskTool).to.exist
 		expect(askTool).to.exist

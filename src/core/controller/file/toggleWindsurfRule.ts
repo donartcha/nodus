@@ -1,5 +1,5 @@
-import type { ToggleWindsurfRuleRequest } from "@shared/proto/cline/file"
-import { ClineRulesToggles } from "@shared/proto/cline/file"
+import type { ToggleWindsurfRuleRequest } from "@shared/proto/nodus/file"
+import { NodusRulesToggles } from "@shared/proto/nodus/file"
 import { Logger } from "@/shared/services/Logger"
 import type { Controller } from "../index"
 
@@ -9,7 +9,7 @@ import type { Controller } from "../index"
  * @param request The toggle request
  * @returns The updated Windsurf rule toggles
  */
-export async function toggleWindsurfRule(controller: Controller, request: ToggleWindsurfRuleRequest): Promise<ClineRulesToggles> {
+export async function toggleWindsurfRule(controller: Controller, request: ToggleWindsurfRuleRequest): Promise<NodusRulesToggles> {
 	const { rulePath, enabled } = request
 
 	if (!rulePath || typeof enabled !== "boolean") {
@@ -26,5 +26,5 @@ export async function toggleWindsurfRule(controller: Controller, request: Toggle
 	controller.stateManager.setWorkspaceState("localWindsurfRulesToggles", toggles)
 
 	// Return the toggles directly
-	return ClineRulesToggles.create({ toggles: toggles })
+	return NodusRulesToggles.create({ toggles: toggles })
 }

@@ -1,14 +1,14 @@
-import type { Boolean, EmptyRequest } from "@shared/proto/cline/common"
+import type { Boolean, EmptyRequest } from "@shared/proto/nodus/common"
 import { useCallback, useEffect, useState } from "react"
 import AccountView from "./components/account/AccountView"
 import ChatView from "./components/chat/ChatView"
-import ClineKanbanLaunchModal, { CLINE_KANBAN_MODAL_DISMISS_ID } from "./components/common/ClineKanbanLaunchModal"
+import NodusKanbanLaunchModal, { NODUS_KANBAN_MODAL_DISMISS_ID } from "./components/common/NodusKanbanLaunchModal"
 import HistoryView from "./components/history/HistoryView"
 import McpView from "./components/mcp/configuration/McpConfigurationView"
 import OnboardingView from "./components/onboarding/OnboardingView"
 import SettingsView from "./components/settings/SettingsView"
 import WorktreesView from "./components/worktrees/WorktreesView"
-import { useClineAuth } from "./context/ClineAuthContext"
+import { useNodusAuth } from "./context/NodusAuthContext"
 import { useExtensionState } from "./context/ExtensionStateContext"
 import { Providers } from "./Providers"
 import { StateServiceClient, UiServiceClient } from "./services/grpc-client"
@@ -40,7 +40,7 @@ const AppContent = () => {
 	const [showKanbanModal, setShowKanbanModal] = useState(false)
 	const [hasShownKanbanModal, setHasShownKanbanModal] = useState(false)
 
-	const { clineUser, organizations, activeOrganization } = useClineAuth()
+	const { NodusUser, organizations, activeOrganization } = useNodusAuth()
 
 	const showUpdateAnnouncementModal = useCallback(() => {
 		setShowAnnouncement(true)
@@ -57,7 +57,7 @@ const AppContent = () => {
 		if (!didHydrateState || showWelcome || hasShownKanbanModal) {
 			return
 		}
-		const hasDismissedKanbanModal = dismissedBanners?.some((banner) => banner.bannerId === CLINE_KANBAN_MODAL_DISMISS_ID)
+		const hasDismissedKanbanModal = dismissedBanners?.some((banner) => banner.bannerId === NODUS_KANBAN_MODAL_DISMISS_ID)
 		if (!hasDismissedKanbanModal) {
 			setShowKanbanModal(true)
 		}
@@ -87,8 +87,8 @@ const AppContent = () => {
 	const handleCloseKanbanModal = useCallback((doNotShowAgain: boolean) => {
 		setShowKanbanModal(false)
 		if (doNotShowAgain) {
-			StateServiceClient.dismissBanner({ value: CLINE_KANBAN_MODAL_DISMISS_ID }).catch((error) =>
-				console.error("Failed to persist Cline Kanban modal dismissal:", error),
+			StateServiceClient.dismissBanner({ value: NODUS_KANBAN_MODAL_DISMISS_ID }).catch((error) =>
+				console.error("Failed to persist Nodus Kanban modal dismissal:", error),
 			)
 		}
 	}, [])
@@ -103,14 +103,14 @@ const AppContent = () => {
 
 	return (
 		<div className="flex h-screen w-full flex-col">
-			<ClineKanbanLaunchModal onClose={handleCloseKanbanModal} open={showKanbanModal} />
+			<NodusKanbanLaunchModal onClose={handleCloseKanbanModal} open={showKanbanModal} />
 			{showSettings && <SettingsView onDone={hideSettings} targetSection={settingsTargetSection} />}
 			{showHistory && <HistoryView onDone={hideHistory} />}
 			{showMcp && <McpView initialTab={mcpTab} onDone={closeMcpView} />}
 			{showAccount && (
 				<AccountView
 					activeOrganization={activeOrganization}
-					clineUser={clineUser}
+					NodusUser={NodusUser}
 					onDone={hideAccount}
 					organizations={organizations}
 				/>

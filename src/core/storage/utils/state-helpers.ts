@@ -1,5 +1,5 @@
 import { ApiProvider } from "@shared/api"
-import type { ClineFileStorage } from "@shared/storage/ClineFileStorage"
+import type { NodusFileStorage } from "@shared/storage/NodusFileStorage"
 import {
 	applyTransform,
 	GlobalStateAndSettingKeys,
@@ -13,16 +13,16 @@ import {
 	Secrets,
 } from "@shared/storage/state-keys"
 import { Logger } from "@/shared/services/Logger"
-import { ClineMemento } from "@/shared/storage"
+import { NodusMemento } from "@/shared/storage"
 import { readTaskHistoryFromState } from "../disk"
 import { StateManager } from "../StateManager"
 
 // ─── File-backed storage readers (used by StateManager) ────────────────────
 
 /**
- * Read secrets from a ClineFileStorage instance.
+ * Read secrets from a NodusFileStorage instance.
  */
-export function readSecretsFromStorage(store: ClineFileStorage<string>): Secrets {
+export function readSecretsFromStorage(store: NodusFileStorage<string>): Secrets {
 	return SecretKeys.reduce((acc, key) => {
 		acc[key] = store.get(key)
 		return acc
@@ -30,9 +30,9 @@ export function readSecretsFromStorage(store: ClineFileStorage<string>): Secrets
 }
 
 /**
- * Read workspace state from a ClineFileStorage instance.
+ * Read workspace state from a NodusFileStorage instance.
  */
-export function readWorkspaceStateFromStorage(store: ClineFileStorage): LocalState {
+export function readWorkspaceStateFromStorage(store: NodusFileStorage): LocalState {
 	return LocalStateKeys.reduce((acc, key) => {
 		acc[key] = store.get(key) || {}
 		return acc
@@ -40,9 +40,9 @@ export function readWorkspaceStateFromStorage(store: ClineFileStorage): LocalSta
 }
 
 /**
- * Read global state from a ClineFileStorage instance.
+ * Read global state from a NodusFileStorage instance.
  */
-export async function readGlobalStateFromStorage(store: ClineMemento): Promise<GlobalStateAndSettings> {
+export async function readGlobalStateFromStorage(store: NodusMemento): Promise<GlobalStateAndSettings> {
 	try {
 		// Batch read all state values in a single optimized pass
 		const stateValues = new Map<string, any>()

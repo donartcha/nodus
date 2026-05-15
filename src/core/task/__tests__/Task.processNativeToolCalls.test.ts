@@ -2,13 +2,13 @@ import { strict as assert } from "node:assert"
 import type { ToolUse } from "@core/assistant-message"
 import { registerPartialMessageCallback } from "@core/controller/ui/subscribeToPartialMessage"
 import { Task } from "@core/task"
-import type { ClineMessage } from "@shared/ExtensionMessage"
-import { ClineDefaultTool } from "@shared/tools"
+import type { NodusMessage } from "@shared/ExtensionMessage"
+import { NodusDefaultTool } from "@shared/tools"
 import { describe, it } from "mocha"
 
 describe("Task.processNativeToolCalls", () => {
 	it("finalizes a partial text row before handing off to native tool calls", async () => {
-		const clineMessages: ClineMessage[] = [
+		const nodusMessages: NodusMessage[] = [
 			{
 				ts: 1,
 				type: "say",
@@ -30,7 +30,7 @@ describe("Task.processNativeToolCalls", () => {
 		const toolBlocks: ToolUse[] = [
 			{
 				type: "tool_use",
-				name: ClineDefaultTool.ASK,
+				name: NodusDefaultTool.ASK,
 				params: {
 					question: "Need clarification",
 				},
@@ -42,8 +42,8 @@ describe("Task.processNativeToolCalls", () => {
 
 		const fakeTask = {
 			messageStateHandler: {
-				getClineMessages: () => clineMessages,
-				saveClineMessagesAndUpdateHistory: async () => {
+				getnodusMessages: () => nodusMessages,
+				savenodusMessagesAndUpdateHistory: async () => {
 					saveCalls += 1
 				},
 			},
@@ -59,8 +59,8 @@ describe("Task.processNativeToolCalls", () => {
 				Task.prototype as unknown as { processNativeToolCalls: (text: string, blocks: ToolUse[]) => Promise<void> }
 			).processNativeToolCalls.call(fakeTask, "visible streamed text", toolBlocks)
 
-			assert.equal(clineMessages[0].text, "visible streamed text")
-			assert.equal(clineMessages[0].partial, false)
+			assert.equal(nodusMessages[0].text, "visible streamed text")
+			assert.equal(nodusMessages[0].partial, false)
 			assert.equal(saveCalls, 1)
 			assert.deepEqual(emittedPartialMessages, [{ partial: false, text: "visible streamed text" }])
 

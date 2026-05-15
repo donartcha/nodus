@@ -1,14 +1,14 @@
-import type { ClineMessage } from "@shared/ExtensionMessage"
+import type { NodusMessage } from "@shared/ExtensionMessage"
 import { render, screen } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 import ErrorRow from "./ErrorRow"
 
 // Mock the auth context
-vi.mock("@/context/ClineAuthContext", () => ({
-	useClineAuth: () => ({
-		clineUser: null,
+vi.mock("@/context/NodusAuthContext", () => ({
+	useNodusAuth: () => ({
+		NodusUser: null,
 	}),
-	useClineSignIn: () => ({
+	useNodusSignIn: () => ({
 		isLoginLoading: false,
 	}),
 	handleSignOut: vi.fn(),
@@ -19,12 +19,12 @@ vi.mock("@/components/chat/CreditLimitError", () => ({
 	default: ({ message }: { message: string }) => <div data-testid="credit-limit-error">{message}</div>,
 }))
 
-// Mock ClineError
-vi.mock("../../../../src/services/error/ClineError", () => ({
-	ClineError: {
+// Mock NodusError
+vi.mock("../../../../src/services/error/NodusError", () => ({
+	NodusError: {
 		parse: vi.fn(),
 	},
-	ClineErrorType: {
+	NodusErrorType: {
 		Balance: "balance",
 		RateLimit: "rateLimit",
 		Auth: "auth",
@@ -32,7 +32,7 @@ vi.mock("../../../../src/services/error/ClineError", () => ({
 }))
 
 describe("ErrorRow", () => {
-	const mockMessage: ClineMessage = {
+	const mockMessage: NodusMessage = {
 		ts: 123456789,
 		type: "say",
 		say: "error",
@@ -64,17 +64,17 @@ describe("ErrorRow", () => {
 		).toBeInTheDocument()
 	})
 
-	it("renders clineignore error", () => {
-		const clineignoreMessage = { ...mockMessage, text: "/path/to/file.txt" }
-		render(<ErrorRow errorType="clineignore_error" message={clineignoreMessage} />)
+	it("renders Nodusignore error", () => {
+		const NodusignoreMessage = { ...mockMessage, text: "/path/to/file.txt" }
+		render(<ErrorRow errorType="NodusIGNORE_ERROR" message={NodusignoreMessage} />)
 
-		expect(screen.getByText(/Cline tried to access/)).toBeInTheDocument()
+		expect(screen.getByText(/Nodus tried to access/)).toBeInTheDocument()
 		expect(screen.getByText("/path/to/file.txt")).toBeInTheDocument()
 	})
 
 	describe("API error handling", () => {
 		it("renders credit limit error when balance error is detected", async () => {
-			const mockClineError = {
+			const mockNodusError = {
 				message: "Insufficient credits",
 				isErrorType: vi.fn((type) => type === "balance"),
 				_error: {
@@ -83,13 +83,13 @@ describe("ErrorRow", () => {
 						total_spent: 10.5,
 						total_promotions: 5.0,
 						message: "You have run out of credits.",
-						buy_credits_url: "https://app.cline.bot/dashboard",
+						buy_credits_url: "https://app.nodus.bot/dashboard",
 					},
 				},
 			}
 
-			const { ClineError } = await import("../../../../src/services/error/ClineError")
-			vi.mocked(ClineError.parse).mockReturnValue(mockClineError as any)
+			const { NodusError } = await import("../../../../src/services/error/NodusError")
+			vi.mocked(NodusError.parse).mockReturnValue(mockNodusError as any)
 
 			render(<ErrorRow apiRequestFailedMessage="Insufficient credits error" errorType="error" message={mockMessage} />)
 
@@ -98,7 +98,7 @@ describe("ErrorRow", () => {
 		})
 
 		it("renders rate limit error with request ID", async () => {
-			const mockClineError = {
+			const mockNodusError = {
 				message: "Rate limit exceeded",
 				isErrorType: vi.fn((type) => type === "rateLimit"),
 				_error: {
@@ -106,8 +106,8 @@ describe("ErrorRow", () => {
 				},
 			}
 
-			const { ClineError } = await import("../../../../src/services/error/ClineError")
-			vi.mocked(ClineError.parse).mockReturnValue(mockClineError as any)
+			const { NodusError } = await import("../../../../src/services/error/NodusError")
+			vi.mocked(NodusError.parse).mockReturnValue(mockNodusError as any)
 
 			render(<ErrorRow apiRequestFailedMessage="Rate limit exceeded" errorType="error" message={mockMessage} />)
 
@@ -116,45 +116,45 @@ describe("ErrorRow", () => {
 		})
 
 		it("renders quota exceeded error", async () => {
-			const mockClineError = {
+			const mockNodusError = {
 				message: "Inference cap reached",
 				isErrorType: vi.fn((type) => type === "quotaexceeded"),
 			}
 
-			const { ClineError } = await import("../../../../src/services/error/ClineError")
-			vi.mocked(ClineError.parse).mockReturnValue(mockClineError as any)
+			const { NodusError } = await import("../../../../src/services/error/NodusError")
+			vi.mocked(NodusError.parse).mockReturnValue(mockNodusError as any)
 
 			render(<ErrorRow apiRequestFailedMessage="The message" errorType="error" message="" />)
 			expect(screen.getByText("Inference cap reached")).toBeInTheDocument()
 		})
 
 		it("renders friendly logged-out message and sign in button when user is not signed in", async () => {
-			const mockClineError = {
+			const mockNodusError = {
 				message: "Authentication failed",
 				isErrorType: vi.fn((type) => type === "auth"),
-				providerId: "cline",
+				providerId: "Nodus",
 				_error: {},
 			}
 
-			const { ClineError } = await import("../../../../src/services/error/ClineError")
-			vi.mocked(ClineError.parse).mockReturnValue(mockClineError as any)
+			const { NodusError } = await import("../../../../src/services/error/NodusError")
+			vi.mocked(NodusError.parse).mockReturnValue(mockNodusError as any)
 
 			render(<ErrorRow apiRequestFailedMessage="Authentication failed" errorType="error" message={mockMessage} />)
 
 			expect(screen.queryByText("Authentication failed")).not.toBeInTheDocument()
 			expect(screen.getByText(/Whoops looks like you're logged out/)).toBeInTheDocument()
-			expect(screen.getByText("Sign in to Cline")).toBeInTheDocument()
+			expect(screen.getByText("Sign in to Nodus")).toBeInTheDocument()
 		})
 
 		it("renders PowerShell troubleshooting link when error mentions PowerShell", async () => {
-			const mockClineError = {
+			const mockNodusError = {
 				message: "PowerShell is not recognized as an internal or external command",
 				isErrorType: vi.fn(() => false),
 				_error: {},
 			}
 
-			const { ClineError } = await import("../../../../src/services/error/ClineError")
-			vi.mocked(ClineError.parse).mockReturnValue(mockClineError as any)
+			const { NodusError } = await import("../../../../src/services/error/NodusError")
+			vi.mocked(NodusError.parse).mockReturnValue(mockNodusError as any)
 
 			render(
 				<ErrorRow
@@ -168,33 +168,33 @@ describe("ErrorRow", () => {
 			expect(screen.getByText("troubleshooting guide")).toBeInTheDocument()
 			expect(screen.getByRole("link", { name: "troubleshooting guide" })).toHaveAttribute(
 				"href",
-				"https://github.com/cline/cline/wiki/TroubleShooting-%E2%80%90-%22PowerShell-is-not-recognized-as-an-internal-or-external-command%22",
+				"https://github.com/Nodus/Nodus/wiki/TroubleShooting-%E2%80%90-%22PowerShell-is-not-recognized-as-an-internal-or-external-command%22",
 			)
 		})
 
 		it("handles apiReqStreamingFailedMessage instead of apiRequestFailedMessage", async () => {
-			const mockClineError = {
+			const mockNodusError = {
 				message: "Streaming failed",
 				isErrorType: vi.fn(() => false),
 				_error: {},
 			}
 
-			const { ClineError } = await import("../../../../src/services/error/ClineError")
-			vi.mocked(ClineError.parse).mockReturnValue(mockClineError as any)
+			const { NodusError } = await import("../../../../src/services/error/NodusError")
+			vi.mocked(NodusError.parse).mockReturnValue(mockNodusError as any)
 
 			render(<ErrorRow apiReqStreamingFailedMessage="Streaming failed" errorType="error" message={mockMessage} />)
 
 			expect(screen.getByText("Streaming failed")).toBeInTheDocument()
 		})
 
-		it("falls back to regular error message when ClineError.parse returns null", async () => {
-			const { ClineError } = await import("../../../../src/services/error/ClineError")
-			vi.mocked(ClineError.parse).mockReturnValue(undefined)
+		it("falls back to regular error message when NodusError.parse returns null", async () => {
+			const { NodusError } = await import("../../../../src/services/error/NodusError")
+			vi.mocked(NodusError.parse).mockReturnValue(undefined)
 
 			render(<ErrorRow apiRequestFailedMessage="Some API error" errorType="error" message={mockMessage} />)
 
-			// When ClineError.parse returns null, we display the raw error message for non-Cline providers
-			// Since clineError is undefined, isClineProvider is false, so we show the raw apiRequestFailedMessage
+			// When NodusError.parse returns null, we display the raw error message for non-Nodus providers
+			// Since NodusError is undefined, isNodusProvider is false, so we show the raw apiRequestFailedMessage
 			expect(screen.getByText("Some API error")).toBeInTheDocument()
 		})
 

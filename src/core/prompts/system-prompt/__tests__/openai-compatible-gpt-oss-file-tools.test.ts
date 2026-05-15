@@ -2,7 +2,7 @@ import { expect } from "chai"
 import { beforeEach, describe, it } from "mocha"
 import type { ApiProviderInfo } from "@/core/api"
 import { ModelFamily } from "@/shared/prompts"
-import { ClineDefaultTool } from "@/shared/tools"
+import { NodusDefaultTool } from "@/shared/tools"
 import { getSystemPrompt } from "../index"
 import { PromptRegistry } from "../registry/PromptRegistry"
 import type { SystemPromptContext } from "../types"
@@ -11,8 +11,8 @@ const makeContext = (modelId: string): SystemPromptContext => ({
 	cwd: "/test/project",
 	ide: "TestIde",
 	supportsBrowserUse: true,
-	clineWebToolsEnabled: true,
-	focusChainSettings: { enabled: true, remindClineInterval: 6 },
+	nodusWebToolsEnabled: true,
+	focusChainSettings: { enabled: true, remindNodusInterval: 6 },
 	browserSettings: { viewport: { width: 1280, height: 720 } },
 	isTesting: true,
 	enableNativeToolCalls: true,
@@ -45,17 +45,17 @@ describe("OpenAI-compatible gpt-oss native tools smoke test", () => {
 		const { tools } = await getSystemPrompt(makeContext("gpt-oss-120b"))
 		const toolNames = toolNamesFrom(tools)
 
-		expect(toolNames).to.include(ClineDefaultTool.BASH)
-		expect(toolNames).to.include(ClineDefaultTool.FILE_READ)
-		expect(toolNames).to.include(ClineDefaultTool.APPLY_PATCH)
-		expect(toolNames).to.not.include(ClineDefaultTool.FILE_NEW)
-		expect(toolNames).to.not.include(ClineDefaultTool.FILE_EDIT)
+		expect(toolNames).to.include(NodusDefaultTool.BASH)
+		expect(toolNames).to.include(NodusDefaultTool.FILE_READ)
+		expect(toolNames).to.include(NodusDefaultTool.APPLY_PATCH)
+		expect(toolNames).to.not.include(NodusDefaultTool.FILE_NEW)
+		expect(toolNames).to.not.include(NodusDefaultTool.FILE_EDIT)
 	})
 
 	it("control: gpt-5-codex still receives apply_patch", async () => {
 		const { tools } = await getSystemPrompt(makeContext("gpt-5-codex"))
 		const toolNames = toolNamesFrom(tools)
 
-		expect(toolNames).to.include(ClineDefaultTool.APPLY_PATCH)
+		expect(toolNames).to.include(NodusDefaultTool.APPLY_PATCH)
 	})
 })

@@ -4,7 +4,7 @@ import { isClaudeOpusAdaptiveThinkingModel, resolveClaudeOpusAdaptiveThinking } 
 import OpenAI from "openai"
 import { StateManager } from "@/core/storage/StateManager"
 import { buildExternalBasicHeaders } from "@/services/EnvUtils"
-import { ClineStorageMessage } from "@/shared/messages/content"
+import { NodusStorageMessage } from "@/shared/messages/content"
 import { createOpenAIClient, fetch } from "@/shared/net"
 import { Logger } from "@/shared/services/Logger"
 import { isAnthropicModelId } from "@/utils/model-utils"
@@ -209,7 +209,7 @@ export class LiteLlmHandler implements ApiHandler {
 	}
 
 	@withRetry()
-	async *createMessage(systemPrompt: string, messages: ClineStorageMessage[]): ApiStream {
+	async *createMessage(systemPrompt: string, messages: NodusStorageMessage[]): ApiStream {
 		const client = this.ensureClient()
 
 		const formattedMessages = convertToOpenAiMessages(messages)
@@ -322,7 +322,7 @@ export class LiteLlmHandler implements ApiHandler {
 			...(isAdaptiveThinkingModel && adaptiveThinking?.effort
 				? { output_config: { effort: adaptiveThinking.effort } }
 				: {}),
-			...(this.options.ulid && { litellm_session_id: `cline-${this.options.ulid}` }), // Add session ID for LiteLLM tracking
+			...(this.options.ulid && { litellm_session_id: `Nodus-${this.options.ulid}` }), // Add session ID for LiteLLM tracking
 		} as LiteLlmChatCompletionCreateParams)
 
 		for await (const chunk of stream) {

@@ -1,8 +1,8 @@
 import fsSync from "node:fs"
 import os from "node:os"
 import path from "node:path"
-import { ClineFileStorage } from "./ClineFileStorage"
-import { ClineMemento } from "./ClineStorage"
+import { NodusFileStorage } from "./NodusFileStorage"
+import { NodusMemento } from "./NodusStorage"
 
 /**
  * The storage backend context object used by StateManager and other components.
@@ -14,24 +14,22 @@ import { ClineMemento } from "./ClineStorage"
  */
 export interface StorageContext {
 	/** Global state — settings, task history references, UI state, etc. */
-	readonly globalState: ClineMemento
+	readonly globalState: NodusMemento
 
 	// TODO: Privatize this field after StorageContext becomes class with a reset method.
 	/**
 	 * The backing store for global state. Prefer `globalState` when possible.
 	 *
-	 * This split exists because CLI needs to intercept the ClineMemento interface to global state,
+	 * This split exists because CLI needs to intercept the NodusMemento interface to global state,
 	 * but state resets need to write through to the backing store.
 	 */
-	readonly globalStateBackingStore: ClineFileStorage
+	readonly globalStateBackingStore: NodusFileStorage
 
 	/** Secrets — API keys and other sensitive values. File uses restricted permissions (0o600). */
-	readonly secrets: ClineFileStorage<string>
-
+	readonly secrets: NodusFileStorage<string>
 	/** Workspace-scoped state — per-project toggles, rules, etc. */
-	readonly workspaceState: ClineFileStorage
-
-	/** The resolved path to the data directory (~/.cline/data) */
+	readonly workspaceState: NodusFileStorage
+	/** The resolved path to the data directory (~/.nodus/data) */
 	readonly dataDir: string
 
 	/** The resolved path to the workspace storage directory (contains workspaceState.json) */
@@ -40,9 +38,9 @@ export interface StorageContext {
 
 export interface StorageContextOptions {
 	/**
-	 * Override the Cline home directory. Defaults to CLINE_DIR env var or ~/.cline.
+	 * Override the Nodus home directory. Defaults to NODUS_DIR env var or ~/.nodus.
 	 */
-	clineDir?: string
+	NodusDir?: string
 
 	/**
 	 * The workspace/project directory path. Used to compute a hash-based
@@ -84,16 +82,16 @@ function hashString(str: string): string {
  * construct paths to these storage files themselves.
  *
  * File layout:
- *   ~/.cline/data/globalState.json    — global state
- *   ~/.cline/data/secrets.json        — secrets (mode 0o600)
- *   ~/.cline/data/workspaces/<hash>/workspaceState.json — per-workspace state
+ *   ~/.nodus/data/globalState.json    — global state
+ *   ~/.nodus/data/secrets.json        — secrets (mode 0o600)
+ *   ~/.nodus/data/workspaces/<hash>/workspaceState.json — per-workspace state
  *
  * @param opts Configuration options for path resolution
  * @returns A StorageContext ready for use by StateManager
  */
 export function createStorageContext(opts: StorageContextOptions = {}): StorageContext {
-	const clineDir = opts.clineDir || process.env.CLINE_DIR || path.join(os.homedir(), ".cline")
-	const dataDir = path.join(clineDir, SETTINGS_SUBFOLDER)
+	const NodusDir = opts.NodusDir || process.env.NODUS_DIR || path.join(os.homedir(), ".nodus")
+	const dataDir = path.join(NodusDir, SETTINGS_SUBFOLDER)
 
 	// Resolve workspace storage directory
 	let workspaceDir: string
@@ -111,15 +109,15 @@ export function createStorageContext(opts: StorageContextOptions = {}): StorageC
 	fsSync.mkdirSync(dataDir, { recursive: true })
 	fsSync.mkdirSync(workspaceDir, { recursive: true })
 
-	const globalState = new ClineFileStorage(path.join(dataDir, "globalState.json"), "GlobalState")
+	const globalState = new NodusFileStorage(path.join(dataDir, "globalState.json"), "GlobalState")
 
 	return {
 		globalState,
 		globalStateBackingStore: globalState,
-		secrets: new ClineFileStorage<string>(path.join(dataDir, "secrets.json"), "Secrets", {
+		secrets: new NodusFileStorage<string>(path.join(dataDir, "secrets.json"), "Secrets", {
 			fileMode: 0o600, // Owner read/write only — protects API keys
 		}),
-		workspaceState: new ClineFileStorage(path.join(workspaceDir, "workspaceState.json"), "WorkspaceState"),
+		workspaceState: new NodusFileStorage(path.join(workspaceDir, "workspaceState.json"), "WorkspaceState"),
 		dataDir,
 		workspaceStoragePath: workspaceDir,
 	}

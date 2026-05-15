@@ -2,41 +2,41 @@ syntax = "proto3";
 
 package host;
 
-option go_package = "github.com/cline/grpc-go/host";
+option go_package = "github.com/nodus/grpc-go/host";
 option java_multiple_files = true;
-option java_package = "bot.cline.host.proto";
+option java_package = "bot.nodus.host.proto";
 
 // Provides methods for working with IDE windows and editors.
 service WindowService {
   // Opens a text document in the IDE editor and returns editor information.
-  rpc showTextDocument(ShowTextDocumentRequest) returns (TextEditorInfo);
+  rpc ShowTextDocument(ShowTextDocumentRequest) returns (TextEditorInfo);
 
   // Shows the open file dialogue / file picker.
-  rpc showOpenDialogue(ShowOpenDialogueRequest) returns (SelectedResources);
+  rpc ShowOpenDialogue(ShowOpenDialogueRequest) returns (SelectedResources);
 
   // Shows a notification.
-  rpc showMessage(ShowMessageRequest) returns (SelectedResponse);
+  rpc ShowMessage(ShowMessageRequest) returns (SelectedResponse);
 
   // Prompts the user for input and returns the response.
-  rpc showInputBox(ShowInputBoxRequest) returns (ShowInputBoxResponse);
+  rpc ShowInputBox(ShowInputBoxRequest) returns (ShowInputBoxResponse);
 
   // Shows the file save dialogue / file picker.
-  rpc showSaveDialog(ShowSaveDialogRequest) returns (ShowSaveDialogResponse);
+  rpc ShowSaveDialog(ShowSaveDialogRequest) returns (ShowSaveDialogResponse);
 
   // Opens a file in the IDE.
-  rpc openFile(OpenFileRequest) returns (OpenFileResponse);
+  rpc OpenFile(OpenFileRequest) returns (OpenFileResponse);
 
   // Opens the host settings UI, optionally focusing a specific query/section.
-  rpc openSettings(OpenSettingsRequest) returns (OpenSettingsResponse);
+  rpc OpenSettings(OpenSettingsRequest) returns (OpenSettingsResponse);
 
   // Returns the open tabs.
-  rpc getOpenTabs(GetOpenTabsRequest) returns (GetOpenTabsResponse);
+  rpc GetOpenTabs(GetOpenTabsRequest) returns (GetOpenTabsResponse);
 
   // Returns the visible tabs.
-  rpc getVisibleTabs(GetVisibleTabsRequest) returns (GetVisibleTabsResponse);
+  rpc GetVisibleTabs(GetVisibleTabsRequest) returns (GetVisibleTabsResponse);
 
   // Returns information about the current editor
-  rpc getActiveEditor(GetActiveEditorRequest) returns (GetActiveEditorResponse);
+  rpc GetActiveEditor(GetActiveEditorRequest) returns (GetActiveEditorResponse);
 }
 
 message ShowTextDocumentRequest {
@@ -162,3 +162,5 @@ message GetActiveEditorRequest {}
 message GetActiveEditorResponse {
   optional string file_path = 1;
 }
+
+

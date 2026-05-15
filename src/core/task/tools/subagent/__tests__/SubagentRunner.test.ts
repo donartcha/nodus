@@ -7,9 +7,9 @@ import type { GlobalInstructionsFile } from "@shared/remote-config/schema"
 import { afterEach, describe, it } from "mocha"
 import sinon from "sinon"
 import { HostProvider } from "@/hosts/host-provider"
-import { ApiFormat } from "@/shared/proto/cline/models"
+import { ApiFormat } from "@/shared/proto/Nodus/models"
 import { Logger } from "@/shared/services/Logger"
-import { ClineDefaultTool } from "@/shared/tools"
+import { NodusDefaultTool } from "@/shared/tools"
 import { TaskState } from "../../../TaskState"
 import { SubagentBuilder } from "../SubagentBuilder"
 import { SubagentRunner } from "../SubagentRunner"
@@ -156,8 +156,8 @@ function createTaskConfig(
 			runUserPromptSubmitHook: sinon.stub().resolves({}),
 		},
 		coordinator: {
-			getHandler: sinon.stub().callsFake((toolName: ClineDefaultTool) => {
-				if (toolName === ClineDefaultTool.LIST_FILES) {
+			getHandler: sinon.stub().callsFake((toolName: NodusDefaultTool) => {
+				if (toolName === NodusDefaultTool.LIST_FILES) {
 					return {
 						execute: sinon.stub().resolves("ok"),
 						getDescription: sinon.stub().returns("list_files"),
@@ -199,7 +199,7 @@ describe("SubagentRunner", () => {
 				tool_call: {
 					function: {
 						id: "toolu_subagent_1",
-						name: ClineDefaultTool.LIST_FILES,
+						name: NodusDefaultTool.LIST_FILES,
 						arguments: JSON.stringify({ path: ".", recursive: false }),
 					},
 				},
@@ -215,7 +215,7 @@ describe("SubagentRunner", () => {
 			const toolUse = assistantMessage.content.find((block) => block.type === "tool_use")
 			assert.ok(toolUse)
 			assert.equal(toolUse.id, "toolu_subagent_1")
-			assert.equal(toolUse.name, ClineDefaultTool.LIST_FILES)
+			assert.equal(toolUse.name, NodusDefaultTool.LIST_FILES)
 
 			const userMessage = conversation[2] as { role: string; content: Array<{ type?: string; [key: string]: unknown }> }
 			assert.equal(userMessage.role, "user")
@@ -228,7 +228,7 @@ describe("SubagentRunner", () => {
 				tool_call: {
 					function: {
 						id: "toolu_subagent_complete_1",
-						name: ClineDefaultTool.ATTEMPT,
+						name: NodusDefaultTool.ATTEMPT,
 						arguments: JSON.stringify({ result: "done" }),
 					},
 				},
@@ -269,7 +269,7 @@ describe("SubagentRunner", () => {
 				tool_call: {
 					function: {
 						id: "toolu_subagent_previous_tokens_1",
-						name: ClineDefaultTool.LIST_FILES,
+						name: NodusDefaultTool.LIST_FILES,
 						arguments: JSON.stringify({ path: ".", recursive: false }),
 					},
 				},
@@ -281,7 +281,7 @@ describe("SubagentRunner", () => {
 				tool_call: {
 					function: {
 						id: "toolu_subagent_previous_tokens_complete_1",
-						name: ClineDefaultTool.ATTEMPT,
+						name: NodusDefaultTool.ATTEMPT,
 						arguments: JSON.stringify({ result: "done" }),
 					},
 				},
@@ -322,7 +322,7 @@ describe("SubagentRunner", () => {
 				tool_call: {
 					function: {
 						id: "toolu_subagent_2",
-						name: ClineDefaultTool.LIST_FILES,
+						name: NodusDefaultTool.LIST_FILES,
 						arguments: JSON.stringify({ path: ".", recursive: false }),
 					},
 				},
@@ -346,7 +346,7 @@ describe("SubagentRunner", () => {
 				tool_call: {
 					function: {
 						id: "toolu_subagent_complete_2",
-						name: ClineDefaultTool.ATTEMPT,
+						name: NodusDefaultTool.ATTEMPT,
 						arguments: JSON.stringify({ result: "done" }),
 					},
 				},
@@ -396,7 +396,7 @@ describe("SubagentRunner", () => {
 				tool_call: {
 					function: {
 						id: "toolu_subagent_complete_3",
-						name: ClineDefaultTool.ATTEMPT,
+						name: NodusDefaultTool.ATTEMPT,
 						arguments: JSON.stringify({ result: "done" }),
 					},
 				},
@@ -496,7 +496,7 @@ describe("SubagentRunner", () => {
 				tool_call: {
 					function: {
 						id: "toolu_subagent_complete_4",
-						name: ClineDefaultTool.ATTEMPT,
+						name: NodusDefaultTool.ATTEMPT,
 						arguments: JSON.stringify({ result: "done" }),
 					},
 				},
@@ -528,7 +528,7 @@ describe("SubagentRunner", () => {
 				tool_call: {
 					function: {
 						id: "toolu_subagent_skills_filtered_1",
-						name: ClineDefaultTool.ATTEMPT,
+						name: NodusDefaultTool.ATTEMPT,
 						arguments: JSON.stringify({ result: "done" }),
 					},
 				},
@@ -570,7 +570,7 @@ describe("SubagentRunner", () => {
 				tool_call: {
 					function: {
 						id: "toolu_subagent_skills_unconfigured_1",
-						name: ClineDefaultTool.ATTEMPT,
+						name: NodusDefaultTool.ATTEMPT,
 						arguments: JSON.stringify({ result: "done" }),
 					},
 				},
@@ -609,7 +609,7 @@ describe("SubagentRunner", () => {
 				tool_call: {
 					function: {
 						id: "toolu_subagent_skills_missing_1",
-						name: ClineDefaultTool.ATTEMPT,
+						name: NodusDefaultTool.ATTEMPT,
 						arguments: JSON.stringify({ result: "done" }),
 					},
 				},
@@ -650,7 +650,7 @@ describe("SubagentRunner", () => {
 				tool_call: {
 					function: {
 						id: "toolu_subagent_remote_skills_1",
-						name: ClineDefaultTool.ATTEMPT,
+						name: NodusDefaultTool.ATTEMPT,
 						arguments: JSON.stringify({ result: "done" }),
 					},
 				},
@@ -732,7 +732,7 @@ describe("SubagentRunner", () => {
 				tool_call: {
 					function: {
 						id: "toolu_subagent_workspace_1",
-						name: ClineDefaultTool.LIST_FILES,
+						name: NodusDefaultTool.LIST_FILES,
 						arguments: JSON.stringify({ path: ".", recursive: false }),
 					},
 				},
@@ -755,7 +755,7 @@ describe("SubagentRunner", () => {
 				tool_call: {
 					function: {
 						id: "toolu_subagent_workspace_complete_1",
-						name: ClineDefaultTool.ATTEMPT,
+						name: NodusDefaultTool.ATTEMPT,
 						arguments: JSON.stringify({ result: "done" }),
 					},
 				},

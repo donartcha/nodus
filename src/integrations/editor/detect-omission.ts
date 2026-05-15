@@ -53,7 +53,7 @@ export function showOmissionWarning(originalFileContent: string, newFileContent:
 			.then((response) => {
 				if (response.selectedOption === "Follow this guide to fix the issue") {
 					openExternal(
-						"https://github.com/cline/cline/wiki/Troubleshooting-%E2%80%90-Cline-Deleting-Code-with-%22Rest-of-Code-Here%22-Comments",
+						"https://github.com/Nodus/Nodus/wiki/Troubleshooting-%E2%80%90-Nodus-Deleting-Code-with-%22Rest-of-Code-Here%22-Comments",
 					)
 				}
 			})

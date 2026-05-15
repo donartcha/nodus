@@ -2,7 +2,7 @@ import { ConverseStreamCommand } from "@aws-sdk/client-bedrock-runtime"
 import { bedrockModels, vertexGlobalModels, vertexModels } from "@shared/api"
 import should from "should"
 import { Readable } from "stream"
-import type { ClineStorageMessage } from "@/shared/messages/content"
+import type { NodusStorageMessage } from "@/shared/messages/content"
 import type { AwsBedrockHandlerOptions } from "../bedrock"
 import { AwsBedrockHandler } from "../bedrock"
 
@@ -760,7 +760,7 @@ describe("AwsBedrockHandler", () => {
 	describe("tool config mapping", () => {
 		it("should map Anthropic tools to Bedrock toolConfig", () => {
 			const handler = new AwsBedrockHandler(mockOptions)
-			const toolConfig = handler["mapClineToolsToBedrockToolConfig"]([
+			const toolConfig = handler["mapNodusToolsToBedrockToolConfig"]([
 				{
 					name: "read_file",
 					description: "Read a file",
@@ -786,14 +786,14 @@ describe("AwsBedrockHandler", () => {
 
 		it("should return undefined when tools is undefined or empty", () => {
 			const handler = new AwsBedrockHandler(mockOptions)
-			should.not.exist(handler["mapClineToolsToBedrockToolConfig"](undefined))
-			should.not.exist(handler["mapClineToolsToBedrockToolConfig"]([]))
+			should.not.exist(handler["mapNodusToolsToBedrockToolConfig"](undefined))
+			should.not.exist(handler["mapNodusToolsToBedrockToolConfig"]([]))
 		})
 
 		it("should silently drop tools without input_schema", () => {
 			const handler = new AwsBedrockHandler(mockOptions)
 			// A tool missing input_schema doesn't match the AnthropicTool type guard
-			const toolConfig = handler["mapClineToolsToBedrockToolConfig"]([
+			const toolConfig = handler["mapNodusToolsToBedrockToolConfig"]([
 				{ name: "bad_tool", description: "No schema" } as any,
 			])
 			// All tools filtered out → undefined
@@ -804,7 +804,7 @@ describe("AwsBedrockHandler", () => {
 	describe("formatMessagesForConverseAPI", () => {
 		it("should format tool_use and tool_result blocks", () => {
 			const handler = new AwsBedrockHandler(mockOptions)
-			const messages: ClineStorageMessage[] = [
+			const messages: NodusStorageMessage[] = [
 				{
 					role: "assistant",
 					content: [
@@ -840,7 +840,7 @@ describe("AwsBedrockHandler", () => {
 
 		it("should format tool_result with array content", () => {
 			const handler = new AwsBedrockHandler(mockOptions)
-			const messages: ClineStorageMessage[] = [
+			const messages: NodusStorageMessage[] = [
 				{
 					role: "user",
 					content: [
@@ -866,7 +866,7 @@ describe("AwsBedrockHandler", () => {
 
 		it("should map is_error to error status on tool_result", () => {
 			const handler = new AwsBedrockHandler(mockOptions)
-			const messages: ClineStorageMessage[] = [
+			const messages: NodusStorageMessage[] = [
 				{
 					role: "user",
 					content: [
@@ -1131,14 +1131,14 @@ describe("AwsBedrockHandler", () => {
 		})
 
 		it("should format a complete tool call round-trip correctly", () => {
-			// Simulates the full cycle: model returns tool_use → Cline executes → sends tool_result back
+			// Simulates the full cycle: model returns tool_use → Nodus executes → sends tool_result back
 			const handler = new AwsBedrockHandler(mockOptions)
 
 			// Turn 1: assistant calls a tool
 			// Turn 2: user sends tool result
 			// Turn 3: assistant calls another tool (proves multi-turn works)
 			// Turn 4: user sends second tool result
-			const conversation: ClineStorageMessage[] = [
+			const conversation: NodusStorageMessage[] = [
 				{
 					role: "assistant",
 					content: [

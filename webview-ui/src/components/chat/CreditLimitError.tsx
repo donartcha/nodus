@@ -1,8 +1,8 @@
-import { AskResponseRequest } from "@shared/proto/cline/task"
+import { AskResponseRequest } from "@shared/proto/nodus/task"
 import { VSCodeButton } from "@vscode/webview-ui-toolkit/react"
 import React, { useEffect, useMemo, useState } from "react"
 import VSCodeButtonLink from "@/components/common/VSCodeButtonLink"
-import { useClineAuth } from "@/context/ClineAuthContext"
+import { useNodusAuth } from "@/context/NodusAuthContext"
 import { AccountServiceClient, TaskServiceClient } from "@/services/grpc-client"
 
 interface CreditLimitErrorProps {
@@ -14,8 +14,8 @@ interface CreditLimitErrorProps {
 }
 
 const DEFAULT_BUY_CREDITS_URL = {
-	USER: "https://app.cline.bot/dashboard/account?tab=credits&redirect=true",
-	ORG: "https://app.cline.bot/dashboard/organization?tab=credits&redirect=true",
+	USER: "https://app.nodus.bot/dashboard/account?tab=credits&redirect=true",
+	ORG: "https://app.nodus.bot/dashboard/organization?tab=credits&redirect=true",
 }
 
 const CreditLimitError: React.FC<CreditLimitErrorProps> = ({
@@ -25,7 +25,7 @@ const CreditLimitError: React.FC<CreditLimitErrorProps> = ({
 	totalPromotions,
 	totalSpent,
 }) => {
-	const { activeOrganization } = useClineAuth()
+	const { activeOrganization } = useNodusAuth()
 	const [fullBuyCreditsUrl, setFullBuyCreditsUrl] = useState<string>("")
 
 	const dashboardUrl = useMemo(() => {

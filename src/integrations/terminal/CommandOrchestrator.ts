@@ -17,7 +17,7 @@ import { setTimeout as setTimeoutPromise } from "node:timers/promises"
 import { formatResponse } from "@core/prompts/responses"
 import { processFilesIntoText } from "@integrations/misc/extract-text"
 import { TerminalHangStage, TerminalUserInterventionAction, telemetryService } from "@services/telemetry"
-import { ClineTempManager } from "@services/temp"
+import { NodusTempManager } from "@services/temp"
 import { COMMAND_CANCEL_TOKEN } from "@shared/ExtensionMessage"
 import * as fs from "fs"
 import { Logger } from "@/shared/services/Logger"
@@ -97,10 +97,10 @@ export async function orchestrateCommandExecution(
 		callbacks.updateBackgroundCommandState(false)
 
 		// Mark the command message as completed
-		const clineMessages = callbacks.getClineMessages()
-		const lastCommandIndex = findLastIndex(clineMessages, (m) => m.ask === "command" || m.say === "command")
+		const nodusMessages = callbacks.getnodusMessages()
+		const lastCommandIndex = findLastIndex(nodusMessages, (m) => m.ask === "command" || m.say === "command")
 		if (lastCommandIndex !== -1) {
-			await callbacks.updateClineMessage(lastCommandIndex, {
+			await callbacks.updateNodusMessage(lastCommandIndex, {
 				commandCompleted: true,
 			})
 		}
@@ -332,8 +332,8 @@ export async function orchestrateCommandExecution(
 			chunkTimer = null
 		}
 
-		// Set up file logging using ClineTempManager for proper cleanup
-		largeOutputLogPath = ClineTempManager.createTempFilePath("large-output")
+		// Set up file logging using NodusTempManager for proper cleanup
+		largeOutputLogPath = NodusTempManager.createTempFilePath("large-output")
 		largeOutputLogStream = fs.createWriteStream(largeOutputLogPath, { flags: "a" })
 
 		// Write all existing lines to file in a single batch to reduce I/O overhead

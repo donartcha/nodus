@@ -60,7 +60,7 @@ export class McpHub {
 	connections: McpConnection[] = []
 	isConnecting = false
 	/**
-	 * Flag to skip file watcher processing when we're updating Cline-specific settings
+	 * Flag to skip file watcher processing when we're updating Nodus-specific settings
 	 * (autoApprove, timeout) that don't require an MCP server restart.
 	 *
 	 * The file watcher has a 100ms stabilityThreshold before firing "change" events.
@@ -73,7 +73,7 @@ export class McpHub {
 	 *   ~100ms: file watcher fires "change" → sees flag=true → skips
 	 *   300ms:  flag = false (ready for external file changes)
 	 */
-	private isUpdatingClineSettings = false
+	private isUpdatingNodusSettings = false
 
 	// Track when remote config is updating to prevent unnecessary watcher triggers
 	private isUpdatingFromRemoteConfig = false
@@ -229,8 +229,8 @@ export class McpHub {
 			if (this.isUpdatingFromRemoteConfig) {
 				return
 			}
-			// Skip processing if we're updating Cline-specific settings (autoApprove, timeout)
-			if (this.isUpdatingClineSettings) {
+			// Skip processing if we're updating Nodus-specific settings (autoApprove, timeout)
+			if (this.isUpdatingNodusSettings) {
 				return
 			}
 
@@ -363,7 +363,7 @@ export class McpHub {
 			// Each MCP server requires its own transport connection and has unique capabilities, configurations, and error handling. Having separate clients also allows proper scoping of resources/tools and independent server management like reconnection.
 			const client = new Client(
 				{
-					name: "Cline",
+					name: "Nodus",
 					version: this.clientVersion,
 				},
 				{
@@ -842,7 +842,7 @@ export class McpHub {
 					Logger.error(`Failed to connect to new MCP server ${name}:`, error)
 				}
 			} else if (this.configsRequireRestart(JSON.parse(currentConnection.server.config), config)) {
-				// Existing server with changed connection config (excludes Cline-specific settings)
+				// Existing server with changed connection config (excludes Nodus-specific settings)
 				try {
 					if (config.type === "stdio") {
 						this.setupFileWatcher(name, config)
@@ -854,7 +854,7 @@ export class McpHub {
 					Logger.error(`Failed to reconnect MCP server ${name}:`, error)
 				}
 			} else {
-				// Only Cline-specific settings changed - update in-memory state without restart
+				// Only Nodus-specific settings changed - update in-memory state without restart
 				const autoApprove = config.autoApprove || []
 				if (currentConnection.server.tools) {
 					currentConnection.server.tools = currentConnection.server.tools.map((tool) => ({
@@ -862,7 +862,7 @@ export class McpHub {
 						autoApprove: autoApprove.includes(tool.name),
 					}))
 				}
-				// Also update Cline-specific settings in the stored config.
+				// Also update Nodus-specific settings in the stored config.
 				// This handles the case where someone manually edits the MCP settings file -
 				// the file watcher triggers this code path, and we need to sync the in-memory
 				// config with the file without restarting the server.
@@ -882,7 +882,7 @@ export class McpHub {
 		const currentNames = new Set(this.connections.map((conn) => conn.server.name))
 		const newNames = new Set(Object.keys(newServers))
 
-		// Track if any connection-level changes occurred (excludes Cline-specific settings)
+		// Track if any connection-level changes occurred (excludes Nodus-specific settings)
 		let connectionChangesOccurred = false
 
 		// Delete removed servers
@@ -911,7 +911,7 @@ export class McpHub {
 					Logger.error(`Failed to connect to new MCP server ${name}:`, error)
 				}
 			} else if (this.configsRequireRestart(JSON.parse(currentConnection.server.config), config)) {
-				// Existing server with changed connection config (excludes Cline-specific settings)
+				// Existing server with changed connection config (excludes Nodus-specific settings)
 				try {
 					// Set status to "connecting" and notify webview before restart (same pattern as restartConnection)
 					currentConnection.server.status = "connecting"
@@ -929,7 +929,7 @@ export class McpHub {
 					Logger.error(`Failed to reconnect MCP server ${name}:`, error)
 				}
 			} else {
-				// Only Cline-specific settings changed - update in-memory state without restart
+				// Only Nodus-specific settings changed - update in-memory state without restart
 				// Don't set connectionChangesOccurred since the RPC already returned the updated state
 				const autoApprove = config.autoApprove || []
 				if (currentConnection.server.tools) {
@@ -938,7 +938,7 @@ export class McpHub {
 						autoApprove: autoApprove.includes(tool.name),
 					}))
 				}
-				// Also update Cline-specific settings in the stored config
+				// Also update Nodus-specific settings in the stored config
 				const currentConfig = JSON.parse(currentConnection.server.config)
 				currentConfig.autoApprove = config.autoApprove
 				currentConfig.timeout = config.timeout
@@ -947,7 +947,7 @@ export class McpHub {
 		}
 
 		// Only notify webview if actual connection changes occurred.
-		// For Cline-specific settings changes, the RPC response already updated the webview,
+		// For Nodus-specific settings changes, the RPC response already updated the webview,
 		// so we skip notification to avoid race conditions.
 		if (connectionChangesOccurred) {
 			await this.notifyWebviewOfServerChanges()
@@ -957,24 +957,24 @@ export class McpHub {
 
 	/**
 	 * Compares two MCP server configs to determine if a restart is required.
-	 * Excludes Cline-specific settings since they don't affect the MCP server transport connection.
+	 * Excludes Nodus-specific settings since they don't affect the MCP server transport connection.
 	 *
-	 * ## Cline-specific settings (don't require restart):
+	 * ## Nodus-specific settings (don't require restart):
 	 * - `autoApprove`: tool approval list (UI setting)
 	 * - `timeout`: request timeout (read at request time, not connection time)
 	 *
 	 * ## MCP SDK connection settings (require restart):
 	 * - `type`, `command`, `args`, `cwd`, `env`, `url`, `headers`, `disabled`
 	 *
-	 * ## Adding new Cline-specific settings:
+	 * ## Adding new Nodus-specific settings:
 	 * When adding a new setting that doesn't require server restart:
 	 * 1. Add it to the destructuring below to exclude from comparison
-	 * 2. Add it to `isUpdatingClineSettings` flag usage in the update function
+	 * 2. Add it to `isUpdatingNodusSettings` flag usage in the update function
 	 * 3. Update in-memory state (e.g., `connection.server.config`) in the update function
 	 * 4. Update the schema in `src/services/mcp/schemas.ts` if needed
 	 */
 	private configsRequireRestart(oldConfig: McpServerConfig, newConfig: McpServerConfig): boolean {
-		// Exclude Cline-specific settings from comparison (add new ones here)
+		// Exclude Nodus-specific settings from comparison (add new ones here)
 		const {
 			autoApprove: _oldAutoApprove,
 			timeout: _oldTimeout,
@@ -993,7 +993,7 @@ export class McpHub {
 	private setupFileWatcher(name: string, config: Extract<McpServerConfig, { type: "stdio" }>) {
 		const filePath = config.args?.find((arg: string) => arg.includes("build/index.js"))
 		if (filePath) {
-			// we use chokidar instead of onDidSaveTextDocument because it doesn't require the file to be open in the editor. The settings config is better suited for onDidSave since that will be manually updated by the user or Cline (and we want to detect save events, not every file change)
+			// we use chokidar instead of onDidSaveTextDocument because it doesn't require the file to be open in the editor. The settings config is better suited for onDidSave since that will be manually updated by the user or Nodus (and we want to detect save events, not every file change)
 			const watcher = chokidar.watch(filePath, {
 				// persistent: true,
 				// ignoreInitial: true,
@@ -1316,7 +1316,7 @@ export class McpHub {
 	 */
 	async toggleToolAutoApproveRPC(serverName: string, toolNames: string[], shouldAllow: boolean): Promise<McpServer[]> {
 		// Set flag to prevent file watcher from triggering during our update
-		this.isUpdatingClineSettings = true
+		this.isUpdatingNodusSettings = true
 		try {
 			const settingsPath = await getMcpSettingsFilePathHelper(await this.getSettingsDirectoryPath())
 			const content = await fs.readFile(settingsPath, "utf-8")
@@ -1362,14 +1362,14 @@ export class McpHub {
 			// Clear flag after a delay to ensure file watcher event has been processed
 			// The file watcher has a 100ms stabilityThreshold, so we wait a bit longer
 			setTimeout(() => {
-				this.isUpdatingClineSettings = false
+				this.isUpdatingNodusSettings = false
 			}, 300)
 		}
 	}
 
 	async toggleToolAutoApprove(serverName: string, toolNames: string[], shouldAllow: boolean): Promise<void> {
 		// Set flag to prevent file watcher from triggering during our update
-		this.isUpdatingClineSettings = true
+		this.isUpdatingNodusSettings = true
 		try {
 			const settingsPath = await getMcpSettingsFilePathHelper(await this.getSettingsDirectoryPath())
 			const content = await fs.readFile(settingsPath, "utf-8")
@@ -1415,7 +1415,7 @@ export class McpHub {
 		} finally {
 			// Clear flag after a delay to ensure file watcher event has been processed
 			setTimeout(() => {
-				this.isUpdatingClineSettings = false
+				this.isUpdatingNodusSettings = false
 			}, 300)
 		}
 	}
@@ -1509,7 +1509,7 @@ export class McpHub {
 
 	public async updateServerTimeoutRPC(serverName: string, timeout: number): Promise<McpServer[]> {
 		// Set flag to prevent file watcher from triggering during our update
-		this.isUpdatingClineSettings = true
+		this.isUpdatingNodusSettings = true
 		try {
 			// Validate timeout against schema
 			const setConfigResult = BaseConfigSchema.shape.timeout.safeParse(timeout)
@@ -1555,7 +1555,7 @@ export class McpHub {
 		} finally {
 			// Clear flag after a delay to ensure file watcher event has been processed
 			setTimeout(() => {
-				this.isUpdatingClineSettings = false
+				this.isUpdatingNodusSettings = false
 			}, 300)
 		}
 	}

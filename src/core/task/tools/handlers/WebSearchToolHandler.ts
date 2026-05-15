@@ -1,13 +1,13 @@
-import { ClineAsk, ClineSayTool } from "@shared/ExtensionMessage"
-import { ClineDefaultTool } from "@shared/tools"
+import { NodusAsk, NodusSayTool } from "@shared/ExtensionMessage"
+import { NodusDefaultTool } from "@shared/tools"
 import axios from "axios"
-import { ClineEnv } from "@/config"
+import { NodusEnv } from "@/config"
 import { AuthService } from "@/services/auth/AuthService"
-import { buildClineExtraHeaders } from "@/services/EnvUtils"
+import { buildNodusExtraHeaders } from "@/services/EnvUtils"
 import { featureFlagsService } from "@/services/feature-flags"
 import { telemetryService } from "@/services/telemetry"
 import { parsePartialArrayString } from "@/shared/array"
-import { CLINE_ACCOUNT_AUTH_ERROR_MESSAGE } from "@/shared/ClineAccount"
+import { Nodus_ACCOUNT_AUTH_ERROR_MESSAGE } from "@/shared/NodusAccount"
 import { getAxiosSettings } from "@/shared/net"
 import { ToolUse } from "../../../assistant-message"
 import { formatResponse } from "../../../prompts/responses"
@@ -19,7 +19,7 @@ import type { StronglyTypedUIHelpers } from "../types/UIHelpers"
 import { ToolResultUtils } from "../utils/ToolResultUtils"
 
 export class WebSearchToolHandler implements IFullyManagedTool {
-	readonly name = ClineDefaultTool.WEB_SEARCH
+	readonly name = NodusDefaultTool.WEB_SEARCH
 
 	getDescription(block: ToolUse): string {
 		return `[${block.name} for '${block.params.query}']`
@@ -27,19 +27,19 @@ export class WebSearchToolHandler implements IFullyManagedTool {
 
 	async handlePartialBlock(block: ToolUse, uiHelpers: StronglyTypedUIHelpers): Promise<void> {
 		const query = block.params.query || ""
-		const sharedMessageProps: ClineSayTool = {
+		const sharedMessageProps: NodusSayTool = {
 			tool: "webSearch",
 			path: uiHelpers.removeClosingTag(block, "query", query),
 			content: `Searching for: ${uiHelpers.removeClosingTag(block, "query", query)}`,
 			operationIsLocatedInWorkspace: false, // web_search is always external
-		} satisfies ClineSayTool
+		} satisfies NodusSayTool
 
 		const partialMessage = JSON.stringify(sharedMessageProps)
 
 		// For partial blocks, we'll let the ToolExecutor handle auto-approval logic
 		// Just stream the UI update for now
 		await uiHelpers.removeLastPartialMessageIfExistsWithType("say", "tool")
-		await uiHelpers.ask("tool" as ClineAsk, partialMessage, block.partial).catch(() => {})
+		await uiHelpers.ask("tool" as NodusAsk, partialMessage, block.partial).catch(() => {})
 	}
 
 	async execute(config: TaskConfig, block: ToolUse): Promise<ToolResponse> {
@@ -53,11 +53,11 @@ export class WebSearchToolHandler implements IFullyManagedTool {
 			const currentMode = config.services.stateManager.getGlobalSettingsKey("mode")
 			const provider = (currentMode === "plan" ? apiConfig.planModeApiProvider : apiConfig.actModeApiProvider) as string
 
-			// Check if Cline web tools are enabled (both user setting and feature flag)
-			const clineWebToolsEnabled = config.services.stateManager.getGlobalSettingsKey("clineWebToolsEnabled")
+			// Check if Nodus web tools are enabled (both user setting and feature flag)
+			const nodusWebToolsEnabled = config.services.stateManager.getGlobalSettingsKey("nodusWebToolsEnabled")
 			const featureFlagEnabled = featureFlagsService.getWebtoolsEnabled()
-			if (provider !== "cline" || !clineWebToolsEnabled || !featureFlagEnabled) {
-				return formatResponse.toolError("Cline web tools are currently disabled.")
+			if (provider !== "Nodus" || !nodusWebToolsEnabled || !featureFlagEnabled) {
+				return formatResponse.toolError("Nodus web tools are currently disabled.")
 			}
 
 			// Validate required parameters
@@ -78,7 +78,7 @@ export class WebSearchToolHandler implements IFullyManagedTool {
 			}
 
 			// Create message for approval
-			const sharedMessageProps: ClineSayTool = {
+			const sharedMessageProps: NodusSayTool = {
 				tool: "webSearch",
 				path: query,
 				content: `Searching for: ${query}`,
@@ -103,7 +103,7 @@ export class WebSearchToolHandler implements IFullyManagedTool {
 			} else {
 				// Manual approval flow
 				showNotificationForApproval(
-					`Cline wants to search for: ${query}`,
+					`Nodus wants to search for: ${query}`,
 					config.autoApprovalSettings.enableNotifications,
 				)
 				await config.callbacks.removeLastPartialMessageIfExistsWithType("say", "tool")
@@ -148,11 +148,11 @@ export class WebSearchToolHandler implements IFullyManagedTool {
 			}
 
 			// Execute the actual search
-			const baseUrl = ClineEnv.config().apiBaseUrl
+			const baseUrl = NodusEnv.config().apiBaseUrl
 			const authToken = await AuthService.getInstance().getAuthToken()
 
 			if (!authToken) {
-				throw new Error(CLINE_ACCOUNT_AUTH_ERROR_MESSAGE)
+				throw new Error(Nodus_ACCOUNT_AUTH_ERROR_MESSAGE)
 			}
 
 			const requestBody: {
@@ -176,7 +176,7 @@ export class WebSearchToolHandler implements IFullyManagedTool {
 					Authorization: `Bearer ${authToken}`,
 					"Content-Type": "application/json",
 					"X-Task-ID": config.ulid || "",
-					...(await buildClineExtraHeaders()),
+					...(await buildNodusExtraHeaders()),
 				},
 				timeout: 15000,
 				...getAxiosSettings(),
