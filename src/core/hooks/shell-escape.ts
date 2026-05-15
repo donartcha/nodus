@@ -51,8 +51,8 @@ function escapeUnixShellPath(path: string): string {
  *
  * Use cases:
  * - Global hooks directory: ~/Documents/Nodus/Hooks/
- * - Workspace hooks: /path/to/My Project/.Nodusrules/hooks/
- * - Multi-root workspaces: each root's .Nodusrules/hooks/
+ * - Workspace hooks: /path/to/My Project/.nodusrules/hooks/
+ * - Multi-root workspaces: each root's .nodusrules/hooks/
  *
  * Examples:
  * - "/Users/user/My Project/hooks/PreToolUse" → "'/Users/user/My Project/hooks/PreToolUse'"

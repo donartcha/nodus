@@ -1,10 +1,10 @@
-import type { OnboardingModel } from "../proto/Nodus/state"
+import type { OnboardingModel } from "../proto/nodus/state"
 
 /**
  * The list of models available to new users during the onboarding flow.
  * NOTE: Can be overridden by feature flag onboarding models payload.
  */
-export const Nodus_ONBOARDING_MODELS: OnboardingModel[] = [
+export const NODUS_ONBOARDING_MODELS: OnboardingModel[] = [
 	{
 		group: "free",
 		id: "kwaipilot/kat-coder-pro",

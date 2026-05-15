@@ -28,7 +28,7 @@ service WorkspaceService {
   rpc OpenInFileExplorerPanel(OpenInFileExplorerPanelRequest) returns (OpenInFileExplorerPanelResponse);
 
   // Opens and focuses the nodus sidebar panel in the host IDE.
-  rpc OpennodusSidebarPanel(OpennodusSidebarPanelRequest) returns (OpennodusSidebarPanelResponse);
+  rpc OpenNodusSidebarPanel(OpenNodusSidebarPanelRequest) returns (OpenNodusSidebarPanelResponse);
 
   // Opens and focuses the terminal panel.
   rpc OpenTerminalPanel(OpenTerminalRequest) returns (OpenTerminalResponse);
@@ -107,8 +107,8 @@ message OpenInFileExplorerPanelRequest {
   string path = 1;
 }
 message OpenInFileExplorerPanelResponse {}
-message OpennodusSidebarPanelRequest {}
-message OpennodusSidebarPanelResponse {}
+message OpenNodusSidebarPanelRequest {}
+message OpenNodusSidebarPanelResponse {}
 message OpenTerminalRequest {}
 message OpenTerminalResponse {}
 
@@ -130,5 +130,4 @@ message OpenFolderRequest {
 message OpenFolderResponse {
   bool success = 1;
 }
-
 

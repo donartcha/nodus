@@ -106,10 +106,10 @@ export async function getDocumentsPath(): Promise<string> {
 }
 
 /**
- * Returns the cross-platform path to the Nodus home directory (~/.Nodus).
+ * Returns the cross-platform path to the Nodus home directory (~/.nodus).
  * This works on macOS, Linux, and Windows:
- * - macOS: /Users/username/.Nodus
- * - Linux: /home/username/.Nodus
+ * - macOS: /Users/username/.nodus
+ * - Linux: /home/username/.nodus
  * - Windows: C:\Users\username\.nodus
  *
  * This is intended to eventually replace ~/Documents/Nodus as the global config location.
@@ -167,7 +167,7 @@ export async function ensureHooksDirectoryExists(): Promise<string> {
 }
 
 /**
- * Returns the global skills directory path (~/.Nodus/skills) without creating it.
+ * Returns the global skills directory path (~/.nodus/skills) without creating it.
  */
 function getNodusSkillsDirectoryPath(): string {
 	return path.join(getNodusHomePath(), "skills")
@@ -299,7 +299,7 @@ export async function collectEnvironmentMetadata(): Promise<Omit<EnvironmentMeta
 			os_arch: os.arch(),
 			host_name: hostVersion.platform || "Unknown",
 			host_version: hostVersion.version || "Unknown",
-			Nodus_version: ExtensionRegistryInfo.version,
+			nodus_version: ExtensionRegistryInfo.version,
 		}
 	} catch (error) {
 		Logger.error("Failed to collect environment metadata:", error)
@@ -310,7 +310,7 @@ export async function collectEnvironmentMetadata(): Promise<Omit<EnvironmentMeta
 			os_arch: os.arch(),
 			host_name: "Unknown",
 			host_version: "Unknown",
-			Nodus_version: "Unknown",
+			nodus_version: "Unknown",
 		}
 	}
 }
@@ -523,7 +523,7 @@ export function setRuntimeHooksDir(dir: string | undefined): void {
  * Gets the paths to all hooks directories to search for hooks, including:
  * 1. The runtime hooks directory (if set via --hooks-dir CLI flag)
  * 2. The global hooks directory (if it exists)
- * 3. Each workspace root's .Nodusrules/hooks directory (if they exist)
+ * 3. Each workspace root's .nodusrules/hooks directory (if they exist)
  *
  * Note: Hooks from different directories may be executed concurrently.
  * No execution order is guaranteed between hooks from different directories.
@@ -552,7 +552,7 @@ export async function getAllHooksDirs(): Promise<string[]> {
 }
 
 /**
- * Gets the paths to the workspace's .Nodusrules/hooks directories to search for
+ * Gets the paths to the workspace's .nodusrules/hooks directories to search for
  * hooks. A workspace may not use hooks, and the resulting array will be empty. A
  * multi-root workspace may have multiple hooks directories.
  */
@@ -565,7 +565,7 @@ export async function getWorkspaceHooksDirs(): Promise<string[]> {
 	return (
 		await Promise.all(
 			workspaceRootPaths.map(async (workspaceRootPath) => {
-				// Look for a .Nodusrules/hooks folder in this workspace root.
+				// Look for a .nodusrules/hooks folder in this workspace root.
 				const candidate = path.join(workspaceRootPath, GlobalFileNames.hooksDir)
 				return (await isDirectory(candidate)) ? candidate : undefined
 			}),

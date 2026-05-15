@@ -57,10 +57,10 @@ export const ErrorBlockTitle = ({
 			details.classNames.push("text-(--vscode-foreground)")
 		} else if (apiRequestFailedMessage) {
 			// Handle failed request
-			const NodusError = NodusError.parse(apiRequestFailedMessage)
-			const titleText = NodusError?.isErrorType(NodusErrorType.Balance)
+			const parsedNodusError = NodusError.parse(apiRequestFailedMessage)
+			const titleText = parsedNodusError?.isErrorType(NodusErrorType.Balance)
 				? "Credit Limit Reached"
-				: NodusError?.isErrorType(NodusErrorType.SpendLimit)
+				: parsedNodusError?.isErrorType(NodusErrorType.SpendLimit)
 					? "Spend Limit Reached"
 					: "API Request Failed"
 			details.title = titleText

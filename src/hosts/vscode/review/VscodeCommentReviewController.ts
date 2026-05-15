@@ -7,7 +7,7 @@ import { DIFF_VIEW_URI_SCHEME } from "../VscodeDiffViewProvider"
 /**
  * Nodus's GitHub avatar URL
  */
-const Nodus_AVATAR_URL = "https://avatars.githubusercontent.com/u/184127137"
+const NODUS_AVATAR_URL = "https://avatars.githubusercontent.com/u/184127137"
 
 /**
  * VS Code implementation of CommentReviewController.
@@ -30,7 +30,7 @@ export class VscodeCommentReviewController extends CommentReviewController imple
 	constructor() {
 		super()
 		// Create the comment controller
-		this.commentController = vscode.comments.createCommentController("Nodus-ai-review", "Nodus AI Review")
+		this.commentController = vscode.comments.createCommentController("nodus-ai-review", "Nodus AI Review")
 
 		// Configure options for the reply input
 		this.commentController.options = {
@@ -49,14 +49,14 @@ export class VscodeCommentReviewController extends CommentReviewController imple
 
 		// Register reply command - this is called when user clicks the Reply button
 		this.disposables.push(
-			vscode.commands.registerCommand("Nodus.reviewComment.reply", async (reply: vscode.CommentReply) => {
+			vscode.commands.registerCommand("nodus.reviewComment.reply", async (reply: vscode.CommentReply) => {
 				await this.handleReply(reply)
 			}),
 		)
 
 		// Register add to chat command - sends the conversation to Nodus's main chat
 		this.disposables.push(
-			vscode.commands.registerCommand("Nodus.reviewComment.addToChat", async (thread: vscode.CommentThread) => {
+			vscode.commands.registerCommand("nodus.reviewComment.addToChat", async (thread: vscode.CommentThread) => {
 				await this.handleAddToChat(thread)
 			}),
 		)
@@ -106,7 +106,7 @@ export class VscodeCommentReviewController extends CommentReviewController imple
 			mode: vscode.CommentMode.Preview,
 			author: {
 				name: "Nodus",
-				iconPath: vscode.Uri.parse(Nodus_AVATAR_URL),
+				iconPath: vscode.Uri.parse(NODUS_AVATAR_URL),
 			},
 		}
 
@@ -153,7 +153,7 @@ export class VscodeCommentReviewController extends CommentReviewController imple
 			mode: vscode.CommentMode.Preview,
 			author: {
 				name: "Nodus",
-				iconPath: vscode.Uri.parse(Nodus_AVATAR_URL),
+				iconPath: vscode.Uri.parse(NODUS_AVATAR_URL),
 			},
 		}
 
@@ -219,7 +219,7 @@ export class VscodeCommentReviewController extends CommentReviewController imple
 			mode: vscode.CommentMode.Preview,
 			author: {
 				name: "Nodus",
-				iconPath: vscode.Uri.parse(Nodus_AVATAR_URL),
+				iconPath: vscode.Uri.parse(NODUS_AVATAR_URL),
 			},
 		}
 		// Create a new array to ensure VS Code detects the change
@@ -241,7 +241,7 @@ export class VscodeCommentReviewController extends CommentReviewController imple
 			mode: vscode.CommentMode.Preview,
 			author: {
 				name: "Nodus",
-				iconPath: vscode.Uri.parse(Nodus_AVATAR_URL),
+				iconPath: vscode.Uri.parse(NODUS_AVATAR_URL),
 			},
 		}
 		this.streamingThread.comments = [commentObj]
@@ -332,7 +332,7 @@ export class VscodeCommentReviewController extends CommentReviewController imple
 					mode: vscode.CommentMode.Preview,
 					author: {
 						name: "Nodus",
-						iconPath: vscode.Uri.parse(Nodus_AVATAR_URL),
+						iconPath: vscode.Uri.parse(NODUS_AVATAR_URL),
 					},
 				}
 				thread.comments = [...thread.comments.slice(0, -1), streamingComment]
@@ -344,7 +344,7 @@ export class VscodeCommentReviewController extends CommentReviewController imple
 				mode: vscode.CommentMode.Preview,
 				author: {
 					name: "Nodus",
-					iconPath: vscode.Uri.parse(Nodus_AVATAR_URL),
+					iconPath: vscode.Uri.parse(NODUS_AVATAR_URL),
 				},
 			}
 			thread.comments = [...thread.comments, thinkingComment]
@@ -370,7 +370,7 @@ export class VscodeCommentReviewController extends CommentReviewController imple
 						mode: vscode.CommentMode.Preview,
 						author: {
 							name: "Nodus",
-							iconPath: vscode.Uri.parse(Nodus_AVATAR_URL),
+							iconPath: vscode.Uri.parse(NODUS_AVATAR_URL),
 						},
 					}
 					thread.comments = [...thread.comments.slice(0, -1), errorComment]

@@ -1,5 +1,5 @@
 import type { ToolUse } from "@core/assistant-message"
-import { Nodus_MCP_TOOL_IDENTIFIER } from "@/shared/mcp"
+import { NODUS_MCP_TOOL_IDENTIFIER } from "@/shared/mcp"
 import { NodusDefaultTool } from "@/shared/tools"
 import type { ToolResponse } from "../index"
 import { AccessMcpResourceHandler } from "./handlers/AccessMcpResourceHandler"
@@ -134,7 +134,7 @@ export class ToolExecutorCoordinator {
 	 */
 	getHandler(toolName: string): IToolHandler | undefined {
 		// HACK: Normalize MCP tool names to the standard handler
-		if (toolName.includes(Nodus_MCP_TOOL_IDENTIFIER)) {
+		if (toolName.includes(NODUS_MCP_TOOL_IDENTIFIER)) {
 			toolName = NodusDefaultTool.MCP_USE
 		}
 

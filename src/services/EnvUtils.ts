@@ -1,7 +1,7 @@
 import { isMultiRootWorkspace } from "@/core/workspace/utils/workspace-detection"
 import { HostProvider } from "@/hosts/host-provider"
 import { ExtensionRegistryInfo } from "@/registry"
-import { EmptyRequest } from "@/shared/proto/Nodus/common"
+import { EmptyRequest } from "@/shared/proto/nodus/common"
 import { Logger } from "@/shared/services/Logger"
 
 // Canonical header names for extra client/host context
@@ -27,8 +27,8 @@ export async function buildBasicNodusHeaders(): Promise<Record<string, string>> 
 		const host = await HostProvider.env.getHostVersion(EmptyRequest.create({}))
 		headers[NodusHeaders.PLATFORM] = host.platform || "unknown"
 		headers[NodusHeaders.PLATFORM_VERSION] = host.version || "unknown"
-		headers[NodusHeaders.CLIENT_TYPE] = host.NodusType || "unknown"
-		headers[NodusHeaders.CLIENT_VERSION] = host.NodusVersion || "unknown"
+		headers[NodusHeaders.CLIENT_TYPE] = host.nodusType || "unknown"
+		headers[NodusHeaders.CLIENT_VERSION] = host.nodusVersion || "unknown"
 	} catch (error) {
 		Logger.log("Failed to get IDE/platform info via HostBridge EnvService.getHostVersion", error)
 		headers[NodusHeaders.PLATFORM] = "unknown"

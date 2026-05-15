@@ -1,15 +1,15 @@
 import { EmptyRequest } from "@shared/proto/nodus/common"
 import * as vscode from "vscode"
 import { ExtensionRegistryInfo } from "@/registry"
-import { NodusClient } from "@/shared/Nodus"
+import { NodusClient } from "@/shared/nodus"
 import { GetHostVersionResponse } from "@/shared/proto/index.host"
 
 export async function getHostVersion(_: EmptyRequest): Promise<GetHostVersionResponse> {
 	return {
 		platform: vscode.env.appName,
 		version: vscode.version,
-		NodusType: NodusClient.VSCode,
-		NodusVersion: ExtensionRegistryInfo.version,
+		nodusType: NodusClient.VSCode,
+		nodusVersion: ExtensionRegistryInfo.version,
 		// vscode.env.remoteName is a non-empty string when connected to a remote workspace
 		// (e.g. "ssh-remote", "dev-container", "codespaces") and undefined otherwise.
 		// We coerce falsy values (undefined, null, "") to undefined so the proto optional

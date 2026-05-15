@@ -62,12 +62,12 @@ export async function resolveHooksDirectory(
 		if (!targetWorkspace) {
 			throw new Error(`Workspace "${workspaceName}" not found`)
 		}
-		return path.join(targetWorkspace, ".Nodusrules", "hooks")
+		return path.join(targetWorkspace, ".nodusrules", "hooks")
 	}
 
 	// Single workspace: use getCwd
 	const cwd = await getCwd(getDesktopDir())
-	return path.join(cwd, ".Nodusrules", "hooks")
+	return path.join(cwd, ".nodusrules", "hooks")
 }
 
 /**

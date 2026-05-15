@@ -13,7 +13,7 @@ export interface NodusRecommendedModelsData {
 /**
  * Hardcoded fallback shown when upstream recommended models are not enabled or unavailable.
  */
-export const Nodus_RECOMMENDED_MODELS_FALLBACK: NodusRecommendedModelsData = {
+export const NODUS_RECOMMENDED_MODELS_FALLBACK: NodusRecommendedModelsData = {
 	recommended: [
 		{
 			id: "google/gemini-3.1-pro-preview",

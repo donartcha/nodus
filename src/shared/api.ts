@@ -1,4 +1,4 @@
-import { ApiFormat } from "./proto/Nodus/models"
+import { ApiFormat } from "./proto/nodus/models"
 import type { ApiHandlerSettings } from "./storage/state-keys"
 
 export type ApiProvider =

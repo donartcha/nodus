@@ -3,7 +3,7 @@
  * Tests API fetching, caching, auth updates, and rate limit backoff
  */
 
-import type { BannerRules } from "@shared/nodusBanner"
+import type { BannerRules } from "@shared/NodusBanner"
 import { expect } from "chai"
 import { afterEach, beforeEach, describe, it } from "mocha"
 import * as sinon from "sinon"
@@ -84,9 +84,9 @@ describe("BannerService", () => {
 		// Mock NodusEnv.config() to return a valid config
 		sandbox.stub(NodusEnv, "config").returns({
 			environment: Environment.production,
-			appBaseUrl: "https://app.Nodus-mock.bot",
-			apiBaseUrl: "https://api.Nodus-mock.bot",
-			mcpBaseUrl: "https://api.Nodus-mock.bot/v1/mcp",
+			appBaseUrl: "https://app.nodus-mock.bot",
+			apiBaseUrl: "https://api.nodus-mock.bot",
+			mcpBaseUrl: "https://api.nodus-mock.bot/v1/mcp",
 		})
 
 		const authService = AuthService.getInstance()

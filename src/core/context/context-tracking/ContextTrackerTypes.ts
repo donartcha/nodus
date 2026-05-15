@@ -2,9 +2,9 @@
 export interface FileMetadataEntry {
 	path: string
 	record_state: "active" | "stale"
-	record_source: "read_tool" | "user_edited" | "Nodus_edited" | "file_mentioned"
-	Nodus_read_date: number | null
-	Nodus_edit_date: number | null
+	record_source: "read_tool" | "user_edited" | "nodus_edited" | "file_mentioned"
+	nodus_read_date: number | null
+	nodus_edit_date: number | null
 	user_edit_date?: number | null
 }
 
@@ -22,7 +22,7 @@ export interface EnvironmentMetadataEntry {
 	os_arch: string
 	host_name: string
 	host_version: string
-	Nodus_version: string
+	nodus_version: string
 }
 
 export interface TaskMetadata {

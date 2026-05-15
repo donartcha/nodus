@@ -4,7 +4,7 @@ import type { FolderLockOptions, FolderLockWithRetryResult } from "@/core/locks/
 /**
  * Base path for checkpoint folders
  */
-const CHECKPOINTS_BASE_PATH = "~/.Nodus/data/checkpoints"
+const CHECKPOINTS_BASE_PATH = "~/.nodus/data/checkpoints"
 
 /**
  * Attempt to acquire checkpoint folder lock with retry logic.

@@ -4,11 +4,11 @@ function normalizeModelId(modelId: string): string {
 	return modelId.trim().toLowerCase()
 }
 
-const Nodus_FREE_MODEL_EXCEPTIONS = ["minimax-m2", "devstral-2512", "arcee-ai/trinity-large"]
+const NODUS_FREE_MODEL_EXCEPTIONS = ["minimax-m2", "devstral-2512", "arcee-ai/trinity-large"]
 
 export function isNodusFreeModelException(modelId: string): boolean {
 	const normalizedModelId = normalizeModelId(modelId)
-	return Nodus_FREE_MODEL_EXCEPTIONS.some((token) => normalizedModelId.includes(token))
+	return NODUS_FREE_MODEL_EXCEPTIONS.some((token) => normalizedModelId.includes(token))
 }
 
 /**

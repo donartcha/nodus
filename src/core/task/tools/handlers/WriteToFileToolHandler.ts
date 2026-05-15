@@ -371,7 +371,7 @@ export class WriteToFileToolHandler implements IFullyManagedTool {
 			config.taskState.fileReadCache.delete(absolutePath.toLowerCase())
 
 			// Track file edit operation
-			await config.services.fileContextTracker.trackFileContext(relPath, "Nodus_edited")
+			await config.services.fileContextTracker.trackFileContext(relPath, "nodus_edited")
 
 			// Reset the diff view
 			await config.services.diffViewProvider.reset()

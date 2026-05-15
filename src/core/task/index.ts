@@ -12,7 +12,7 @@ import {
 	getGlobalNodusRules,
 	getLocalNodusRules,
 	refreshNodusRulesToggles,
-} from "@core/context/instructions/user-instructions/Nodus-rules"
+} from "@core/context/instructions/user-instructions/nodus-rules"
 import {
 	getLocalAgentsRules,
 	getLocalCursorRules,
@@ -61,7 +61,7 @@ import { NodusApiReqCancelReason, NodusApiReqInfo, NodusAsk, NodusMessage, Nodus
 import { HistoryItem } from "@shared/HistoryItem"
 import { DEFAULT_LANGUAGE_SETTINGS, getLanguageKey, LanguageDisplay } from "@shared/Languages"
 import { USER_CONTENT_TAGS } from "@shared/messages/constants"
-import { convertNodusMessageToProto } from "@shared/proto-conversions/Nodus-message"
+import { convertNodusMessageToProto } from "@shared/proto-conversions/nodus-message"
 import { NodusDefaultTool, READ_ONLY_TOOLS } from "@shared/tools"
 import { NodusAskResponse } from "@shared/WebviewMessage"
 import {
@@ -92,7 +92,7 @@ import {
 } from "@/integrations/terminal"
 import { NodusError, NodusErrorType, ErrorService } from "@/services/error"
 import { telemetryService } from "@/services/telemetry"
-import { NodusClient } from "@/shared/Nodus"
+import { NodusClient } from "@/shared/nodus"
 import {
 	NodusAssistantContent,
 	NodusContent,
@@ -103,7 +103,7 @@ import {
 	NodusToolResponseContent,
 	NodusUserContent,
 } from "@/shared/messages"
-import { ApiFormat } from "@/shared/proto/Nodus/models"
+import { ApiFormat } from "@/shared/proto/nodus/models"
 import { ShowMessageType } from "@/shared/proto/index.host"
 import { Logger } from "@/shared/services/Logger"
 import { Session } from "@/shared/services/Session"
@@ -1746,19 +1746,19 @@ export class Task {
 	}
 
 	private async writePromptMetadataArtifacts(params: { systemPrompt: string; providerInfo: ApiProviderInfo }): Promise<void> {
-		const enabledFlag = process.env.Nodus_WRITE_PROMPT_ARTIFACTS?.toLowerCase()
+		const enabledFlag = process.env.nodus_WRITE_PROMPT_ARTIFACTS?.toLowerCase()
 		const enabled = enabledFlag === "1" || enabledFlag === "true" || enabledFlag === "yes"
 		if (!enabled) {
 			return
 		}
 
 		try {
-			const configuredDir = process.env.Nodus_PROMPT_ARTIFACT_DIR?.trim()
+			const configuredDir = process.env.nodus_PROMPT_ARTIFACT_DIR?.trim()
 			const artifactDir = configuredDir
 				? path.isAbsolute(configuredDir)
 					? configuredDir
 					: path.resolve(this.cwd, configuredDir)
-				: path.resolve(this.cwd, ".Nodus-prompt-artifacts")
+				: path.resolve(this.cwd, ".nodus-prompt-artifacts")
 
 			await fs.mkdir(artifactDir, { recursive: true })
 
@@ -1873,7 +1873,7 @@ export class Task {
 		const providerInfo = this.getCurrentProviderInfo()
 		const host = await HostProvider.env.getHostVersion({})
 		const ide = host?.platform || "Unknown"
-		const isCliEnvironment = host.NodusType === NodusClient.Cli
+		const isCliEnvironment = host.nodusType === NodusClient.Cli
 		const browserSettings = this.stateManager.getGlobalSettingsKey("browserSettings")
 		const disableBrowserTool = browserSettings.disableToolUse ?? false
 		// Nodus browser tool uses image recognition for navigation (requires model image support).
@@ -2088,7 +2088,7 @@ export class Task {
 						return false
 					}
 					try {
-						const parsedError = NodusError.transform(error, model.id, providerId)
+						const parsedError = ErrorService.get().toNodusError(error, model.id, providerId)
 						return parsedError.isErrorType(NodusErrorType.Balance)
 					} catch {
 						return false
@@ -2586,11 +2586,11 @@ export class Task {
 			)
 		}
 
-		// error handling if the user uses the /newrule command & their .Nodusrules is a file, for file read operations didnt work properly
+		// error handling if the user uses the /newrule command & their .nodusrules is a file, for file read operations didnt work properly
 		if (NodusrulesError === true) {
 			await this.say(
 				"error",
-				"Issue with processing the /newrule command. Double check that, if '.Nodusrules' already exists, it's a directory and not a file. Otherwise there was an issue referencing this file/directory.",
+				"Issue with processing the /newrule command. Double check that, if '.nodusrules' already exists, it's a directory and not a file. Otherwise there was an issue referencing this file/directory.",
 			)
 		}
 

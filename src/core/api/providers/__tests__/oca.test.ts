@@ -2,7 +2,7 @@ import { expect } from "chai"
 import { afterEach, describe, it } from "mocha"
 import sinon from "sinon"
 import { NodusStorageMessage } from "@/shared/messages/content"
-import { ApiFormat } from "@/shared/proto/index.Nodus"
+import { ApiFormat } from "@/shared/proto/index.nodus"
 import { OcaHandler } from "../oca"
 
 const messages: NodusStorageMessage[] = [{ role: "user", content: "Hello" }]

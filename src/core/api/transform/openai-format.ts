@@ -385,7 +385,7 @@ function consolidateReasoningDetails(reasoningDetails: ReasoningDetail[]): Reaso
 }
 
 // Unique name to use to filter out tool call that cannot be parsed correctly
-const UNIQUE_ERROR_TOOL_NAME = "_Nodus_error_unknown_function_"
+const UNIQUE_ERROR_TOOL_NAME = "_nodus_error_unknown_function_"
 
 // Convert OpenAI response to Anthropic format
 export function convertToAnthropicMessage(completion: OpenAI.Chat.Completions.ChatCompletion): Anthropic.Messages.Message {

@@ -101,8 +101,8 @@ async function fetchRawnodusModels(): Promise<NodusRawModelInfo[]> {
  * @param controller The controller instance
  * @returns Record of model ID to ModelInfo (application types)
  */
-export async function refreshnodusModels(controller: Controller): Promise<Record<string, ModelInfo>> {
-	const shouldUseNodusEndpointSource = featureFlagsService.getBooleanFlagEnabled(FeatureFlag.EXTENSION_Nodus_MODELS_ENDPOINT)
+export async function refreshNodusModels(controller: Controller): Promise<Record<string, ModelInfo>> {
+	const shouldUseNodusEndpointSource = featureFlagsService.getBooleanFlagEnabled(FeatureFlag.EXTENSION_NODUS_MODELS_ENDPOINT)
 	if (!shouldUseNodusEndpointSource) {
 		return refreshOpenRouterModels(controller)
 	}

@@ -147,21 +147,21 @@ function getOtelConfig(): OpenTelemetryClientConfig {
  * - **Development**: Environment variables from .env file loaded by VSCode
  *
  * Supported Environment Variables:
- * - Nodus_OTEL_TELEMETRY_ENABLED: "1" to enable OpenTelemetry (default: off)
- * - Nodus_OTEL_METRICS_EXPORTER: Comma-separated list: "console", "otlp", "prometheus"
- * - Nodus_OTEL_LOGS_EXPORTER: Comma-separated list: "console", "otlp"
- * - Nodus_OTEL_EXPORTER_OTLP_PROTOCOL: "grpc", "http/json", or "http/protobuf"
- * - Nodus_OTEL_EXPORTER_OTLP_ENDPOINT: OTLP collector endpoint (if not using specific endpoints)
- * - Nodus_OTEL_EXPORTER_OTLP_HEADERS: Comma-separated key-value pairs (e.g., "key1=value1,key2=value2")
- * - Nodus_OTEL_EXPORTER_OTLP_METRICS_PROTOCOL: Metrics-specific protocol override
- * - Nodus_OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: Metrics-specific endpoint override
- * - Nodus_OTEL_EXPORTER_OTLP_LOGS_PROTOCOL: Logs-specific protocol override
- * - Nodus_OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: Logs-specific endpoint override
- * - Nodus_OTEL_METRIC_EXPORT_INTERVAL: Milliseconds between metric exports (default: 60000)
- * - Nodus_OTEL_EXPORTER_OTLP_INSECURE: "true" to disable TLS for gRPC (for local development)
- * - Nodus_OTEL_LOG_BATCH_SIZE: Maximum batch size for log records (default: 512)
- * - Nodus_OTEL_LOG_BATCH_TIMEOUT: Maximum time to wait before exporting logs in ms (default: 5000)
- * - Nodus_OTEL_LOG_MAX_QUEUE_SIZE: Maximum queue size for log records (default: 2048)
+ * - NODUS_OTEL_TELEMETRY_ENABLED: "1" to enable OpenTelemetry (default: off)
+ * - NODUS_OTEL_METRICS_EXPORTER: Comma-separated list: "console", "otlp", "prometheus"
+ * - NODUS_OTEL_LOGS_EXPORTER: Comma-separated list: "console", "otlp"
+ * - NODUS_OTEL_EXPORTER_OTLP_PROTOCOL: "grpc", "http/json", or "http/protobuf"
+ * - NODUS_OTEL_EXPORTER_OTLP_ENDPOINT: OTLP collector endpoint (if not using specific endpoints)
+ * - NODUS_OTEL_EXPORTER_OTLP_HEADERS: Comma-separated key-value pairs (e.g., "key1=value1,key2=value2")
+ * - NODUS_OTEL_EXPORTER_OTLP_METRICS_PROTOCOL: Metrics-specific protocol override
+ * - NODUS_OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: Metrics-specific endpoint override
+ * - NODUS_OTEL_EXPORTER_OTLP_LOGS_PROTOCOL: Logs-specific protocol override
+ * - NODUS_OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: Logs-specific endpoint override
+ * - NODUS_OTEL_METRIC_EXPORT_INTERVAL: Milliseconds between metric exports (default: 60000)
+ * - NODUS_OTEL_EXPORTER_OTLP_INSECURE: "true" to disable TLS for gRPC (for local development)
+ * - NODUS_OTEL_LOG_BATCH_SIZE: Maximum batch size for log records (default: 512)
+ * - NODUS_OTEL_LOG_BATCH_TIMEOUT: Maximum time to wait before exporting logs in ms (default: 5000)
+ * - NODUS_OTEL_LOG_MAX_QUEUE_SIZE: Maximum queue size for log records (default: 2048)
  *
  * @private
  * @see .env.example for development setup
@@ -169,30 +169,30 @@ function getOtelConfig(): OpenTelemetryClientConfig {
  */
 function getRuntimeOtelConfig(): OpenTelemetryClientConfig {
 	return {
-		enabled: process.env.Nodus_OTEL_TELEMETRY_ENABLED === "true",
-		metricsExporter: process.env.Nodus_OTEL_METRICS_EXPORTER,
-		logsExporter: process.env.Nodus_OTEL_LOGS_EXPORTER,
-		otlpProtocol: process.env.Nodus_OTEL_EXPORTER_OTLP_PROTOCOL,
-		otlpEndpoint: process.env.Nodus_OTEL_EXPORTER_OTLP_ENDPOINT,
-		otlpMetricsProtocol: process.env.Nodus_OTEL_EXPORTER_OTLP_METRICS_PROTOCOL,
-		otlpMetricsEndpoint: process.env.Nodus_OTEL_EXPORTER_OTLP_METRICS_ENDPOINT,
-		otlpLogsProtocol: process.env.Nodus_OTEL_EXPORTER_OTLP_LOGS_PROTOCOL,
-		otlpLogsEndpoint: process.env.Nodus_OTEL_EXPORTER_OTLP_LOGS_ENDPOINT,
-		metricExportInterval: process.env.Nodus_OTEL_METRIC_EXPORT_INTERVAL
-			? Number.parseInt(process.env.Nodus_OTEL_METRIC_EXPORT_INTERVAL, 10)
+		enabled: process.env.NODUS_OTEL_TELEMETRY_ENABLED === "true",
+		metricsExporter: process.env.NODUS_OTEL_METRICS_EXPORTER,
+		logsExporter: process.env.NODUS_OTEL_LOGS_EXPORTER,
+		otlpProtocol: process.env.NODUS_OTEL_EXPORTER_OTLP_PROTOCOL,
+		otlpEndpoint: process.env.NODUS_OTEL_EXPORTER_OTLP_ENDPOINT,
+		otlpMetricsProtocol: process.env.NODUS_OTEL_EXPORTER_OTLP_METRICS_PROTOCOL,
+		otlpMetricsEndpoint: process.env.NODUS_OTEL_EXPORTER_OTLP_METRICS_ENDPOINT,
+		otlpLogsProtocol: process.env.NODUS_OTEL_EXPORTER_OTLP_LOGS_PROTOCOL,
+		otlpLogsEndpoint: process.env.NODUS_OTEL_EXPORTER_OTLP_LOGS_ENDPOINT,
+		metricExportInterval: process.env.NODUS_OTEL_METRIC_EXPORT_INTERVAL
+			? Number.parseInt(process.env.NODUS_OTEL_METRIC_EXPORT_INTERVAL, 10)
 			: undefined,
-		otlpInsecure: process.env.Nodus_OTEL_EXPORTER_OTLP_INSECURE === "true",
-		logBatchSize: process.env.Nodus_OTEL_LOG_BATCH_SIZE
-			? Math.max(1, Number.parseInt(process.env.Nodus_OTEL_LOG_BATCH_SIZE, 10))
+		otlpInsecure: process.env.NODUS_OTEL_EXPORTER_OTLP_INSECURE === "true",
+		logBatchSize: process.env.NODUS_OTEL_LOG_BATCH_SIZE
+			? Math.max(1, Number.parseInt(process.env.NODUS_OTEL_LOG_BATCH_SIZE, 10))
 			: undefined,
-		logBatchTimeout: process.env.Nodus_OTEL_LOG_BATCH_TIMEOUT
-			? Math.max(1, Number.parseInt(process.env.Nodus_OTEL_LOG_BATCH_TIMEOUT, 10))
+		logBatchTimeout: process.env.NODUS_OTEL_LOG_BATCH_TIMEOUT
+			? Math.max(1, Number.parseInt(process.env.NODUS_OTEL_LOG_BATCH_TIMEOUT, 10))
 			: undefined,
-		logMaxQueueSize: process.env.Nodus_OTEL_LOG_MAX_QUEUE_SIZE
-			? Math.max(1, Number.parseInt(process.env.Nodus_OTEL_LOG_MAX_QUEUE_SIZE, 10))
+		logMaxQueueSize: process.env.NODUS_OTEL_LOG_MAX_QUEUE_SIZE
+			? Math.max(1, Number.parseInt(process.env.NODUS_OTEL_LOG_MAX_QUEUE_SIZE, 10))
 			: undefined,
-		otlpHeaders: process.env.Nodus_OTEL_EXPORTER_OTLP_HEADERS
-			? parseKeyPairsIntoRecord(process.env.Nodus_OTEL_EXPORTER_OTLP_HEADERS)
+		otlpHeaders: process.env.NODUS_OTEL_EXPORTER_OTLP_HEADERS
+			? parseKeyPairsIntoRecord(process.env.NODUS_OTEL_EXPORTER_OTLP_HEADERS)
 			: undefined,
 	}
 }

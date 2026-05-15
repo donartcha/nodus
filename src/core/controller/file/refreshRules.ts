@@ -1,4 +1,4 @@
-import { refreshNodusRulesToggles } from "@core/context/instructions/user-instructions/Nodus-rules"
+import { refreshNodusRulesToggles } from "@core/context/instructions/user-instructions/nodus-rules"
 import { refreshExternalRulesToggles } from "@core/context/instructions/user-instructions/external-rules"
 import { refreshWorkflowToggles } from "@core/context/instructions/user-instructions/workflows"
 import { EmptyRequest } from "@shared/proto/nodus/common"

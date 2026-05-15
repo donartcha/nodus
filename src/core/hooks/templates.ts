@@ -49,18 +49,18 @@ function getTaskStartTemplate(): string {
 	return `#!/bin/bash
 #
 # TaskStart Hook
-# 
+#
 # Executes when a new task begins.
-# 
-# Input: { 
-#   taskId, 
-#   taskStart: { 
-#     taskMetadata: { taskId: string, ulid: string, initialTask: string } 
-#   }, 
-#   NodusVersion, timestamp, ... 
+#
+# Input: {
+#   taskId,
+#   taskStart: {
+#     taskMetadata: { taskId: string, ulid: string, initialTask: string }
+#   },
+#   nodusVersion: NodusVersion, timestamp, ...
 # }
 # Output: { cancel: boolean, contextModification?: string, errorMessage?: string }
-# 
+#
 # Use cases:
 # - Log task start time
 # - Add context about environment or project state
@@ -104,19 +104,19 @@ function getTaskResumeTemplate(): string {
 	return `#!/bin/bash
 #
 # TaskResume Hook
-# 
+#
 # Executes when a task is resumed after being interrupted.
-# 
-# Input: { 
-#   taskId, 
-#   taskResume: { 
+#
+# Input: {
+#   taskId,
+#   taskResume: {
 #     taskMetadata: { taskId: string, ulid: string },
 #     previousState: { lastMessageTs: string, messageCount: string, conversationHistoryDeleted: string }
-#   }, 
-#   NodusVersion, timestamp, ... 
+#   },
+#   nodusVersion: NodusVersion, timestamp, ...
 # }
 # Output: { cancel: boolean, contextModification?: string, errorMessage?: string }
-# 
+#
 # Use cases:
 # - Check for changes since task was paused
 # - Refresh context with latest project state
@@ -145,18 +145,18 @@ function getTaskCancelTemplate(): string {
 	return `#!/bin/bash
 #
 # TaskCancel Hook
-# 
+#
 # Executes when a task is cancelled by the user.
-# 
-# Input: { 
-#   taskId, 
-#   taskCancel: { 
-#     taskMetadata: { taskId: string, ulid: string, completionStatus: string } 
-#   }, 
-#   NodusVersion, timestamp, ... 
+#
+# Input: {
+#   taskId,
+#   taskCancel: {
+#     taskMetadata: { taskId: string, ulid: string, completionStatus: string }
+#   },
+#   nodusVersion: NodusVersion, timestamp, ...
 # }
 # Output: { cancel: boolean, contextModification?: string, errorMessage?: string }
-# 
+#
 # Use cases:
 # - Clean up temporary files or resources
 # - Notify external systems about cancellation
@@ -185,18 +185,18 @@ function getTaskCompleteTemplate(): string {
 	return `#!/bin/bash
 #
 # TaskComplete Hook
-# 
+#
 # Executes when a task completes successfully.
-# 
-# Input: { 
-#   taskId, 
-#   taskComplete: { 
-#     taskMetadata: { taskId: string, ulid: string, result: string, command: string } 
-#   }, 
-#   NodusVersion, timestamp, ... 
+#
+# Input: {
+#   taskId,
+#   taskComplete: {
+#     taskMetadata: { taskId: string, ulid: string, result: string, command: string }
+#   },
+#   nodusVersion: NodusVersion, timestamp, ...
 # }
 # Output: { cancel: boolean, contextModification?: string, errorMessage?: string }
-# 
+#
 # Use cases:
 # - Run tests or validation
 # - Generate reports or summaries
@@ -226,12 +226,12 @@ function getPreToolUseTemplate(): string {
 	return `#!/bin/bash
 #
 # PreToolUse Hook
-# 
+#
 # Executes before any tool is used (read_file, write_to_file, execute_command, etc.)
-# 
+#
 # Input: { taskId, preToolUse: { toolName: string, parameters: object }, ... }
 # Output: { cancel: boolean, contextModification?: string, errorMessage?: string }
-# 
+#
 # Use cases:
 # - Block dangerous operations
 # - Add safety checks before file modifications
@@ -268,22 +268,22 @@ function getPostToolUseTemplate(): string {
 	return `#!/bin/bash
 #
 # PostToolUse Hook
-# 
+#
 # Executes after any tool is used successfully or fails.
-# 
-# Input: { 
-#   taskId, 
-#   postToolUse: { 
-#     toolName: string, 
+#
+# Input: {
+#   taskId,
+#   postToolUse: {
+#     toolName: string,
 #     parameters: object,
 #     result: string,
 #     success: boolean,
 #     executionTimeMs: number
-#   }, 
-#   ... 
+#   },
+#   ...
 # }
 # Output: { cancel: boolean, contextModification?: string, errorMessage?: string }
-# 
+#
 # Use cases:
 # - Audit tool usage
 # - Validate results
@@ -318,12 +318,12 @@ function getUserPromptSubmitTemplate(): string {
 	return `#!/bin/bash
 #
 # UserPromptSubmit Hook
-# 
+#
 # Executes when the user submits a prompt to Nodus.
-# 
-# Input: { taskId, userPromptSubmit: { prompt: string, attachments: string[] }, NodusVersion, timestamp, ... }
+#
+# Input: { taskId, userPromptSubmit: { prompt: string, attachments: string[] }, nodusVersion: NodusVersion, timestamp, ... }
 # Output: { cancel: boolean, contextModification?: string, errorMessage?: string }
-# 
+#
 # Use cases:
 # - Log user prompts for analytics
 # - Add context based on prompt content
@@ -370,7 +370,7 @@ function getNotificationTemplate(): string {
 #     requiresUserAction: boolean,
 #     severity: string
 #   },
-#   NodusVersion,
+#   nodusVersion: NodusVersion,
 #   timestamp,
 #   ...
 # }
@@ -415,12 +415,12 @@ function getPreCompactTemplate(): string {
 	return `#!/bin/bash
 #
 # PreCompact Hook
-# 
+#
 # Executes before conversation context is compacted (to free up token space).
-# 
-# Input: { 
-#   taskId, 
-#   preCompact: { 
+#
+# Input: {
+#   taskId,
+#   preCompact: {
 #     taskId: string,
 #     ulid: string,
 #     contextSize: number,
@@ -434,11 +434,11 @@ function getPreCompactTemplate(): string {
 #     deletedRangeEnd: number,
 #     contextJsonPath: string,
 #     contextRawPath: string
-#   }, 
-#   ... 
+#   },
+#   ...
 # }
 # Output: { cancel: boolean, contextModification?: string, errorMessage?: string }
-# 
+#
 # Use cases:
 # - Archive important conversation parts
 # - Log compaction events
@@ -471,7 +471,7 @@ function getDefaultTemplate(hookName: string): string {
 	return `#!/bin/bash
 #
 # ${hookName} Hook
-# 
+#
 # Input: JSON via stdin
 # Output: JSON to stdout
 

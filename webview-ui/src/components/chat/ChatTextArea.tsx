@@ -41,7 +41,7 @@ import {
 	slashCommandRegexGlobal,
 	validateSlashCommand,
 } from "@/utils/slash-commands"
-import NodusRulesToggleModal from "../Nodus-rules/NodusRulesToggleModal"
+import NodusRulesToggleModal from "../nodus-rules/NodusRulesToggleModal"
 import ServersToggleModal from "./ServersToggleModal"
 
 const { MAX_IMAGES_AND_FILES_PER_MESSAGE } = CHAT_CONSTANTS

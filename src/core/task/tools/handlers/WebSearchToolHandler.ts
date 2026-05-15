@@ -7,7 +7,7 @@ import { buildNodusExtraHeaders } from "@/services/EnvUtils"
 import { featureFlagsService } from "@/services/feature-flags"
 import { telemetryService } from "@/services/telemetry"
 import { parsePartialArrayString } from "@/shared/array"
-import { Nodus_ACCOUNT_AUTH_ERROR_MESSAGE } from "@/shared/NodusAccount"
+import { NODUS_ACCOUNT_AUTH_ERROR_MESSAGE } from "@/shared/NodusAccount"
 import { getAxiosSettings } from "@/shared/net"
 import { ToolUse } from "../../../assistant-message"
 import { formatResponse } from "../../../prompts/responses"
@@ -152,7 +152,7 @@ export class WebSearchToolHandler implements IFullyManagedTool {
 			const authToken = await AuthService.getInstance().getAuthToken()
 
 			if (!authToken) {
-				throw new Error(Nodus_ACCOUNT_AUTH_ERROR_MESSAGE)
+				throw new Error(NODUS_ACCOUNT_AUTH_ERROR_MESSAGE)
 			}
 
 			const requestBody: {

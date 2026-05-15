@@ -2,7 +2,7 @@ import type { ToolUse } from "@core/assistant-message"
 import { JSONParser } from "@streamparser/json"
 import { nanoid } from "nanoid"
 import { McpHub } from "@/services/mcp/McpHub"
-import { Nodus_MCP_TOOL_IDENTIFIER } from "@/shared/mcp"
+import { NODUS_MCP_TOOL_IDENTIFIER } from "@/shared/mcp"
 import {
 	NodusAssistantRedactedThinkingBlock,
 	NodusAssistantThinkingBlock,
@@ -186,8 +186,8 @@ class ToolUseHandler {
 				}
 			}
 
-			if (pending.name.includes(Nodus_MCP_TOOL_IDENTIFIER)) {
-				const [key, toolName] = pending.name.split(Nodus_MCP_TOOL_IDENTIFIER)
+			if (pending.name.includes(NODUS_MCP_TOOL_IDENTIFIER)) {
+				const [key, toolName] = pending.name.split(NODUS_MCP_TOOL_IDENTIFIER)
 				results.push({
 					type: "tool_use",
 					name: NodusDefaultTool.MCP_USE,

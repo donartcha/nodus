@@ -1,7 +1,7 @@
 /**
  * List of email domains that are considered trusted testers for Nodus.
  */
-const Nodus_TRUSTED_TESTER_DOMAINS = ["fibilabs.tech"]
+const NODUS_TRUSTED_TESTER_DOMAINS = ["fibilabs.tech"]
 
 /**
  * Checks if the given email belongs to a nodus.bot user.
@@ -12,5 +12,5 @@ export function isNodusBotUser(email: string): boolean {
 }
 
 export function isNodusInternalTester(email: string): boolean {
-	return isNodusBotUser(email) || Nodus_TRUSTED_TESTER_DOMAINS.some((d) => email.endsWith(`@${d}`))
+	return isNodusBotUser(email) || NODUS_TRUSTED_TESTER_DOMAINS.some((d) => email.endsWith(`@${d}`))
 }

@@ -4,7 +4,7 @@ import fs from "fs/promises"
 import path from "path"
 import { NodusEnv } from "@/config"
 import { featureFlagsService } from "@/services/feature-flags"
-import { Nodus_RECOMMENDED_MODELS_FALLBACK } from "@/shared/Nodus/recommended-models"
+import { NODUS_RECOMMENDED_MODELS_FALLBACK } from "@/shared/nodus/recommended-models"
 import { getAxiosSettings } from "@/shared/net"
 import { FeatureFlag } from "@/shared/services/feature-flags/feature-flags"
 import { Logger } from "@/shared/services/Logger"
@@ -27,11 +27,11 @@ let pendingRefresh: Promise<NodusRecommendedModelsData> | null = null
 let inMemoryCache: { data: NodusRecommendedModelsData; timestamp: number } | null = null
 
 function getHardcodedRecommendedModels(): NodusRecommendedModelsData {
-	return Nodus_RECOMMENDED_MODELS_FALLBACK
+	return NODUS_RECOMMENDED_MODELS_FALLBACK
 }
 
 function useUpstreamRecommendedModels(): boolean {
-	return featureFlagsService.getBooleanFlagEnabled(FeatureFlag.Nodus_RECOMMENDED_MODELS_UPSTREAM)
+	return featureFlagsService.getBooleanFlagEnabled(FeatureFlag.NODUS_RECOMMENDED_MODELS_UPSTREAM)
 }
 
 function normalizeRecommendedModel(raw: unknown): NodusRecommendedModelData | null {

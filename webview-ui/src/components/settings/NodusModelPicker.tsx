@@ -1,5 +1,5 @@
 import { CLAUDE_SONNET_1M_SUFFIX, openRouterDefaultModelId } from "@shared/api"
-import { Nodus_RECOMMENDED_MODELS_FALLBACK } from "@shared/Nodus/recommended-models"
+import { NODUS_RECOMMENDED_MODELS_FALLBACK } from "@shared/nodus/recommended-models"
 import { EmptyRequest, StringRequest } from "@shared/proto/nodus/common"
 import { type NodusRecommendedModel, NodusRecommendedModelsResponse } from "@shared/proto/nodus/models"
 import type { Mode } from "@shared/storage/types"
@@ -60,7 +60,7 @@ interface FeaturedModelCardEntry {
 	label: string
 }
 
-const Nodus_RECOMMENDED_MODELS_RETRY_DELAY_MS = 5000
+const NODUS_RECOMMENDED_MODELS_RETRY_DELAY_MS = 5000
 
 function normalizeModelId(modelId: string): string {
 	return modelId.trim().toLowerCase()
@@ -84,17 +84,17 @@ function toFeaturedModelCardEntry(
 	}
 }
 
-const RECOMMENDED_MODELS_FALLBACK: FeaturedModelCardEntry[] = Nodus_RECOMMENDED_MODELS_FALLBACK.recommended
+const RECOMMENDED_MODELS_FALLBACK: FeaturedModelCardEntry[] = NODUS_RECOMMENDED_MODELS_FALLBACK.recommended
 	.map((model) => toFeaturedModelCardEntry(model, "RECOMMENDED"))
 	.filter((model): model is FeaturedModelCardEntry => model !== null)
 
-const FREE_MODELS_FALLBACK: FeaturedModelCardEntry[] = Nodus_RECOMMENDED_MODELS_FALLBACK.free
+const FREE_MODELS_FALLBACK: FeaturedModelCardEntry[] = NODUS_RECOMMENDED_MODELS_FALLBACK.free
 	.map((model) => toFeaturedModelCardEntry(model, "FREE"))
 	.filter((model): model is FeaturedModelCardEntry => model !== null)
 
 const NodusModelPicker: React.FC<NodusModelPickerProps> = ({ isPopup, currentMode, showProviderRouting, initialTab }) => {
 	const { handleModeFieldsChange, handleFieldChange } = useApiConfigurationHandlers()
-	const { apiConfiguration, favoritedModelIds, nodusModels, refreshnodusModels } = useExtensionState()
+	const { apiConfiguration, favoritedModelIds, nodusModels, refreshNodusModels } = useExtensionState()
 	const modeFields = getModeSpecificFields(apiConfiguration, currentMode)
 	const [searchTerm, setSearchTerm] = useState(modeFields.NodusModelId || openRouterDefaultModelId)
 	const [isDropdownVisible, setIsDropdownVisible] = useState(false)
@@ -168,7 +168,7 @@ const NodusModelPicker: React.FC<NodusModelPickerProps> = ({ isPopup, currentMod
 			NodusRecommendedModelsRetryTimeoutRef.current = window.setTimeout(() => {
 				NodusRecommendedModelsRetryTimeoutRef.current = null
 				void fetchNodusRecommendedModels()
-			}, Nodus_RECOMMENDED_MODELS_RETRY_DELAY_MS)
+			}, NODUS_RECOMMENDED_MODELS_RETRY_DELAY_MS)
 		}
 	}, [clearNodusRecommendedModelsRetryTimeout, refreshNodusRecommendedModels])
 
@@ -229,7 +229,7 @@ const NodusModelPicker: React.FC<NodusModelPickerProps> = ({ isPopup, currentMod
 	}, [apiConfiguration, currentMode, freeNodusModelIdSet])
 
 	useMount(() => {
-		refreshnodusModels()
+		refreshNodusModels()
 	})
 
 	useEffect(() => {
@@ -456,7 +456,7 @@ const NodusModelPicker: React.FC<NodusModelPickerProps> = ({ isPopup, currentMod
 						role="combobox"
 						style={{
 							width: "100%",
-							zIndex: Nodus_MODEL_PICKER_Z_INDEX,
+							zIndex: NODUS_MODEL_PICKER_Z_INDEX,
 							position: "relative",
 						}}
 						value={searchTerm}>
@@ -603,7 +603,7 @@ const DropdownWrapper = styled.div`
 	width: 100%;
 `
 
-const Nodus_MODEL_PICKER_Z_INDEX = 1_000
+const NODUS_MODEL_PICKER_Z_INDEX = 1_000
 
 const DropdownList = styled.div`
 	position: absolute;
@@ -614,7 +614,7 @@ const DropdownList = styled.div`
 	overflow-y: auto;
 	background-color: var(--vscode-dropdown-background);
 	border: 1px solid var(--vscode-list-activeSelectionBackground);
-	z-index: ${Nodus_MODEL_PICKER_Z_INDEX - 1};
+	z-index: ${NODUS_MODEL_PICKER_Z_INDEX - 1};
 	border-bottom-left-radius: 3px;
 	border-bottom-right-radius: 3px;
 `

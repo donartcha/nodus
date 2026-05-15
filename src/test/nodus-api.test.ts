@@ -3,7 +3,7 @@ import * as should from "should"
 import * as sinon from "sinon"
 import { createNodusAPI } from "@/exports"
 import { Logger } from "@/shared/services/Logger"
-import type { NodusAPI } from "../exports/Nodus"
+import type { NodusAPI } from "../exports/nodus"
 import { setVscodeHostProviderMock } from "./host-provider-test-utils"
 
 describe("NodusAPI Core Functionality", () => {

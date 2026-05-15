@@ -239,8 +239,8 @@ export const e2e = test
 						...process.env,
 						TEMP_PROFILE: "true",
 						E2E_TEST: "true",
-						Nodus_ENVIRONMENT: "local",
-						Nodus_DIR: NodusTestDir, // Isolate test data from user's ~/.Nodus
+						NODUS_ENVIRONMENT: "local",
+						NODUS_DIR: NodusTestDir, // Isolate test data from user's ~/.nodus
 						GRPC_RECORDER_FILE_NAME: E2ETestHelper.generateTestFileName(testInfo.title, testInfo.project.name),
 						// GRPC_RECORDER_ENABLED: "true",
 						// GRPC_RECORDER_TESTS_FILTERS_ENABLED: "true"
@@ -277,7 +277,7 @@ export const e2e = test
 			const originalOpenVSCode = openVSCode
 			const wrappedOpenVSCode = async (wp: string) => {
 				const app = await originalOpenVSCode(wp)
-				// Extract Nodus_DIR from the launched app's environment
+				// Extract NODUS_DIR from the launched app's environment
 				// We'll need to pass it through the fixture chain
 				return app
 			}

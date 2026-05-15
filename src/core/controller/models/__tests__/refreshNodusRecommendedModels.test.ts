@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, it } from "mocha"
 import sinon from "sinon"
 import { NodusEnv, Environment } from "@/config"
 import { getFeatureFlagsService } from "@/services/feature-flags"
-import { Nodus_RECOMMENDED_MODELS_FALLBACK } from "@/shared/Nodus/recommended-models"
+import { NODUS_RECOMMENDED_MODELS_FALLBACK } from "@/shared/nodus/recommended-models"
 import { FeatureFlag } from "@/shared/services/feature-flags/feature-flags"
 import { Logger } from "@/shared/services/Logger"
 import { refreshNodusRecommendedModels, resetNodusRecommendedModelsCacheForTests } from "../refreshNodusRecommendedModels"
@@ -32,19 +32,19 @@ describe("refreshNodusRecommendedModels", () => {
 
 		const result = await refreshNodusRecommendedModels()
 
-		expect(result).to.deep.equal(Nodus_RECOMMENDED_MODELS_FALLBACK)
+		expect(result).to.deep.equal(NODUS_RECOMMENDED_MODELS_FALLBACK)
 		expect(axiosGetStub.called).to.equal(false)
 	})
 
 	it("fetches from upstream when rollout flag is on", async () => {
 		sandbox.stub(getFeatureFlagsService(), "getBooleanFlagEnabled").callsFake((flag) => {
-			return flag === FeatureFlag.Nodus_RECOMMENDED_MODELS_UPSTREAM
+			return flag === FeatureFlag.NODUS_RECOMMENDED_MODELS_UPSTREAM
 		})
 		sandbox.stub(NodusEnv, "config").returns({
 			environment: Environment.production,
-			appBaseUrl: "https://app.Nodus-mock.bot",
-			apiBaseUrl: "https://api.Nodus-mock.bot",
-			mcpBaseUrl: "https://api.Nodus-mock.bot/v1/mcp",
+			appBaseUrl: "https://app.nodus-mock.bot",
+			apiBaseUrl: "https://api.nodus-mock.bot",
+			mcpBaseUrl: "https://api.nodus-mock.bot/v1/mcp",
 		})
 		sandbox.stub(disk, "ensureCacheDirectoryExists").resolves("/tmp")
 		sandbox.stub(fs, "writeFile").resolves()
@@ -84,9 +84,9 @@ describe("refreshNodusRecommendedModels", () => {
 		flagStub.onSecondCall().returns(false)
 		sandbox.stub(NodusEnv, "config").returns({
 			environment: Environment.production,
-			appBaseUrl: "https://app.Nodus-mock.bot",
-			apiBaseUrl: "https://api.Nodus-mock.bot",
-			mcpBaseUrl: "https://api.Nodus-mock.bot/v1/mcp",
+			appBaseUrl: "https://app.nodus-mock.bot",
+			apiBaseUrl: "https://api.nodus-mock.bot",
+			mcpBaseUrl: "https://api.nodus-mock.bot/v1/mcp",
 		})
 		sandbox.stub(disk, "ensureCacheDirectoryExists").resolves("/tmp")
 		sandbox.stub(fs, "writeFile").resolves()
@@ -101,7 +101,7 @@ describe("refreshNodusRecommendedModels", () => {
 		const secondResult = await refreshNodusRecommendedModels()
 
 		expect(axiosGetStub.calledOnce).to.equal(true)
-		expect(firstResult).to.not.deep.equal(Nodus_RECOMMENDED_MODELS_FALLBACK)
-		expect(secondResult).to.deep.equal(Nodus_RECOMMENDED_MODELS_FALLBACK)
+		expect(firstResult).to.not.deep.equal(NODUS_RECOMMENDED_MODELS_FALLBACK)
+		expect(secondResult).to.deep.equal(NODUS_RECOMMENDED_MODELS_FALLBACK)
 	})
 })

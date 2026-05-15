@@ -22,7 +22,7 @@ export async function validateWorkspacePath(workspacePath: string): Promise<void
 
 	// Check if the directory is writable
 	try {
-		const testFile = path.join(workspacePath, ".Nodus_write_test")
+		const testFile = path.join(workspacePath, ".nodus_write_test")
 		await execa("touch", [testFile])
 		await execa("rm", [testFile])
 	} catch (error) {

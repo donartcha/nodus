@@ -44,7 +44,7 @@ describe("Telemetry system is abstracted and can easily switch between providers
 	}
 	const MOCK_METADATA: TelemetryMetadata = {
 		extension_version: "1.2.3",
-		Nodus_type: "Nodus-unit-test",
+		nodus_type: "Nodus-unit-test",
 		platform: "Test-IDE",
 		platform_version: "9.8.7-abc",
 		os_type: "win32",
@@ -65,13 +65,13 @@ describe("Telemetry system is abstracted and can easily switch between providers
 			hostVersionStub.onFirstCall().resolves({
 				platform: "VS Code",
 				version: "1.103.0",
-				NodusType: "VSCode Extension",
+				nodusType: "VSCode Extension",
 				remoteName: "ssh-remote",
 			})
 			hostVersionStub.onSecondCall().resolves({
 				platform: "VS Code",
 				version: "1.103.0",
-				NodusType: "VSCode Extension",
+				nodusType: "VSCode Extension",
 			})
 			createProvidersStub.onFirstCall().resolves([remoteProvider])
 			createProvidersStub.onSecondCall().resolves([localProvider])

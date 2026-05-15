@@ -156,7 +156,7 @@ export class SummarizeTaskHandler implements IToolHandler, IPartialBlockHandler 
 						break
 					}
 
-					// Check .Nodusignore first and skip ignored files
+					// Check .nodusignore first and skip ignored files
 					const accessValidation = this.validator.checkNodusIgnorePath(relPath)
 					if (!accessValidation.ok) {
 						continue

@@ -71,14 +71,14 @@ setTimeout(() => {
 
 		// Create temporary directory for test hooks
 		baseTempDir = await fs.mkdtemp(path.join(os.tmpdir(), "hook-test-"))
-		// Create .Nodusrules/hooks subdirectory structure
-		tempDir = path.join(baseTempDir, ".Nodusrules", "hooks")
+		// Create .nodusrules/hooks subdirectory structure
+		tempDir = path.join(baseTempDir, ".nodusrules", "hooks")
 		await fs.mkdir(tempDir, { recursive: true })
 		testHandler = createTestHandler()
 		mockMessages = []
 
 		// Mock StateManager to return baseTempDir as workspace root
-		// This allows HookFactory to find hooks in baseTempDir/.Nodusrules/hooks/
+		// This allows HookFactory to find hooks in baseTempDir/.nodusrules/hooks/
 		stateManagerStub = sinon.stub(StateManager, "get").returns({
 			getGlobalStateKey: (key: string) => {
 				if (key === "workspaceRoots") {

@@ -25,10 +25,10 @@ export const formatResponse = {
 	toolError: (error?: string) => `The tool execution failed with the following error:\n<error>\n${error}\n</error>`,
 
 	NodusIgnoreError: (path: string) =>
-		`Access to ${path} is blocked by the .Nodusignore file settings. You must try to continue in the task without using this file, or ask the user to update the .Nodusignore file.`,
+		`Access to ${path} is blocked by the .nodusignore file settings. You must try to continue in the task without using this file, or ask the user to update the .nodusignore file.`,
 
 	permissionDeniedError: (reason: string) =>
-		`Command execution blocked by Nodus_COMMAND_PERMISSIONS: ${reason}. You must try a different approach or ask the user to update the permission settings.`,
+		`Command execution blocked by NODUS_COMMAND_PERMISSIONS: ${reason}. You must try a different approach or ask the user to update the permission settings.`,
 
 	noToolsUsed: (usingNativeToolCalls: boolean) =>
 		`[ERROR] You did not use a tool in your previous response! Please retry with a tool use.
@@ -310,16 +310,16 @@ Otherwise, if you have not completed the task and do not need additional informa
 		`Tool [${toolName}] has been called ${count} times consecutively with identical arguments. This is not making progress. Please use a different tool or different arguments instead of repeating the same call.`,
 
 	NodusIgnoreInstructions: (content: string) =>
-		`# .Nodusignore\n\n(The following is provided by a root-level .Nodusignore file where the user has specified files and directories that should not be accessed. When using list_files, you'll notice a ${LOCK_TEXT_SYMBOL} next to files that are blocked. Attempting to access the file's contents e.g. through read_file will result in an error.)\n\n${content}\n.Nodusignore`,
+		`# .nodusignore\n\n(The following is provided by a root-level .nodusignore file where the user has specified files and directories that should not be accessed. When using list_files, you'll notice a ${LOCK_TEXT_SYMBOL} next to files that are blocked. Attempting to access the file's contents e.g. through read_file will result in an error.)\n\n${content}\n.nodusignore`,
 
 	NodusRulesGlobalDirectoryInstructions: (globalNodusRulesFilePath: string, content: string) =>
-		`# .Nodusrules/\n\nThe following is provided by a global .Nodusrules/ directory, located at ${globalNodusRulesFilePath.toPosix()}, where the user has specified instructions for all working directories:\n\n${content}`,
+		`# .nodusrules/\n\nThe following is provided by a global .nodusrules/ directory, located at ${globalNodusRulesFilePath.toPosix()}, where the user has specified instructions for all working directories:\n\n${content}`,
 
 	NodusRulesLocalDirectoryInstructions: (cwd: string, content: string) =>
-		`# .Nodusrules/\n\nThe following is provided by a root-level .Nodusrules/ directory where the user has specified instructions for this working directory (${cwd.toPosix()})\n\n${content}`,
+		`# .nodusrules/\n\nThe following is provided by a root-level .nodusrules/ directory where the user has specified instructions for this working directory (${cwd.toPosix()})\n\n${content}`,
 
 	NodusRulesLocalFileInstructions: (cwd: string, content: string) =>
-		`# .Nodusrules\n\nThe following is provided by a root-level .Nodusrules file where the user has specified instructions for this working directory (${cwd.toPosix()})\n\n${content}`,
+		`# .nodusrules\n\nThe following is provided by a root-level .nodusrules file where the user has specified instructions for this working directory (${cwd.toPosix()})\n\n${content}`,
 
 	windsurfRulesLocalFileInstructions: (cwd: string, content: string) =>
 		`# .windsurfrules\n\nThe following is provided by a root-level .windsurfrules file where the user has specified instructions for this working directory (${cwd.toPosix()})\n\n${content}`,

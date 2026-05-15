@@ -1,5 +1,5 @@
 import { serializeError } from "serialize-error"
-import { Nodus_ACCOUNT_AUTH_ERROR_MESSAGE } from "../../shared/NodusAccount"
+import { NODUS_ACCOUNT_AUTH_ERROR_MESSAGE } from "../../shared/NodusAccount"
 
 export enum NodusErrorType {
 	Auth = "auth",
@@ -165,7 +165,7 @@ export class NodusError extends Error {
 		if (message) {
 			// Check for specific error codes/messages if applicable
 			const authErrorRegex = [/(?:in)?valid[-_ ]?(?:api )?(?:token|key)/i, /authentication[-_ ]?failed/i, /unauthorized/i]
-			if (message?.includes(Nodus_ACCOUNT_AUTH_ERROR_MESSAGE) || authErrorRegex.some((regex) => regex.test(message))) {
+			if (message?.includes(NODUS_ACCOUNT_AUTH_ERROR_MESSAGE) || authErrorRegex.some((regex) => regex.test(message))) {
 				return NodusErrorType.Auth
 			}
 

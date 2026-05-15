@@ -79,7 +79,7 @@ export type TelemetryMetadata = {
 	 * is different than the `platform` because there are many variants of VSCode and JetBrains but they
 	 * all use the same extension or plugin.
 	 */
-	Nodus_type: string
+	nodus_type: string
 	/** The name of the host IDE or environment e.g. VSCode, Cursor, IntelliJ Professional Edition, etc. */
 	platform: string
 	/** The version of the host environment */
@@ -291,7 +291,7 @@ export class TelemetryService {
 			// Tracks when yolo mode setting is toggled on/off
 			YOLO_MODE_TOGGLED: "task.yolo_mode_toggled",
 			// Tracks when Nodus web tools setting is toggled on/off
-			Nodus_WEB_TOOLS_TOGGLED: "task.Nodus_web_tools_toggled",
+			NODUS_WEB_TOOLS_TOGGLED: "task.nodus_web_tools_toggled",
 			// Tracks task initialization timing
 			INITIALIZATION: "task.initialization",
 			// Terminal execution telemetry events
@@ -359,7 +359,7 @@ export class TelemetryService {
 			extension_version: extensionVersion,
 			platform: hostVersion.platform || "unknown",
 			platform_version: hostVersion.version || "unknown",
-			Nodus_type: hostVersion.NodusType || "unknown",
+			nodus_type: hostVersion.nodusType || "unknown",
 			os_type: os.platform(),
 			os_version: os.version(),
 			// `remoteName` is normalized by the host bridge to `undefined` for local workspaces.
@@ -1624,7 +1624,7 @@ export class TelemetryService {
 	 */
 	public captureNodusWebToolsToggle(ulid: string, enabled: boolean) {
 		this.capture({
-			event: TelemetryService.EVENTS.TASK.Nodus_WEB_TOOLS_TOGGLED,
+			event: TelemetryService.EVENTS.TASK.NODUS_WEB_TOOLS_TOGGLED,
 			properties: {
 				ulid,
 				enabled,

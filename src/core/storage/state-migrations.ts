@@ -151,7 +151,7 @@ export async function migrateCustomInstructionsToGlobalRules(context: vscode.Ext
 		if (customInstructions?.trim()) {
 			Logger.log("Migrating custom instructions to global Nodus rules...")
 
-			// Create global .Nodusrules directory if it doesn't exist
+			// Create global .nodusrules directory if it doesn't exist
 			const globalRulesDir = await ensureRulesDirectoryExists()
 
 			// Use a fixed filename for custom instructions

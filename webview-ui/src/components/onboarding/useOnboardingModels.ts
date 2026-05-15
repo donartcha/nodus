@@ -1,5 +1,5 @@
 import type { ModelInfo } from "@shared/api"
-import { Nodus_ONBOARDING_MODELS } from "@shared/Nodus/onboarding"
+import { NODUS_ONBOARDING_MODELS } from "@shared/nodus/onboarding"
 import { EmptyRequest } from "@shared/proto/nodus/common"
 import type { NodusRecommendedModel } from "@shared/proto/nodus/models"
 import type { OnboardingModel, OnboardingModelGroup } from "@shared/proto/nodus/state"
@@ -52,7 +52,7 @@ interface RecommendedModelsData {
 type FetchState = { status: "loading" } | { status: "success"; data: RecommendedModelsData } | { status: "empty" }
 
 export function useOnboardingModels(): UseOnboardingModelsResult {
-	const { openRouterModels, nodusModels, refreshnodusModels } = useExtensionState()
+	const { openRouterModels, nodusModels, refreshNodusModels } = useExtensionState()
 	const [fetchState, setFetchState] = useState<FetchState>({ status: "loading" })
 
 	useEffect(() => {
@@ -85,8 +85,8 @@ export function useOnboardingModels(): UseOnboardingModelsResult {
 	}, [])
 
 	useEffect(() => {
-		refreshnodusModels()
-	}, [refreshnodusModels])
+		refreshNodusModels()
+	}, [refreshNodusModels])
 
 	// Merge openRouter and Nodus models into a single catalog for lookups
 	const modelCatalog = useMemo<Record<string, ModelInfo>>(() => {
@@ -95,7 +95,7 @@ export function useOnboardingModels(): UseOnboardingModelsResult {
 
 	return useMemo<UseOnboardingModelsResult>(() => {
 		if (fetchState.status !== "success") {
-			return { status: fetchState.status, models: { models: Nodus_ONBOARDING_MODELS } }
+			return { status: fetchState.status, models: { models: NODUS_ONBOARDING_MODELS } }
 		}
 
 		const { data } = fetchState

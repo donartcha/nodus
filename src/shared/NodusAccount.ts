@@ -95,4 +95,4 @@ export interface UserRemoteConfigDiscoveryResponse {
 }
 
 // Used in Nodus.ts provider and in webview-ui/src/components/chat/ChatRow.tsx to display the login button
-export const Nodus_ACCOUNT_AUTH_ERROR_MESSAGE = "Unauthorized: Please sign in to Nodus before trying again."
+export const NODUS_ACCOUNT_AUTH_ERROR_MESSAGE = "Unauthorized: Please sign in to Nodus before trying again."

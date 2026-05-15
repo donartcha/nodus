@@ -78,12 +78,12 @@ describe("FileContextTracker", () => {
 		expect(fileEntry.path).to.equal(filePath)
 		expect(fileEntry.record_state).to.equal("active")
 		expect(fileEntry.record_source).to.equal("read_tool")
-		expect(fileEntry.Nodus_read_date).to.be.a("number")
-		expect(fileEntry.Nodus_edit_date).to.be.null
+		expect(fileEntry.nodus_read_date).to.be.a("number")
+		expect(fileEntry.nodus_edit_date).to.be.null
 	})
 
 	it("should add a record when a file is edited by Nodus", async () => {
-		await tracker.trackFileContext(filePath, "Nodus_edited")
+		await tracker.trackFileContext(filePath, "nodus_edited")
 
 		// Verify saveTaskMetadata was called with the correct data
 		expect(saveTaskMetadataStub.calledOnce).to.be.true
@@ -103,9 +103,9 @@ describe("FileContextTracker", () => {
 		// Now check the properties of the active entry
 		expect(activeEntry.path).to.equal(filePath)
 		expect(activeEntry.record_state).to.equal("active")
-		expect(activeEntry.record_source).to.equal("Nodus_edited")
-		expect(activeEntry.Nodus_read_date).to.be.a("number")
-		expect(activeEntry.Nodus_edit_date).to.be.a("number")
+		expect(activeEntry.record_source).to.equal("nodus_edited")
+		expect(activeEntry.nodus_read_date).to.be.a("number")
+		expect(activeEntry.nodus_edit_date).to.be.a("number")
 	})
 
 	it("should add a record when a file is mentioned", async () => {
@@ -118,8 +118,8 @@ describe("FileContextTracker", () => {
 		expect(fileEntry.path).to.equal(filePath)
 		expect(fileEntry.record_state).to.equal("active")
 		expect(fileEntry.record_source).to.equal("file_mentioned")
-		expect(fileEntry.Nodus_read_date).to.be.a("number")
-		expect(fileEntry.Nodus_edit_date).to.be.null
+		expect(fileEntry.nodus_read_date).to.be.a("number")
+		expect(fileEntry.nodus_edit_date).to.be.null
 	})
 
 	it("should add a record when a file is edited by the user", async () => {
@@ -146,14 +146,14 @@ describe("FileContextTracker", () => {
 				path: filePath,
 				record_state: "active",
 				record_source: "read_tool",
-				Nodus_read_date: Date.now() - 1000, // 1 second ago
-				Nodus_edit_date: null,
+				nodus_read_date: Date.now() - 1000, // 1 second ago
+				nodus_edit_date: null,
 				user_edit_date: null,
 			},
 		]
 
 		// Track a new operation on the same file
-		await tracker.trackFileContext(filePath, "Nodus_edited")
+		await tracker.trackFileContext(filePath, "nodus_edited")
 
 		// Verify the metadata now has two entries - one stale and one active
 		const savedMetadata = saveTaskMetadataStub.firstCall.args[1]
@@ -165,7 +165,7 @@ describe("FileContextTracker", () => {
 		// New entry should be active
 		const newEntry = savedMetadata.files_in_context[1]
 		expect(newEntry.record_state).to.equal("active")
-		expect(newEntry.record_source).to.equal("Nodus_edited")
+		expect(newEntry.record_source).to.equal("nodus_edited")
 	})
 
 	it("should setup a file watcher for tracked files", async () => {

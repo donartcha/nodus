@@ -1,9 +1,9 @@
-enum Nodus_API_AUTH_ENDPOINTS {
+enum NODUS_API_AUTH_ENDPOINTS {
 	AUTH = "/api/v1/auth/authorize",
 	REFRESH_TOKEN = "/api/v1/auth/refresh",
 }
 
-enum Nodus_API_ENDPOINT_V1 {
+enum NODUS_API_ENDPOINT_V1 {
 	TOKEN_EXCHANGE = "/api/v1/auth/token",
 	USER_INFO = "/api/v1/users/me",
 	FEATUREBASE_TOKEN = "/api/v1/users/me/featurebase-token",
@@ -13,7 +13,7 @@ enum Nodus_API_ENDPOINT_V1 {
 	API_KEYS = "/api/v1/organizations/{id}/api-keys",
 }
 
-export const Nodus_API_ENDPOINT = {
-	...Nodus_API_AUTH_ENDPOINTS,
-	...Nodus_API_ENDPOINT_V1,
+export const NODUS_API_ENDPOINT = {
+	...NODUS_API_AUTH_ENDPOINTS,
+	...NODUS_API_ENDPOINT_V1,
 }

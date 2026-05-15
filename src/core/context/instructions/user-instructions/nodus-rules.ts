@@ -46,7 +46,7 @@ export const getGlobalNodusRules = async (
 					activatedConditionalRules.push(...rulesFilesTotal.activatedConditionalRules)
 				}
 			} catch {
-				Logger.error(`Failed to read .Nodusrules directory at ${globalNodusRulesFilePath}`)
+				Logger.error(`Failed to read .nodusrules directory at ${globalNodusRulesFilePath}`)
 			}
 		} else {
 			Logger.error(`${globalNodusRulesFilePath} is not a directory`)
@@ -92,9 +92,9 @@ export const getLocalNodusRules = async (
 		if (await isDirectory(NodusRulesFilePath)) {
 			try {
 				const rulesFilePaths = await readDirectory(NodusRulesFilePath, [
-					[".Nodusrules", "workflows"],
-					[".Nodusrules", "hooks"],
-					[".Nodusrules", "skills"],
+					[".nodusrules", "workflows"],
+					[".nodusrules", "hooks"],
+					[".nodusrules", "skills"],
 				])
 
 				const rulesFilesTotal = await getRuleFilesTotalContentWithMetadata(rulesFilePaths, cwd, toggles, {
@@ -106,14 +106,14 @@ export const getLocalNodusRules = async (
 					activatedConditionalRules.push(...rulesFilesTotal.activatedConditionalRules)
 				}
 			} catch {
-				Logger.error(`Failed to read .Nodusrules directory at ${NodusRulesFilePath}`)
+				Logger.error(`Failed to read .nodusrules directory at ${NodusRulesFilePath}`)
 			}
 		} else {
 			try {
 				if (NodusRulesFilePath in toggles && toggles[NodusRulesFilePath] !== false) {
 					const raw = (await fs.readFile(NodusRulesFilePath, "utf8")).trim()
 					if (raw) {
-						// Keep single-file .Nodusrules behavior consistent with directory/remote rules:
+						// Keep single-file .nodusrules behavior consistent with directory/remote rules:
 						// - Parse YAML frontmatter (fail-open on parse errors)
 						// - Evaluate conditionals against the request's evaluation context
 						const parsed = parseYamlFrontmatter(raw)
@@ -138,7 +138,7 @@ export const getLocalNodusRules = async (
 					}
 				}
 			} catch {
-				Logger.error(`Failed to read .Nodusrules file at ${NodusRulesFilePath}`)
+				Logger.error(`Failed to read .nodusrules file at ${NodusRulesFilePath}`)
 			}
 		}
 	}
@@ -163,9 +163,9 @@ export async function refreshNodusRulesToggles(
 	const localNodusRulesToggles = controller.stateManager.getWorkspaceStateKey("localNodusRulesToggles")
 	const localNodusRulesFilePath = path.resolve(workingDirectory, GlobalFileNames.NodusRules)
 	const updatedLocalToggles = await synchronizeRuleToggles(localNodusRulesFilePath, localNodusRulesToggles, "", [
-		[".Nodusrules", "workflows"],
-		[".Nodusrules", "hooks"],
-		[".Nodusrules", "skills"],
+		[".nodusrules", "workflows"],
+		[".nodusrules", "hooks"],
+		[".nodusrules", "skills"],
 	])
 	controller.stateManager.setWorkspaceState("localNodusRulesToggles", updatedLocalToggles)
 

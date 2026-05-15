@@ -1,6 +1,6 @@
 import deepEqual from "fast-deep-equal"
 import * as path from "path"
-import { Diagnostic, DiagnosticSeverity, FileDiagnostics } from "@/shared/proto/index.Nodus"
+import { Diagnostic, DiagnosticSeverity, FileDiagnostics } from "@/shared/proto/index.nodus"
 import { Logger } from "@/shared/services/Logger"
 import { getCwd } from "@/utils/path"
 

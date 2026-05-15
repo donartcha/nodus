@@ -139,7 +139,7 @@ ${
 
 export const newRuleToolResponse = () =>
 	`<explicit_instructions type="new_rule">
-The user has explicitly asked you to help them create a new Nodus rule file inside the .Nodusrules top-level directory based on the conversation up to this point in time. The user may have provided instructions or additional information for you to consider when creating the new Nodus rule.
+The user has explicitly asked you to help them create a new Nodus rule file inside the .nodusrules top-level directory based on the conversation up to this point in time. The user may have provided instructions or additional information for you to consider when creating the new Nodus rule.
 When creating a new Nodus rule file, you should NOT overwrite or alter an existing Nodus rule file. To create the Nodus rule file you MUST use the new_rule tool. The new_rule tool can be used in either of the PLAN or ACT modes.
 
 The new_rule tool is defined below:
@@ -149,7 +149,7 @@ Your task is to create a new Nodus rule file which includes guidelines on how to
 The Nodus rule file must be formatted as markdown and be a '.md' file. The name of the file you generate must be as succinct as possible and be encompassing the main overarching concept of the rules you added to the file (e.g., 'memory-bank.md' or 'project-overview.md').
 
 Parameters:
-- Path: (required) The path of the file to write to (relative to the current working directory). This will be the Nodus rule file you create, and it must be placed inside the .Nodusrules top-level directory (create this if it doesn't exist). The filename created CANNOT be "default-Nodusignore.md". For filenames, use hyphens ("-") instead of underscores ("_") to separate words.
+- Path: (required) The path of the file to write to (relative to the current working directory). This will be the Nodus rule file you create, and it must be placed inside the .nodusrules top-level directory (create this if it doesn't exist). The filename created CANNOT be "default-Nodusignore.md". For filenames, use hyphens ("-") instead of underscores ("_") to separate words.
 - Content: (required) The content to write to the file. ALWAYS provide the COMPLETE intended content of the file, without any truncation or omissions. You MUST include ALL parts of the file, even if they haven't been modified. The content for the Nodus rule file MUST be created according to the following instructions:
   1. Format the Nodus rule file to have distinct guideline sections, each with their own markdown heading, starting with "## Brief overview". Under each of these headings, include bullet points fully fleshing out the details, with examples and/or trigger cases ONLY when applicable.
   2. These guidelines can be specific to the task(s) or project worked on thus far, or cover more high-level concepts. Guidelines can include coding conventions, general design patterns, preferred tech stack including favorite libraries and language, communication style with Nodus (verbose vs concise), prompting strategies, naming conventions, testing strategies, comment verbosity, time spent on architecting prior to development, and other preferences.
@@ -158,13 +158,13 @@ Parameters:
 
 Usage:
 <new_rule>
-<path>.Nodusrules/{file name}.md</path>
+<path>.nodusrules/{file name}.md</path>
 <content>Nodus rule file content here</content>
 </new_rule>
 
 Example:
 <new_rule>
-<path>.Nodusrules/project-preferences.md</path>
+<path>.nodusrules/project-preferences.md</path>
 <content>
 ## Brief overview
   [Brief description of the rules, including if this set of guidelines is project-specific or global]

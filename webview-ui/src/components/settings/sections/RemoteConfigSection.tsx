@@ -1,4 +1,4 @@
-import { EmptyRequest } from "@shared/proto/index.Nodus"
+import { EmptyRequest } from "@shared/proto/index.nodus"
 import { VSCodeButton, VSCodeLink } from "@vscode/webview-ui-toolkit/react"
 import { useEffect, useRef, useState } from "react"
 import { RemoteConfigToggle } from "@/components/account/RemoteConfigToggle"

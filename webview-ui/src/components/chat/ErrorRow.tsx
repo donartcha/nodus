@@ -28,15 +28,15 @@ const ErrorRow = memo(({ message, errorType, apiRequestFailedMessage, apiReqStre
 				// Handle API request errors with special error parsing
 				if (rawApiError) {
 					// FIXME: NodusError parsing should not be applied to non-Nodus providers, but it seems we're using NodusErrorMessage below in the default error display
-					const NodusError = NodusError.parse(rawApiError)
-					const errorMessage = NodusError?._error?.message || NodusError?.message || rawApiError
-					const requestId = NodusError?._error?.request_id
-					const providerId = NodusError?.providerId || NodusError?._error?.providerId
+					const parsedNodusError = NodusError.parse(rawApiError)
+					const errorMessage = parsedNodusError?._error?.message || parsedNodusError?.message || rawApiError
+					const requestId = parsedNodusError?._error?.request_id
+					const providerId = parsedNodusError?.providerId || parsedNodusError?._error?.providerId
 					const isNodusProvider = providerId === "Nodus"
-					const errorCode = NodusError?._error?.code
+					const errorCode = parsedNodusError?._error?.code
 
-					if (NodusError?.isErrorType(NodusErrorType.Balance)) {
-						const errorDetails = NodusError._error?.details
+					if (parsedNodusError?.isErrorType(NodusErrorType.Balance)) {
+						const errorDetails = parsedNodusError._error?.details
 						return (
 							<CreditLimitError
 								buyCreditsUrl={errorDetails?.buy_credits_url}
@@ -48,8 +48,8 @@ const ErrorRow = memo(({ message, errorType, apiRequestFailedMessage, apiReqStre
 						)
 					}
 
-					if (NodusError?.isErrorType(NodusErrorType.SpendLimit)) {
-						const d = NodusError._error?.details
+					if (parsedNodusError?.isErrorType(NodusErrorType.SpendLimit)) {
+						const d = parsedNodusError._error?.details
 						return (
 							<SpendLimitError
 								budgetPeriod={d?.budget_period}
@@ -61,7 +61,7 @@ const ErrorRow = memo(({ message, errorType, apiRequestFailedMessage, apiReqStre
 						)
 					}
 
-					if (NodusError?.isErrorType(NodusErrorType.RateLimit)) {
+					if (parsedNodusError?.isErrorType(NodusErrorType.RateLimit)) {
 						return (
 							<p className="m-0 whitespace-pre-wrap text-error wrap-anywhere">
 								{errorMessage}
@@ -70,12 +70,12 @@ const ErrorRow = memo(({ message, errorType, apiRequestFailedMessage, apiReqStre
 						)
 					}
 
-					if (NodusError?.isErrorType(NodusErrorType.QuotaExceeded)) {
-						const detailMessage = NodusError?._error?.details?.message || errorMessage
+					if (parsedNodusError?.isErrorType(NodusErrorType.QuotaExceeded)) {
+						const detailMessage = parsedNodusError?._error?.details?.message || errorMessage
 						return <p className="m-0 whitespace-pre-wrap text-error wrap-anywhere">{detailMessage}</p>
 					}
 
-					if (NodusError?.isErrorType(NodusErrorType.Auth) && isNodusProvider) {
+					if (parsedNodusError?.isErrorType(NodusErrorType.Auth) && isNodusProvider) {
 						return !NodusUser ? (
 							// User is using Nodus provider and is not logged in
 							<div className="flex flex-col gap-3">
@@ -147,7 +147,7 @@ const ErrorRow = memo(({ message, errorType, apiRequestFailedMessage, apiReqStre
 				return (
 					<div className="flex flex-col p-2 rounded text-xs opacity-80 bg-quote text-foreground">
 						<div>
-							Nodus tried to access <code>{message.text}</code> which is blocked by the <code>.Nodusignore</code>
+							Nodus tried to access <code>{message.text}</code> which is blocked by the <code>.nodusignore</code>
 							file.
 						</div>
 					</div>

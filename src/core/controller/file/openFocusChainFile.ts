@@ -1,6 +1,6 @@
 import { openFile as openFileIntegration } from "@integrations/misc/open-file"
 import { telemetryService } from "../../../services/telemetry"
-import { Empty, StringRequest } from "../../../shared/proto/Nodus/common"
+import { Empty, StringRequest } from "../../../shared/proto/nodus/common"
 import { ensureFocusChainFile, extractFocusChainListFromText } from "../../task/focus-chain/file-utils"
 import { Controller } from ".."
 

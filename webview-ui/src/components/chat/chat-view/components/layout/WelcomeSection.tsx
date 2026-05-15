@@ -1,4 +1,4 @@
-import { BANNER_DATA, BannerAction, BannerActionType, BannerCardData } from "@shared/Nodus/banner"
+import { BANNER_DATA, BannerAction, BannerActionType, BannerCardData } from "@shared/nodus/banner"
 import { EmptyRequest } from "@shared/proto/nodus/common"
 import type { Worktree } from "@shared/proto/nodus/worktree"
 import { TrackWorktreeViewOpenedRequest } from "@shared/proto/nodus/worktree"

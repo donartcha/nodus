@@ -11,7 +11,7 @@ import { createHooksDirectory } from "./test-utils"
 export interface HookTestEnvironment {
 	/** Temporary directory for this test */
 	tempDir: string
-	/** Array of hooks directories (.Nodusrules/hooks paths) */
+	/** Array of hooks directories (.nodusrules/hooks paths) */
 	hooksDirs: string[]
 	/** Cleanup function to remove temp directories */
 	cleanup: () => Promise<void>
@@ -19,7 +19,7 @@ export interface HookTestEnvironment {
 
 /**
  * Creates a fresh test environment with temp directories.
- * Automatically creates .Nodusrules/hooks structure.
+ * Automatically creates .nodusrules/hooks structure.
  *
  * @returns Test environment with cleanup function
  *

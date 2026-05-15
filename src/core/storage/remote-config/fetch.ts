@@ -7,7 +7,7 @@ import { Logger } from "@/shared/services/Logger"
 import { ConfiguredAPIKeys } from "@/shared/storage/state-keys"
 import { NodusEnv } from "../../../config"
 import { AuthService } from "../../../services/auth/AuthService"
-import { Nodus_API_ENDPOINT } from "../../../shared/Nodus/api"
+import { NODUS_API_ENDPOINT } from "../../../shared/nodus/api"
 import { APIKeySchema, type APIKeySettings, RemoteConfig, RemoteConfigSchema } from "../../../shared/remote-config/schema"
 import { deleteRemoteConfigFromCache, readRemoteConfigFromCache, writeRemoteConfigToCache } from "../disk"
 import { applyRemoteConfig, clearRemoteConfig, isRemoteConfigEnabled } from "./utils"
@@ -100,7 +100,7 @@ async function fetchRemoteConfigForOrganization(organizationId: string): Promise
 	try {
 		// Fetch config data using helper
 		const configData = await makeAuthenticatedRequest<{ value: string; enabled: boolean }>(
-			Nodus_API_ENDPOINT.REMOTE_CONFIG,
+			NODUS_API_ENDPOINT.REMOTE_CONFIG,
 			organizationId,
 		)
 
@@ -147,7 +147,7 @@ async function fetchRemoteConfigForOrganization(organizationId: string): Promise
 async function fetchApiKeysForOrganization(organizationId: string): Promise<APIKeySettings> {
 	try {
 		// Fetch API keys string using helper
-		const response = await makeAuthenticatedRequest<{ providerApiKeys: string }>(Nodus_API_ENDPOINT.API_KEYS, organizationId)
+		const response = await makeAuthenticatedRequest<{ providerApiKeys: string }>(NODUS_API_ENDPOINT.API_KEYS, organizationId)
 
 		// Parse and return API keys
 		return parseApiKeys(response?.providerApiKeys)

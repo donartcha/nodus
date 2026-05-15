@@ -14,9 +14,9 @@ describe("NodusIgnoreController", () => {
 		tempDir = path.join(os.tmpdir(), `llm-test-${Date.now()}-${Math.random().toString(36).slice(2)}`)
 		await fs.mkdir(tempDir)
 
-		// Create default .Nodusignore file
+		// Create default .nodusignore file
 		await fs.writeFile(
-			path.join(tempDir, ".Nodusignore"),
+			path.join(tempDir, ".nodusignore"),
 			[".env", "*.secret", "private/", "# This is a comment", "", "temp.*", "file-with-space-at-end.* ", "**/.git/**"].join(
 				"\n",
 			),
@@ -50,8 +50,8 @@ describe("NodusIgnoreController", () => {
 			results.forEach((result) => result.should.be.true())
 		})
 
-		it("should block access to .Nodusignore file", async () => {
-			const result = controller.validateAccess(".Nodusignore")
+		it("should block access to .nodusignore file", async () => {
+			const result = controller.validateAccess(".nodusignore")
 			result.should.be.false()
 		})
 	})
@@ -81,7 +81,7 @@ describe("NodusIgnoreController", () => {
 
 		it("should handle pattern edge cases", async () => {
 			await fs.writeFile(
-				path.join(tempDir, ".Nodusignore"),
+				path.join(tempDir, ".nodusignore"),
 				["*.secret", "private/", "*.tmp", "data-*.json", "temp/*"].join("\n"),
 			)
 
@@ -103,7 +103,7 @@ describe("NodusIgnoreController", () => {
 
 		// it("should handle negation patterns", async () => {
 		// 	await fs.writeFile(
-		// 		path.join(tempDir, ".Nodusignore"),
+		// 		path.join(tempDir, ".nodusignore"),
 		// 		[
 		// 			"temp/*", // Ignore everything in temp
 		// 			"!temp/allowed/*", // But allow files in temp/allowed
@@ -148,10 +148,10 @@ describe("NodusIgnoreController", () => {
 		// 	results[9].should.be.true() // assets/public/data.json
 		// })
 
-		it("should handle comments in .Nodusignore", async () => {
-			// Create a new .Nodusignore with comments
+		it("should handle comments in .nodusignore", async () => {
+			// Create a new .nodusignore with comments
 			await fs.writeFile(
-				path.join(tempDir, ".Nodusignore"),
+				path.join(tempDir, ".nodusignore"),
 				["# Comment line", "*.secret", "private/", "temp.*"].join("\n"),
 			)
 
@@ -217,8 +217,8 @@ describe("NodusIgnoreController", () => {
 			result.should.be.true()
 		})
 
-		it("should handle missing .Nodusignore gracefully", async () => {
-			// Create a new controller in a directory without .Nodusignore
+		it("should handle missing .nodusignore gracefully", async () => {
+			// Create a new controller in a directory without .nodusignore
 			const emptyDir = path.join(os.tmpdir(), `llm-test-empty-${Date.now()}`)
 			await fs.mkdir(emptyDir)
 
@@ -232,8 +232,8 @@ describe("NodusIgnoreController", () => {
 			}
 		})
 
-		it("should handle empty .Nodusignore", async () => {
-			await fs.writeFile(path.join(tempDir, ".Nodusignore"), "")
+		it("should handle empty .nodusignore", async () => {
+			await fs.writeFile(path.join(tempDir, ".nodusignore"), "")
 
 			controller = new NodusIgnoreController(tempDir)
 			await controller.initialize()
@@ -248,10 +248,10 @@ describe("NodusIgnoreController", () => {
 			// Create a .gitignore file with patterns "*.log" and "debug/"
 			await fs.writeFile(path.join(tempDir, ".gitignore"), ["*.log", "debug/"].join("\n"))
 
-			// Create a .Nodusignore file that includes .gitignore and adds an extra pattern "secret.txt"
-			await fs.writeFile(path.join(tempDir, ".Nodusignore"), ["!include .gitignore", "secret.txt"].join("\n"))
+			// Create a .nodusignore file that includes .gitignore and adds an extra pattern "secret.txt"
+			await fs.writeFile(path.join(tempDir, ".nodusignore"), ["!include .gitignore", "secret.txt"].join("\n"))
 
-			// Initialize the controller to load the updated .Nodusignore
+			// Initialize the controller to load the updated .nodusignore
 			controller = new NodusIgnoreController(tempDir)
 			await controller.initialize()
 
@@ -259,15 +259,15 @@ describe("NodusIgnoreController", () => {
 			controller.validateAccess("server.log").should.be.false()
 			// "debug/app.js" should be ignored due to the "debug/" pattern from .gitignore
 			controller.validateAccess("debug/app.js").should.be.false()
-			// "secret.txt" should be ignored as specified directly in .Nodusignore
+			// "secret.txt" should be ignored as specified directly in .nodusignore
 			controller.validateAccess("secret.txt").should.be.false()
 			// Other files should be allowed
 			controller.validateAccess("app.js").should.be.true()
 		})
 
 		it("should handle non-existent included file gracefully", async () => {
-			// Create a .Nodusignore file that includes a non-existent file
-			await fs.writeFile(path.join(tempDir, ".Nodusignore"), ["!include missing-file.txt"].join("\n"))
+			// Create a .nodusignore file that includes a non-existent file
+			await fs.writeFile(path.join(tempDir, ".nodusignore"), ["!include missing-file.txt"].join("\n"))
 
 			// Initialize the controller
 			controller = new NodusIgnoreController(tempDir)
@@ -279,7 +279,7 @@ describe("NodusIgnoreController", () => {
 
 		it("should handle non-existent included file gracefully alongside a valid pattern", async () => {
 			// Test with an include directive for a non-existent file alongside a valid pattern ("*.tmp")
-			await fs.writeFile(path.join(tempDir, ".Nodusignore"), ["!include non-existent.txt", "*.tmp"].join("\n"))
+			await fs.writeFile(path.join(tempDir, ".nodusignore"), ["!include non-existent.txt", "*.tmp"].join("\n"))
 
 			controller = new NodusIgnoreController(tempDir)
 			await controller.initialize()

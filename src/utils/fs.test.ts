@@ -198,23 +198,23 @@ describe("Filesystem Utilities", () => {
 		files.sort().should.deepEqual(expectedFiles.sort())
 	})
 
-	it("should exclude .Nodusrules/workflows directory specifically", async () => {
+	it("should exclude .nodusrules/workflows directory specifically", async () => {
 		// Create a test directory structure
 		const NodusrulesDirTest = path.join(tmpDir, "Nodusrules-test")
-		const NodusrulesDirPath = path.join(NodusrulesDirTest, ".Nodusrules")
+		const NodusrulesDirPath = path.join(NodusrulesDirTest, ".nodusrules")
 
-		// Create .Nodusrules directory and root files
+		// Create .nodusrules directory and root files
 		await fs.mkdir(NodusrulesDirPath, { recursive: true })
 		await fs.writeFile(path.join(NodusrulesDirPath, "config.json"), "{}")
 		await fs.writeFile(path.join(NodusrulesDirPath, "settings.js"), "// settings")
 
-		// Create .Nodusrules/other directory and files
+		// Create .nodusrules/other directory and files
 		const otherDirPath = path.join(NodusrulesDirPath, "other")
 		await fs.mkdir(otherDirPath, { recursive: true })
 		await fs.writeFile(path.join(otherDirPath, "helper.js"), "// helper code")
 		await fs.writeFile(path.join(otherDirPath, "util.js"), "// util functions")
 
-		// Create .Nodusrules/workflows directory and files
+		// Create .nodusrules/workflows directory and files
 		const workflowsDirPath = path.join(NodusrulesDirPath, "workflows")
 		await fs.mkdir(workflowsDirPath, { recursive: true })
 		await fs.writeFile(path.join(workflowsDirPath, "workflow1.js"), "// workflow1")
@@ -229,7 +229,7 @@ describe("Filesystem Utilities", () => {
 		allFiles.some((file) => file.includes("workflow2.js")).should.be.true()
 
 		// Get files WITH workflows directory excluded
-		const filteredFiles = await readDirectory(NodusrulesDirPath, [[".Nodusrules", "workflows"]])
+		const filteredFiles = await readDirectory(NodusrulesDirPath, [[".nodusrules", "workflows"]])
 
 		// Verify workflows files are excluded but others remain
 		filteredFiles.length.should.equal(4) // 2 in root + 2 in other
@@ -245,8 +245,8 @@ describe("Filesystem Utilities", () => {
 
 		// Test with multiple exclusions
 		const multiExcludeFiles = await readDirectory(NodusrulesDirPath, [
-			[".Nodusrules", "workflows"],
-			[".Nodusrules", "other"],
+			[".nodusrules", "workflows"],
+			[".nodusrules", "other"],
 		])
 
 		// Verify both workflows and other directories are excluded
@@ -257,22 +257,22 @@ describe("Filesystem Utilities", () => {
 		multiExcludeFiles.sort().should.deepEqual(rootOnlyFiles.sort())
 	})
 
-	it("should exclude .Nodusrules/hooks directory specifically", async () => {
+	it("should exclude .nodusrules/hooks directory specifically", async () => {
 		// Create a test directory structure
 		const NodusrulesDirTest = path.join(tmpDir, "Nodusrules-hooks-test")
-		const NodusrulesDirPath = path.join(NodusrulesDirTest, ".Nodusrules")
+		const NodusrulesDirPath = path.join(NodusrulesDirTest, ".nodusrules")
 
-		// Create .Nodusrules directory and root files
+		// Create .nodusrules directory and root files
 		await fs.mkdir(NodusrulesDirPath, { recursive: true })
 		await fs.writeFile(path.join(NodusrulesDirPath, "config.json"), "{}")
 		await fs.writeFile(path.join(NodusrulesDirPath, "settings.js"), "// settings")
 
-		// Create .Nodusrules/workflows directory and files
+		// Create .nodusrules/workflows directory and files
 		const workflowsDirPath = path.join(NodusrulesDirPath, "workflows")
 		await fs.mkdir(workflowsDirPath, { recursive: true })
 		await fs.writeFile(path.join(workflowsDirPath, "workflow1.js"), "// workflow1")
 
-		// Create .Nodusrules/hooks directory and files
+		// Create .nodusrules/hooks directory and files
 		const hooksDirPath = path.join(NodusrulesDirPath, "hooks")
 		await fs.mkdir(hooksDirPath, { recursive: true })
 		await fs.writeFile(path.join(hooksDirPath, "PreToolUse"), "#!/usr/bin/env bash")
@@ -287,7 +287,7 @@ describe("Filesystem Utilities", () => {
 		allFiles.some((file) => file.includes("PostToolUse")).should.be.true()
 
 		// Get files WITH hooks directory excluded
-		const filteredFiles = await readDirectory(NodusrulesDirPath, [[".Nodusrules", "hooks"]])
+		const filteredFiles = await readDirectory(NodusrulesDirPath, [[".nodusrules", "hooks"]])
 
 		// Verify hooks files are excluded but others remain
 		filteredFiles.length.should.equal(3) // 2 in root + 1 in workflows
@@ -302,8 +302,8 @@ describe("Filesystem Utilities", () => {
 
 		// Test with multiple exclusions (both workflows and hooks)
 		const multiExcludeFiles = await readDirectory(NodusrulesDirPath, [
-			[".Nodusrules", "workflows"],
-			[".Nodusrules", "hooks"],
+			[".nodusrules", "workflows"],
+			[".nodusrules", "hooks"],
 		])
 
 		// Verify both workflows and hooks directories are excluded

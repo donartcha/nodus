@@ -6,7 +6,7 @@ import { HostProvider } from "@/hosts/host-provider"
 import { buildBasicNodusHeaders } from "@/services/EnvUtils"
 import { AuthInvalidTokenError, AuthNetworkError } from "@/services/error/NodusError"
 import { telemetryService } from "@/services/telemetry"
-import { Nodus_API_ENDPOINT } from "@/shared/Nodus/api"
+import { NODUS_API_ENDPOINT } from "@/shared/nodus/api"
 import { fetch, getAxiosSettings } from "@/shared/net"
 import { Logger } from "@/shared/services/Logger"
 import { type NodusAccountUserInfo, type NodusAuthInfo } from "../AuthService"
@@ -292,7 +292,7 @@ export class NodusAuthProvider {
 	 */
 	async refreshToken(refreshToken: string, storedData: NodusAuthInfo): Promise<NodusAuthInfo> {
 		try {
-			const endpoint = new URL(Nodus_API_ENDPOINT.REFRESH_TOKEN, this.config.apiBaseUrl)
+			const endpoint = new URL(NODUS_API_ENDPOINT.REFRESH_TOKEN, this.config.apiBaseUrl)
 			const response = await fetch(endpoint.toString(), {
 				method: "POST",
 				headers: await this.headers(),
@@ -343,7 +343,7 @@ export class NodusAuthProvider {
 	}
 
 	async getAuthRequest(callbackUrl: string): Promise<string> {
-		const authUrl = new URL(Nodus_API_ENDPOINT.AUTH, this.config.apiBaseUrl)
+		const authUrl = new URL(NODUS_API_ENDPOINT.AUTH, this.config.apiBaseUrl)
 		authUrl.searchParams.set("client_type", "extension")
 		authUrl.searchParams.set("callback_url", callbackUrl)
 		// Ensure the redirect_uri is properly encoded and included
@@ -390,7 +390,7 @@ export class NodusAuthProvider {
 			const callbackUrl = await HostProvider.get().getCallbackUrl("/auth")
 
 			// Exchange the authorization code for tokens
-			const tokenUrl = new URL(Nodus_API_ENDPOINT.TOKEN_EXCHANGE, this.config.apiBaseUrl)
+			const tokenUrl = new URL(NODUS_API_ENDPOINT.TOKEN_EXCHANGE, this.config.apiBaseUrl)
 
 			const response = await fetch(tokenUrl.toString(), {
 				method: "POST",

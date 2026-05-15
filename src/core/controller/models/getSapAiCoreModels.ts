@@ -1,6 +1,6 @@
 import axios from "axios"
 import { getAxiosSettings } from "@/shared/net"
-import { SapAiCoreModelDeployment, SapAiCoreModelsRequest, SapAiCoreModelsResponse } from "@/shared/proto/Nodus/models"
+import { SapAiCoreModelDeployment, SapAiCoreModelsRequest, SapAiCoreModelsResponse } from "@/shared/proto/nodus/models"
 import { Logger } from "@/shared/services/Logger"
 import { Controller } from ".."
 

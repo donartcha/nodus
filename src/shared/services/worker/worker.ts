@@ -30,20 +30,20 @@ function parseIntEnv(value: string | undefined, fallback: number): number {
  */
 export function getBlobStoreSettingsFromEnv(): BlobStoreSettings {
 	return {
-		adapterType: process?.env?.Nodus_STORAGE_ADAPTER || "unknown",
-		bucket: process?.env?.Nodus_STORAGE_BUCKET || "Nodus",
-		accessKeyId: process?.env?.Nodus_STORAGE_ACCESS_KEY_ID || "",
-		secretAccessKey: process?.env?.Nodus_STORAGE_SECRET_ACCESS_KEY || "",
-		region: process?.env?.Nodus_STORAGE_REGION,
-		endpoint: process?.env?.Nodus_STORAGE_ENDPOINT,
-		accountId: process?.env?.Nodus_STORAGE_ACCOUNT_ID,
+		adapterType: process?.env?.NODUS_STORAGE_ADAPTER || "unknown",
+		bucket: process?.env?.NODUS_STORAGE_BUCKET || "Nodus",
+		accessKeyId: process?.env?.NODUS_STORAGE_ACCESS_KEY_ID || "",
+		secretAccessKey: process?.env?.NODUS_STORAGE_SECRET_ACCESS_KEY || "",
+		region: process?.env?.NODUS_STORAGE_REGION,
+		endpoint: process?.env?.NODUS_STORAGE_ENDPOINT,
+		accountId: process?.env?.NODUS_STORAGE_ACCOUNT_ID,
 
-		intervalMs: parseIntEnv(process.env.Nodus_STORAGE_SYNC_INTERVAL_MS, 30000),
-		maxRetries: parseIntEnv(process.env.Nodus_STORAGE_SYNC_MAX_RETRIES, 5),
-		batchSize: parseIntEnv(process.env.Nodus_STORAGE_SYNC_BATCH_SIZE, 10),
-		maxQueueSize: parseIntEnv(process.env.Nodus_STORAGE_SYNC_MAX_QUEUE_SIZE, 1000),
-		maxFailedAgeMs: parseIntEnv(process.env.Nodus_STORAGE_SYNC_MAX_FAILED_AGE_MS, SEVEN_DAYS_MS),
-		backfillEnabled: process.env.Nodus_STORAGE_SYNC_BACKFILL_ENABLED === "true",
+		intervalMs: parseIntEnv(process.env.NODUS_STORAGE_SYNC_INTERVAL_MS, 30000),
+		maxRetries: parseIntEnv(process.env.NODUS_STORAGE_SYNC_MAX_RETRIES, 5),
+		batchSize: parseIntEnv(process.env.NODUS_STORAGE_SYNC_BATCH_SIZE, 10),
+		maxQueueSize: parseIntEnv(process.env.NODUS_STORAGE_SYNC_MAX_QUEUE_SIZE, 1000),
+		maxFailedAgeMs: parseIntEnv(process.env.NODUS_STORAGE_SYNC_MAX_FAILED_AGE_MS, SEVEN_DAYS_MS),
+		backfillEnabled: process.env.NODUS_STORAGE_SYNC_BACKFILL_ENABLED === "true",
 	}
 }
 

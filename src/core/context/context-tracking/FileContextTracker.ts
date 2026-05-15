@@ -82,7 +82,7 @@ export class FileContextTracker {
 	 * Tracks a file operation in metadata and sets up a watcher for the file
 	 * This is the main entry point for FileContextTracker and is called when a file is passed to Nodus via a tool, mention, or edit.
 	 */
-	async trackFileContext(filePath: string, operation: "read_tool" | "user_edited" | "Nodus_edited" | "file_mentioned") {
+	async trackFileContext(filePath: string, operation: "read_tool" | "user_edited" | "nodus_edited" | "file_mentioned") {
 		try {
 			const cwd = await getCwd()
 			if (!cwd) {
@@ -130,8 +130,8 @@ export class FileContextTracker {
 				path: filePath,
 				record_state: "active",
 				record_source: source,
-				Nodus_read_date: getLatestDateForField(filePath, "Nodus_read_date"),
-				Nodus_edit_date: getLatestDateForField(filePath, "Nodus_edit_date"),
+				nodus_read_date: getLatestDateForField(filePath, "nodus_read_date"),
+				nodus_edit_date: getLatestDateForField(filePath, "nodus_edit_date"),
 				user_edit_date: getLatestDateForField(filePath, "user_edit_date"),
 			}
 
@@ -142,16 +142,16 @@ export class FileContextTracker {
 					this.recentlyModifiedFiles.add(filePath)
 					break
 
-				// Nodus_edited: Nodus has edited the file
-				case "Nodus_edited":
-					newEntry.Nodus_read_date = now
-					newEntry.Nodus_edit_date = now
+				// nodus_edited: Nodus has edited the file
+				case "nodus_edited":
+					newEntry.nodus_read_date = now
+					newEntry.nodus_edit_date = now
 					break
 
 				// read_tool/file_mentioned: Nodus has read the file via a tool or file mention
 				case "read_tool":
 				case "file_mentioned":
-					newEntry.Nodus_read_date = now
+					newEntry.nodus_read_date = now
 					break
 			}
 
@@ -200,7 +200,7 @@ export class FileContextTracker {
 
 			if (taskMetadata?.files_in_context) {
 				for (const fileEntry of taskMetadata.files_in_context) {
-					const NodusEditedAfter = fileEntry.Nodus_edit_date && fileEntry.Nodus_edit_date > messageTs
+					const NodusEditedAfter = fileEntry.nodus_edit_date && fileEntry.nodus_edit_date > messageTs
 					const userEditedAfter = fileEntry.user_edit_date && fileEntry.user_edit_date > messageTs
 
 					if (NodusEditedAfter || userEditedAfter) {

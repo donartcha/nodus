@@ -40,7 +40,7 @@ class NodusEndpoint {
 
 	private constructor() {
 		// Set environment at module load. Use override if provided.
-		const _env = process?.env?.Nodus_ENVIRONMENT_OVERRIDE || process?.env?.Nodus_ENVIRONMENT
+		const _env = process?.env?.NODUS_ENVIRONMENT_OVERRIDE || process?.env?.NODUS_ENVIRONMENT
 		if (_env && Object.values(Environment).includes(_env as Environment)) {
 			this.environment = _env as Environment
 		}
@@ -125,7 +125,7 @@ class NodusEndpoint {
 
 	/**
 	 * Returns the path to the endpoints.json configuration file.
-	 * Located at ~/.Nodus/endpoints.json
+	 * Located at ~/.nodus/endpoints.json
 	 */
 	private static getEndpointsFilePath(): string {
 		return path.join(os.homedir(), ".nodus", "endpoints.json")
@@ -142,7 +142,7 @@ class NodusEndpoint {
 	/**
 	 * Loads and validates the endpoints.json file.
 	 * Checks bundled location first, then falls back to user directory.
-	 * Priority: bundled endpoints.json → ~/.Nodus/endpoints.json → null (standard mode)
+	 * Priority: bundled endpoints.json → ~/.nodus/endpoints.json → null (standard mode)
 	 * @returns The validated endpoints config, or null if no file exists
 	 * @throws NodusConfigurationError if a file exists but is invalid
 	 */
@@ -174,7 +174,7 @@ class NodusEndpoint {
 			// Bundled file doesn't exist or is not accessible, try user file
 		}
 
-		// 2. Try ~/.Nodus/endpoints.json
+		// 2. Try ~/.nodus/endpoints.json
 		const userPath = NodusEndpoint.getEndpointsFilePath()
 		try {
 			await fs.access(userPath)

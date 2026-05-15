@@ -1,4 +1,4 @@
-import { UpdateTerminalConnectionTimeoutResponse } from "@shared/proto/index.Nodus"
+import { UpdateTerminalConnectionTimeoutResponse } from "@shared/proto/index.nodus"
 import { VSCodeCheckbox, VSCodeDropdown, VSCodeOption, VSCodeTextField } from "@vscode/webview-ui-toolkit/react"
 import React, { useState } from "react"
 import { PlatformType } from "@/config/platform.config"

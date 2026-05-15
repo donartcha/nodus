@@ -67,7 +67,7 @@ class FakeProvider implements ITelemetryProvider {
 function createTelemetryService(provider: FakeProvider, overrides: Partial<TelemetryMetadata> = {}): TelemetryService {
 	return new TelemetryService([provider], {
 		extension_version: "test",
-		Nodus_type: "Nodus-unit-tests",
+		nodus_type: "Nodus-unit-tests",
 		platform: "test-platform",
 		platform_version: "1.0.0",
 		os_type: "darwin",

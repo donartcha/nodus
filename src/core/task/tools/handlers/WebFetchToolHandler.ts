@@ -6,7 +6,7 @@ import { AuthService } from "@/services/auth/AuthService"
 import { buildNodusExtraHeaders } from "@/services/EnvUtils"
 import { featureFlagsService } from "@/services/feature-flags"
 import { telemetryService } from "@/services/telemetry"
-import { Nodus_ACCOUNT_AUTH_ERROR_MESSAGE } from "@/shared/NodusAccount"
+import { NODUS_ACCOUNT_AUTH_ERROR_MESSAGE } from "@/shared/NodusAccount"
 import { getAxiosSettings } from "@/shared/net"
 import { ToolUse } from "../../../assistant-message"
 import { formatResponse } from "../../../prompts/responses"
@@ -144,7 +144,7 @@ export class WebFetchToolHandler implements IFullyManagedTool {
 			const authToken = await AuthService.getInstance().getAuthToken()
 
 			if (!authToken) {
-				throw new Error(Nodus_ACCOUNT_AUTH_ERROR_MESSAGE)
+				throw new Error(NODUS_ACCOUNT_AUTH_ERROR_MESSAGE)
 			}
 
 			const response = await axios.post(

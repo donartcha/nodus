@@ -2,7 +2,7 @@ import { EmptyRequest } from "@shared/proto/nodus/common"
 import { OpenRouterCompatibleModelInfo } from "@shared/proto/nodus/models"
 import { toProtobufModels } from "../../../shared/proto-conversions/models/typeConversion"
 import type { Controller } from "../index"
-import { refreshnodusModels } from "./refreshnodusModels"
+import { refreshNodusModels } from "./refreshNodusModels"
 
 /**
  * Refreshes Nodus models and returns protobuf types for gRPC
@@ -10,11 +10,11 @@ import { refreshnodusModels } from "./refreshnodusModels"
  * @param request Empty request (unused but required for gRPC signature)
  * @returns OpenRouterCompatibleModelInfo with protobuf types (reusing the same proto type)
  */
-export async function refreshnodusModelsRpc(
+export async function refreshNodusModelsRpc(
 	controller: Controller,
 	_request: EmptyRequest,
 ): Promise<OpenRouterCompatibleModelInfo> {
-	const models = await refreshnodusModels(controller)
+	const models = await refreshNodusModels(controller)
 	return OpenRouterCompatibleModelInfo.create({
 		models: toProtobufModels(models),
 	})

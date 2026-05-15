@@ -11,7 +11,7 @@ const FEATURE_TIPS: FeatureTipItem[] = [
 		text: 'Enable "Double-Check Completion" in settings to have Nodus verify its work before finishing a task.',
 	},
 	{
-		text: "Add a .Nodusrules file to your project root to give Nodus project-specific instructions.",
+		text: "Add a .nodusrules file to your project root to give Nodus project-specific instructions.",
 	},
 	{
 		text: "Switch to Plan Mode to discuss and plan an approach before Nodus takes action.",

@@ -275,8 +275,8 @@ export function getRemoteRulesTotalContentWithMetadata(
 }
 
 /**
- * Handles converting any directory into a file (specifically used for .Nodusrules and .Nodusrules/workflows)
- * The old .Nodusrules file or .Nodusrules/workflows file will be renamed to a default filename
+ * Handles converting any directory into a file (specifically used for .nodusrules and .nodusrules/workflows)
+ * The old .nodusrules file or .nodusrules/workflows file will be renamed to a default filename
  * Doesn't do anything if the dir already exists or doesn't exist
  * Returns whether there are any uncaught errors
  */
@@ -285,7 +285,7 @@ export async function ensureLocalNodusDirExists(NodusrulePath: string, defaultRu
 		const exists = await fileExistsAtPath(NodusrulePath)
 
 		if (exists && !(await isDirectory(NodusrulePath))) {
-			// logic to convert .Nodusrules file into directory, and rename the rules file to {defaultRuleFilename}
+			// logic to convert .nodusrules file into directory, and rename the rules file to {defaultRuleFilename}
 			const content = await fs.readFile(NodusrulePath, "utf8")
 			const tempPath = NodusrulePath + ".bak"
 			await fs.rename(NodusrulePath, tempPath) // create backup

@@ -506,7 +506,7 @@ const NodusRulesToggleModal: React.FC = () => {
 									to include context and preferences for your projects or globally for every conversation.{" "}
 									<VSCodeLink
 										className="text-xs"
-										href="https://docs.nodus.bot/features/Nodus-rules"
+										href="https://docs.nodus.bot/features/nodus-rules"
 										style={{ display: "inline", fontSize: "inherit" }}>
 										Docs
 									</VSCodeLink>
@@ -746,7 +746,7 @@ const NodusRulesToggleModal: React.FC = () => {
 										className={index === workspaceHooks.length - 1 ? "-mb-2.5" : "mb-3"}
 										key={workspace.workspaceName}>
 										<div className="text-sm font-normal mb-2">
-											{workspace.workspaceName}/.Nodusrules/hooks/
+											{workspace.workspaceName}/.nodusrules/hooks/
 										</div>
 										<div className="flex flex-col gap-0">
 											{workspace.hooks

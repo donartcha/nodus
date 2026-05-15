@@ -37,7 +37,7 @@ export class EnvironmentContextTracker {
 			a.os_arch === b.os_arch &&
 			a.host_name === b.host_name &&
 			a.host_version === b.host_version &&
-			a.Nodus_version === b.Nodus_version
+			a.nodus_version === b.nodus_version
 		)
 	}
 }

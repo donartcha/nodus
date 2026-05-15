@@ -1,4 +1,4 @@
-import type { Banner, BannerAction, BannerRules, BannersResponse } from "@shared/nodusBanner"
+import type { Banner, BannerAction, BannerRules, BannersResponse } from "@shared/NodusBanner"
 import { BannerActionType, type BannerCardData } from "@shared/nodus/banner"
 import { NodusEnv } from "@/config"
 import { Controller } from "@/core/controller"
@@ -168,13 +168,13 @@ export class BannerService {
 	 * so the webview falls back to hardcoded welcome items.
 	 */
 	public getWelcomeBanners(): BannerCardData[] | undefined {
-		const isLocal = process.env.IS_DEV === "true" || process.env.Nodus_ENVIRONMENT === "local"
+		const isLocal = process.env.IS_DEV === "true" || process.env.NODUS_ENVIRONMENT === "local"
 		const flagEnabled = isLocal || featureFlagsService.getBooleanFlagEnabled(FeatureFlag.REMOTE_WELCOME_BANNERS)
 
 		if (!flagEnabled) {
 			return undefined
 		}
-		const bypassDismissals = process.env.IS_DEV === "true" || process.env.Nodus_ENVIRONMENT === "local"
+		const bypassDismissals = process.env.IS_DEV === "true" || process.env.NODUS_ENVIRONMENT === "local"
 
 		this.ensureFreshCache()
 

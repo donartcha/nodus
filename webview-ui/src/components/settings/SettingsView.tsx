@@ -1,6 +1,6 @@
 import type { ExtensionMessage } from "@shared/ExtensionMessage"
 import { ResetStateRequest } from "@shared/proto/nodus/state"
-import { UserOrganization } from "@shared/proto/index.Nodus"
+import { UserOrganization } from "@shared/proto/index.nodus"
 import {
 	CheckCheck,
 	FlaskConical,

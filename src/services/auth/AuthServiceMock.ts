@@ -3,7 +3,7 @@ import { NodusEnv } from "@/config"
 import { Controller } from "@/core/controller"
 import { setWelcomeViewCompleted } from "@/core/controller/state/setWelcomeViewCompleted"
 import { WebviewProvider } from "@/core/webview"
-import { Nodus_API_ENDPOINT } from "@/shared/Nodus/api"
+import { NODUS_API_ENDPOINT } from "@/shared/nodus/api"
 import { fetch } from "@/shared/net"
 import { Logger } from "@/shared/services/Logger"
 import { BannerService } from "../banner/BannerService"
@@ -14,7 +14,7 @@ export class AuthServiceMock extends AuthService {
 	protected constructor(controller: Controller) {
 		super(controller)
 
-		if (process?.env?.Nodus_ENVIRONMENT !== "local") {
+		if (process?.env?.NODUS_ENVIRONMENT !== "local") {
 			throw new Error("AuthServiceMock should only be used in local environment for testing purposes.")
 		}
 
@@ -59,7 +59,7 @@ export class AuthServiceMock extends AuthService {
 
 		try {
 			// Use token exchange endpoint like NodusAuthProvider
-			const tokenExchangeUri = new URL(Nodus_API_ENDPOINT.TOKEN_EXCHANGE, NodusEnv.config().apiBaseUrl)
+			const tokenExchangeUri = new URL(NODUS_API_ENDPOINT.TOKEN_EXCHANGE, NodusEnv.config().apiBaseUrl)
 			const tokenType = "personal"
 			const testCode = `test-${tokenType}-token`
 

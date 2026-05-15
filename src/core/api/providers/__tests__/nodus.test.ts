@@ -3,7 +3,7 @@ import { openRouterDefaultModelInfo } from "@shared/api"
 import sinon from "sinon"
 import { NodusAccountService } from "@/services/account/NodusAccountService"
 import { AuthService } from "@/services/auth/AuthService"
-import { NodusHandler } from "../Nodus"
+import { NodusHandler } from "../nodus"
 
 describe("NodusHandler", () => {
 	afterEach(() => {

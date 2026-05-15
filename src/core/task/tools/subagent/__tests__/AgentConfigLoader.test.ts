@@ -75,7 +75,7 @@ Prompt body`
 		assert.equal(result.size, 0)
 	})
 
-	it("loads all yaml/yml files from homeDir/.Nodus/data/agents", async () => {
+	it("loads all yaml/yml files from homeDir/.nodus/data/agents", async () => {
 		const tempHome = await createTempHomeDir()
 		tempDirs.push(tempHome)
 

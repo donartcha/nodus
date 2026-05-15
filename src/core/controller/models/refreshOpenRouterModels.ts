@@ -342,7 +342,7 @@ async function fetchAndCacheModels(controller: Controller): Promise<Record<strin
 /**
  * Stealth models are models that are compatible with the OpenRouter API but not listed on the OpenRouter website or API.
  */
-const Nodus_STEALTH_MODELS: Record<string, ModelInfo> = {
+const NODUS_STEALTH_MODELS: Record<string, ModelInfo> = {
 	"stealth/giga-potato": {
 		name: "Giga Potato",
 		maxTokens: 8192,
@@ -358,7 +358,7 @@ const Nodus_STEALTH_MODELS: Record<string, ModelInfo> = {
 export function appendNodusStealthModels(currentModels: Record<string, ModelInfo>): Record<string, ModelInfo> {
 	// Create a shallow clone of the current models to avoid mutating the original object
 	const cloned = { ...currentModels }
-	for (const [modelId, modelInfo] of Object.entries(Nodus_STEALTH_MODELS)) {
+	for (const [modelId, modelInfo] of Object.entries(NODUS_STEALTH_MODELS)) {
 		if (!cloned[modelId]) {
 			cloned[modelId] = modelInfo
 		}

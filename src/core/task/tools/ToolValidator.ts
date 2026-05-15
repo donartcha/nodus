@@ -26,7 +26,7 @@ export class ToolValidator {
 	}
 
 	/**
-	 * Verifies access is allowed to a given path via .Nodusignore rules.
+	 * Verifies access is allowed to a given path via .nodusignore rules.
 	 * Callers should pass a repo-relative (workspace-relative) path.
 	 */
 	checkNodusIgnorePath(relPath: string): ValidationResult {
@@ -34,7 +34,7 @@ export class ToolValidator {
 		if (!accessAllowed) {
 			return {
 				ok: false,
-				error: `Access to path '${relPath}' is blocked by .Nodusignore settings.`,
+				error: `Access to path '${relPath}' is blocked by .nodusignore settings.`,
 			}
 		}
 		return { ok: true }

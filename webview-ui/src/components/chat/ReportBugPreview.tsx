@@ -63,10 +63,10 @@ const ReportBugPreview: React.FC<ReportBugPreviewProps> = ({ data }) => {
 					</div>
 				)}
 
-				{bugData.Nodus_version && (
+				{bugData.nodus_version && (
 					<div>
 						<div className="font-semibold">Nodus Version</div>
-						<MarkdownBlock markdown={bugData.Nodus_version} />
+						<MarkdownBlock markdown={bugData.nodus_version} />
 					</div>
 				)}
 

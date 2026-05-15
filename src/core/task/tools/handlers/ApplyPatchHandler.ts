@@ -335,7 +335,7 @@ export class ApplyPatchHandler implements IFullyManagedTool {
 				// For move operations, track the new path instead
 				const pathToTrack = change.type === PatchActionType.UPDATE && change.movePath ? change.movePath : changedFilePath
 				config.services.fileContextTracker.markFileAsEditedByNodus(pathToTrack)
-				await config.services.fileContextTracker.trackFileContext(pathToTrack, "Nodus_edited")
+				await config.services.fileContextTracker.trackFileContext(pathToTrack, "nodus_edited")
 
 				// Invalidate file read cache for all changed files so re-reads get fresh content
 				config.taskState.fileReadCache.delete(resolvePath(config.cwd, pathToTrack).toLowerCase())

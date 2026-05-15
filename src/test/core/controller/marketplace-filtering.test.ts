@@ -91,9 +91,9 @@ describe("Controller Marketplace Filtering", () => {
 				workspaceClient: {},
 				envClient: {
 					getHostVersion: sinon.stub().resolves({
-						NodusVersion: "1.0.0",
+						nodusVersion: "1.0.0",
 						platform: "darwin",
-						NodusType: "vscode",
+						nodusType: "vscode",
 					}),
 				},
 				windowClient: {},

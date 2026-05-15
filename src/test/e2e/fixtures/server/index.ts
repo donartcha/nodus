@@ -7,9 +7,9 @@ import { NodusDataMock } from "./data"
 
 const E2E_API_SERVER_PORT = 7777
 
-export const MOCK_Nodus_API_SERVER_URL = `http://localhost:${E2E_API_SERVER_PORT}`
+export const MOCK_NODUS_API_SERVER_URL = `http://localhost:${E2E_API_SERVER_PORT}`
 
-const useVerboseLogging = process.env.Nodus_E2E_TESTS_VERBOSE === "true"
+const useVerboseLogging = process.env.nodus_E2E_TESTS_VERBOSE === "true"
 function log(...args: unknown[]) {
 	if (useVerboseLogging) {
 		console.log("[NodusApiServerMock]", ...args)
@@ -132,7 +132,7 @@ export class NodusApiServerMock {
 		log("Starting global server...")
 		const server = createServer((req: IncomingMessage, res: ServerResponse) => {
 			// Parse URL and method
-			const parsedUrl = new URL(req.url || "/", MOCK_Nodus_API_SERVER_URL)
+			const parsedUrl = new URL(req.url || "/", MOCK_NODUS_API_SERVER_URL)
 			const path = parsedUrl.pathname
 			const query = Object.fromEntries(parsedUrl.searchParams.entries())
 			const method = req.method || "GET"

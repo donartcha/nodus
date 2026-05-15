@@ -1,6 +1,6 @@
 import { featureFlagsService } from "@/services/feature-flags"
-import { Nodus_ONBOARDING_MODELS } from "@/shared/Nodus/onboarding"
-import { OnboardingModel, OnboardingModelGroup } from "@/shared/proto/Nodus/state"
+import { NODUS_ONBOARDING_MODELS } from "@/shared/nodus/onboarding"
+import { OnboardingModel, OnboardingModelGroup } from "@/shared/proto/nodus/state"
 
 type OnboardingModelOverride = OnboardingModel & { hidden?: boolean }
 
@@ -12,7 +12,7 @@ export function getNodusOnboardingModels(): OnboardingModelGroup {
 	}
 
 	const remoteOverrides = featureFlagsService.getOnboardingOverrides()
-	const models = [...Nodus_ONBOARDING_MODELS]
+	const models = [...NODUS_ONBOARDING_MODELS]
 
 	// Apply remote overrides if available
 	if (remoteOverrides) {

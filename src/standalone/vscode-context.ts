@@ -9,14 +9,14 @@ import { log } from "./utils"
 import { EnvironmentVariableCollection, MementoStore, readJson, SecretStore } from "./vscode-context-utils"
 
 log("Running standalone Nodus", ExtensionRegistryInfo.version)
-log(`Nodus_ENVIRONMENT: ${process.env.Nodus_ENVIRONMENT}`)
+log(`NODUS_ENVIRONMENT: ${process.env.NODUS_ENVIRONMENT}`)
 
 // WE WILL HAVE TO MIGRATE THIS FROM DATA TO v1 LATER
 const SETTINGS_SUBFOLDER = "data"
 
 export function initializeContext(NodusDir?: string) {
-	const Nodus_DIR = NodusDir || process.env.Nodus_DIR || `${os.homedir()}/.Nodus`
-	const DATA_DIR = path.join(Nodus_DIR, SETTINGS_SUBFOLDER)
+	const NODUS_DIR = NodusDir || process.env.NODUS_DIR || `${os.homedir()}/.nodus`
+	const DATA_DIR = path.join(NODUS_DIR, SETTINGS_SUBFOLDER)
 	const INSTALL_DIR = process.env.INSTALL_DIR || __dirname
 	const WORKSPACE_STORAGE_DIR = process.env.WORKSPACE_STORAGE_DIR || path.join(DATA_DIR, "workspace")
 

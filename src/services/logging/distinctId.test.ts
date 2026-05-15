@@ -28,9 +28,9 @@ describe("distinctId", () => {
 				workspaceClient: {},
 				envClient: {
 					getHostVersion: sandbox.stub().resolves({
-						NodusVersion: "1.0.0",
+						nodusVersion: "1.0.0",
 						platform: "darwin",
-						NodusType: "vscode",
+						nodusType: "vscode",
 					}),
 				},
 				windowClient: {},

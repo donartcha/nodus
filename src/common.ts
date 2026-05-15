@@ -36,7 +36,7 @@ export async function initialize(storageContext: StorageContext): Promise<Webvie
 	Logger.subscribe((msg: string) => HostProvider.get().logToChannel(msg)) // File system logging
 	Logger.subscribe((msg: string) => HostProvider.env.debugLog({ value: msg })) // Host debug logging
 
-	// Initialize NodusEndpoint configuration (reads bundled and ~/.Nodus/endpoints.json if present)
+	// Initialize NodusEndpoint configuration (reads bundled and ~/.nodus/endpoints.json if present)
 	// This must be done before any other code that calls NodusEnv.config()
 	// Throws NodusConfigurationError if config file exists but is invalid
 	const { NodusEndpoint } = await import("./config")

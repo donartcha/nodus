@@ -26,7 +26,7 @@ export class TerminalRegistry {
 			name: "Nodus",
 			iconPath: new vscode.ThemeIcon("Nodus-icon"),
 			env: {
-				Nodus_ACTIVE: "true",
+				NODUS_ACTIVE: "true",
 			},
 		}
 

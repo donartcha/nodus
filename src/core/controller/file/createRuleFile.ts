@@ -1,4 +1,4 @@
-import { refreshNodusRulesToggles } from "@core/context/instructions/user-instructions/Nodus-rules"
+import { refreshNodusRulesToggles } from "@core/context/instructions/user-instructions/nodus-rules"
 import { createRuleFile as createRuleFileImpl } from "@core/context/instructions/user-instructions/rule-helpers"
 import { getWorkspaceBasename } from "@core/workspace"
 import { RuleFile, RuleFileRequest } from "@shared/proto/nodus/file"

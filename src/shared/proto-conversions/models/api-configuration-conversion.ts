@@ -279,7 +279,7 @@ function convertApiProviderToProto(provider: string | undefined): ProtoApiProvid
 		case "vscode-lm":
 			return ProtoApiProvider.VSCODE_LM
 		case "Nodus":
-			return ProtoApiProvider.Nodus
+			return ProtoApiProvider.nodus
 		case "litellm":
 			return ProtoApiProvider.LITELLM
 		case "moonshot":
@@ -370,7 +370,7 @@ export function convertProtoToApiProvider(provider: ProtoApiProvider): ApiProvid
 			return "mistral"
 		case ProtoApiProvider.VSCODE_LM:
 			return "vscode-lm"
-		case ProtoApiProvider.Nodus:
+		case ProtoApiProvider.nodus:
 			return "Nodus"
 		case ProtoApiProvider.LITELLM:
 			return "litellm"
@@ -430,7 +430,7 @@ export function convertApiConfigurationToProto(config: ApiConfiguration): ProtoA
 	return {
 		// Global configuration fields
 		apiKey: config.apiKey,
-		NodusAccountId: config.nodusAccountId,
+		nodusAccountId: config.nodusAccountId,
 		ulid: config.ulid,
 		liteLlmBaseUrl: config.liteLlmBaseUrl,
 		liteLlmApiKey: config.liteLlmApiKey,
@@ -507,7 +507,7 @@ export function convertApiConfigurationToProto(config: ApiConfiguration): ProtoA
 		minimaxApiKey: config.minimaxApiKey,
 		minimaxApiLine: config.minimaxApiLine,
 		nousResearchApiKey: config.nousResearchApiKey,
-		NodusApiKey: config.nodusApiKey,
+		nodusApiKey: config.nodusApiKey,
 		ocaMode: config.ocaMode,
 		aihubmixApiKey: config.aihubmixApiKey,
 		aihubmixBaseUrl: config.aihubmixBaseUrl,
@@ -610,7 +610,7 @@ export function convertProtoToApiConfiguration(protoConfig: ProtoApiConfiguratio
 	return {
 		// Global configuration fields
 		apiKey: protoConfig.apiKey,
-		nodusAccountId: protoConfig.NodusAccountId,
+		nodusAccountId: protoConfig.nodusAccountId,
 		ulid: protoConfig.ulid,
 		liteLlmBaseUrl: protoConfig.liteLlmBaseUrl,
 		liteLlmApiKey: protoConfig.liteLlmApiKey,
@@ -693,7 +693,7 @@ export function convertProtoToApiConfiguration(protoConfig: ProtoApiConfiguratio
 		hicapApiKey: protoConfig.hicapApiKey,
 		hicapModelId: protoConfig.hicapModelId,
 		nousResearchApiKey: protoConfig.nousResearchApiKey,
-		nodusApiKey: protoConfig.NodusApiKey,
+		nodusApiKey: protoConfig.nodusApiKey,
 
 		// Plan mode configurations
 		planModeApiProvider:

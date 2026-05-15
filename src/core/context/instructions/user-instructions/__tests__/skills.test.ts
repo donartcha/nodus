@@ -24,7 +24,7 @@ describe("Skills Utility Functions", () => {
 
 	// Use path.join for OS-independent paths
 	const TEST_CWD = path.join("/test", "project")
-	const GLOBAL_SKILLS_DIR = path.join("/home", "user", ".Nodus", "skills")
+	const GLOBAL_SKILLS_DIR = path.join("/home", "user", ".nodus", "skills")
 
 	beforeEach(() => {
 		sandbox = sinon.createSandbox()
@@ -39,8 +39,8 @@ describe("Skills Utility Functions", () => {
 		statStub = sandbox.stub(fs.promises, "stat")
 		readFileStub = sandbox.stub(fs.promises, "readFile")
 		sandbox.stub(disk, "getSkillsDirectoriesForScan").returns([
-			{ path: path.join(TEST_CWD, ".Nodusrules", "skills"), source: "project" },
-			{ path: path.join(TEST_CWD, ".Nodus", "skills"), source: "project" },
+			{ path: path.join(TEST_CWD, ".nodusrules", "skills"), source: "project" },
+			{ path: path.join(TEST_CWD, ".nodus", "skills"), source: "project" },
 			{ path: path.join(TEST_CWD, ".claude", "skills"), source: "project" },
 			{ path: path.join(TEST_CWD, ".agents", "skills"), source: "project" },
 			{ path: GLOBAL_SKILLS_DIR, source: "global" },
@@ -80,8 +80,8 @@ Instructions here`)
 			expect(skills[0].source).to.equal("global")
 		})
 
-		it("should discover skills from project .Nodusrules/skills directory", async () => {
-			const projectSkillsDir = path.join(TEST_CWD, ".Nodusrules", "skills")
+		it("should discover skills from project .nodusrules/skills directory", async () => {
+			const projectSkillsDir = path.join(TEST_CWD, ".nodusrules", "skills")
 			const skillDir = path.join(projectSkillsDir, "explaining-code")
 			const skillMdPath = path.join(skillDir, "SKILL.md")
 
@@ -103,8 +103,8 @@ Use analogies and ASCII diagrams when explaining code.`)
 			expect(skills[0].source).to.equal("project")
 		})
 
-		it("should discover skills from project .Nodus/skills directory", async () => {
-			const NodusSkillsDir = path.join(TEST_CWD, ".Nodus", "skills")
+		it("should discover skills from project .nodus/skills directory", async () => {
+			const NodusSkillsDir = path.join(TEST_CWD, ".nodus", "skills")
 			const skillDir = path.join(NodusSkillsDir, "debugging")
 			const skillMdPath = path.join(skillDir, "SKILL.md")
 
@@ -239,7 +239,7 @@ description: Global coding skill
 Global instructions`)
 
 			// Setup project skill with same name (lower priority)
-			const projectSkillsDir = path.join(TEST_CWD, ".Nodusrules", "skills")
+			const projectSkillsDir = path.join(TEST_CWD, ".nodusrules", "skills")
 			const projectSkillDir = path.join(projectSkillsDir, "coding")
 			const projectSkillMdPath = path.join(projectSkillDir, "SKILL.md")
 
@@ -279,7 +279,7 @@ description: A global skill
 Content`)
 
 			// Setup project skill with different name
-			const projectSkillsDir = path.join(TEST_CWD, ".Nodusrules", "skills")
+			const projectSkillsDir = path.join(TEST_CWD, ".nodusrules", "skills")
 			const projectSkillDir = path.join(projectSkillsDir, "project-skill")
 			const projectSkillMdPath = path.join(projectSkillDir, "SKILL.md")
 
@@ -601,7 +601,7 @@ description: Test
 
 			it("remote overrides project skill of same name", async () => {
 				const entries = [makeEntry("coding", "Remote coding")]
-				const projDir = path.join(TEST_CWD, ".Nodusrules", "skills")
+				const projDir = path.join(TEST_CWD, ".nodusrules", "skills")
 				const projSkillDir = path.join(projDir, "coding")
 				const projMd = path.join(projSkillDir, "SKILL.md")
 				fileExistsStub.withArgs(projDir).resolves(true)

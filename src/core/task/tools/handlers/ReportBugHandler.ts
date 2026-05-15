@@ -94,7 +94,7 @@ export class ReportBugHandler implements IToolHandler, IPartialBlockHandler {
 			provider_and_model: providerAndModel,
 			operating_system: operatingSystem,
 			system_info: systemInfo,
-			Nodus_version: NodusVersion,
+			nodus_version: NodusVersion,
 		})
 
 		const { text, images, files: reportBugFiles } = await config.callbacks.ask(this.name, bugReportData, false)

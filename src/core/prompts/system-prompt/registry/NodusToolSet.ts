@@ -1,5 +1,5 @@
 import { AgentConfigLoader } from "@core/task/tools/subagent/AgentConfigLoader"
-import { Nodus_MCP_TOOL_IDENTIFIER, McpServer } from "@/shared/mcp"
+import { NODUS_MCP_TOOL_IDENTIFIER, McpServer } from "@/shared/mcp"
 import { ModelFamily } from "@/shared/prompts"
 import { NodusDefaultTool } from "@/shared/tools"
 import { type NodusToolSpec, toolSpecFunctionDeclarations, toolSpecFunctionDefinition, toolSpecInputSchema } from "../spec"
@@ -235,7 +235,7 @@ export function mcpToolToNodusToolSpec(family: ModelFamily, server: McpServer): 
 				})
 			}
 
-			const mcpToolName = server.uid + Nodus_MCP_TOOL_IDENTIFIER + mcpTool.name
+			const mcpToolName = server.uid + NODUS_MCP_TOOL_IDENTIFIER + mcpTool.name
 
 			// NOTE: When the name is too long, the provider API will reject the tool registration with the following error:
 			// `Invalid 'tools[n].name': string too long. Expected a string with maximum length 64, but got a string with length n instead.`

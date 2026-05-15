@@ -8,8 +8,8 @@ import { refreshNodusRecommendedModels } from "@/core/controller/models/refreshN
 import { NodusAccountService } from "@/services/account/NodusAccountService"
 import { AuthService } from "@/services/auth/AuthService"
 import { buildNodusExtraHeaders } from "@/services/EnvUtils"
-import { Nodus_ACCOUNT_AUTH_ERROR_MESSAGE } from "@/shared/NodusAccount"
-import { Nodus_RECOMMENDED_MODELS_FALLBACK } from "@/shared/Nodus/recommended-models"
+import { NODUS_ACCOUNT_AUTH_ERROR_MESSAGE } from "@/shared/NodusAccount"
+import { NODUS_RECOMMENDED_MODELS_FALLBACK } from "@/shared/nodus/recommended-models"
 import type { NodusStorageMessage } from "@/shared/messages/content"
 import { fetch, getAxiosSettings } from "@/shared/net"
 import { Logger } from "@/shared/services/Logger"
@@ -37,7 +37,7 @@ function normalizeModelId(modelId: string): string {
 	return modelId.trim().toLowerCase()
 }
 
-const Nodus_FREE_MODEL_IDS = new Set(Nodus_RECOMMENDED_MODELS_FALLBACK.free.map((model) => normalizeModelId(model.id)))
+const NODUS_FREE_MODEL_IDS = new Set(NODUS_RECOMMENDED_MODELS_FALLBACK.free.map((model) => normalizeModelId(model.id)))
 
 function getCacheReadTokens(usage: any): number {
 	return usage?.prompt_tokens_details?.cached_tokens || usage?.cache_read_input_tokens || 0
@@ -75,13 +75,13 @@ export class NodusHandler implements ApiHandler {
 			Logger.error("Error resolving Nodus free model IDs from recommended models:", error)
 		}
 
-		return Nodus_FREE_MODEL_IDS
+		return NODUS_FREE_MODEL_IDS
 	}
 
 	private async ensureClient(): Promise<OpenAI> {
 		const NodusAccountAuthToken = this.options.nodusApiKey || (await this._authService.getAuthToken())
 		if (!NodusAccountAuthToken) {
-			throw new Error(Nodus_ACCOUNT_AUTH_ERROR_MESSAGE)
+			throw new Error(NODUS_ACCOUNT_AUTH_ERROR_MESSAGE)
 		}
 		if (!this.client) {
 			try {
@@ -277,7 +277,7 @@ export class NodusHandler implements ApiHandler {
 				const resolvedFreeModelIds = freeModelIds || (await this.getFreeModelIdSet())
 				const NodusAccountAuthToken = await this._authService.getAuthToken()
 				if (!NodusAccountAuthToken) {
-					throw new Error(Nodus_ACCOUNT_AUTH_ERROR_MESSAGE)
+					throw new Error(NODUS_ACCOUNT_AUTH_ERROR_MESSAGE)
 				}
 				const headers: Record<string, string> = {
 					// Align with backend auth expectations

@@ -1,5 +1,5 @@
 import { clearOnboardingModelsCache, getNodusOnboardingModels } from "@/core/controller/models/getNodusOnboardingModels"
-import type { OnboardingModel } from "@/shared/proto/Nodus/state"
+import type { OnboardingModel } from "@/shared/proto/nodus/state"
 import { FEATURE_FLAGS, FeatureFlag, FeatureFlagDefaultValue } from "@/shared/services/feature-flags/feature-flags"
 import { Logger } from "@/shared/services/Logger"
 import { telemetryService } from "../telemetry"

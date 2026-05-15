@@ -14,7 +14,7 @@ import { getWorkspacePath } from "@utils/path"
 import { Logger } from "@/shared/services/Logger"
 import { Controller } from ".."
 
-// error_reason values surfaced on FileSearchResults; see proto/Nodus/file.proto.
+// error_reason values surfaced on FileSearchResults; see proto/nodus/file.proto.
 const ERROR_REASON_WORKSPACE_UNAVAILABLE = "workspace_unavailable"
 const ERROR_REASON_RIPGREP_SPAWN_FAILED = "ripgrep_spawn_failed"
 const ERROR_REASON_UNKNOWN = "unknown"

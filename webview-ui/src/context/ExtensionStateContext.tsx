@@ -8,7 +8,7 @@ import type { UserInfo } from "@shared/proto/nodus/account"
 import { EmptyRequest } from "@shared/proto/nodus/common"
 import type { OpenRouterCompatibleModelInfo } from "@shared/proto/nodus/models"
 import { OnboardingModelGroup, type TerminalProfile } from "@shared/proto/nodus/state"
-import { convertProtoToNodusMessage } from "@shared/proto-conversions/Nodus-message"
+import { convertProtoToNodusMessage } from "@shared/proto-conversions/nodus-message"
 import { convertProtoMcpServersToMcpServers } from "@shared/proto-conversions/mcp/mcp-server-conversion"
 import { fromProtobufModels } from "@shared/proto-conversions/models/typeConversion"
 import type React from "react"
@@ -88,7 +88,7 @@ export interface ExtensionStateContextType extends ExtensionState {
 	setOnboardingModels: (value: OnboardingModelGroup | undefined) => void
 
 	// Refresh functions
-	refreshnodusModels: () => void
+	refreshNodusModels: () => void
 	refreshOpenRouterModels: () => void
 	refreshVercelAiGatewayModels: () => void
 	refreshHicapModels: () => void
@@ -765,8 +765,8 @@ export const ExtensionStateContextProvider: React.FC<{
 	])
 
 	// Refresh Nodus models function
-	const refreshnodusModels = useCallback(() => {
-		ModelsServiceClient.refreshnodusModelsRpc(EmptyRequest.create({}))
+	const refreshNodusModels = useCallback(() => {
+		ModelsServiceClient.refreshNodusModelsRpc(EmptyRequest.create({}))
 			.then((response: OpenRouterCompatibleModelInfo) => {
 				const models = fromProtobufModels(response.models)
 				setnodusModels((prev) => (Object.keys(models).length > 0 ? models : (prev ?? null)))
@@ -779,9 +779,9 @@ export const ExtensionStateContextProvider: React.FC<{
 		const hasNodusProvider =
 			state.apiConfiguration?.actModeApiProvider === "Nodus" || state.apiConfiguration?.planModeApiProvider === "Nodus"
 		if (hasNodusProvider && nodusModels === null) {
-			refreshnodusModels()
+			refreshNodusModels()
 		}
-	}, [state.apiConfiguration?.actModeApiProvider, state.apiConfiguration?.planModeApiProvider, nodusModels, refreshnodusModels])
+	}, [state.apiConfiguration?.actModeApiProvider, state.apiConfiguration?.planModeApiProvider, nodusModels, refreshNodusModels])
 
 	const contextValue: ExtensionStateContextType = {
 		...state,
@@ -911,7 +911,7 @@ export const ExtensionStateContextProvider: React.FC<{
 			})),
 		setMcpTab,
 		setTotalTasksSize,
-		refreshnodusModels,
+		refreshNodusModels,
 		refreshOpenRouterModels,
 		refreshVercelAiGatewayModels,
 		refreshHicapModels,

@@ -24,8 +24,8 @@ import { accountLogoutClicked } from "../account/accountLogoutClicked"
  */
 export async function updateSettings(controller: Controller, request: UpdateSettingsRequest): Promise<Empty> {
 	try {
-		if (request.NodusEnv !== undefined) {
-			NodusEnv.setEnvironment(request.NodusEnv)
+		if (request.nodusEnv !== undefined) {
+			NodusEnv.setEnvironment(request.nodusEnv)
 			await accountLogoutClicked(controller, Empty.create())
 		}
 

@@ -16,8 +16,8 @@ describe("NodusEndpoint configuration", () => {
 		tempDir = path.join(os.tmpdir(), `config-test-${Date.now()}-${Math.random().toString(36).slice(2)}`)
 		await fs.mkdir(tempDir, { recursive: true })
 
-		// Create .Nodus directory
-		await fs.mkdir(path.join(tempDir, ".Nodus"), { recursive: true })
+		// Create .nodus directory
+		await fs.mkdir(path.join(tempDir, ".nodus"), { recursive: true })
 
 		// Stub os.homedir to return our temp directory
 		originalHomedir = os.homedir
@@ -51,7 +51,7 @@ describe("NodusEndpoint configuration", () => {
 				mcpBaseUrl: "https://mcp.enterprise.com",
 			}
 
-			await fs.writeFile(path.join(tempDir, ".Nodus", "endpoints.json"), JSON.stringify(validConfig), "utf8")
+			await fs.writeFile(path.join(tempDir, ".nodus", "endpoints.json"), JSON.stringify(validConfig), "utf8")
 
 			await NodusEndpoint.initialize(tempDir)
 
@@ -81,7 +81,7 @@ describe("NodusEndpoint configuration", () => {
 				mcpBaseUrl: "http://localhost:8080/mcp",
 			}
 
-			await fs.writeFile(path.join(tempDir, ".Nodus", "endpoints.json"), JSON.stringify(validConfig), "utf8")
+			await fs.writeFile(path.join(tempDir, ".nodus", "endpoints.json"), JSON.stringify(validConfig), "utf8")
 
 			await NodusEndpoint.initialize(tempDir)
 
@@ -98,7 +98,7 @@ describe("NodusEndpoint configuration", () => {
 				mcpBaseUrl: "https://proxy.enterprise.com/Nodus/mcp",
 			}
 
-			await fs.writeFile(path.join(tempDir, ".Nodus", "endpoints.json"), JSON.stringify(validConfig), "utf8")
+			await fs.writeFile(path.join(tempDir, ".nodus", "endpoints.json"), JSON.stringify(validConfig), "utf8")
 
 			await NodusEndpoint.initialize(tempDir)
 
@@ -109,7 +109,7 @@ describe("NodusEndpoint configuration", () => {
 
 	describe("invalid JSON handling", () => {
 		it("should throw NodusConfigurationError for invalid JSON syntax", async () => {
-			await fs.writeFile(path.join(tempDir, ".Nodus", "endpoints.json"), "{ invalid json }", "utf8")
+			await fs.writeFile(path.join(tempDir, ".nodus", "endpoints.json"), "{ invalid json }", "utf8")
 
 			try {
 				await NodusEndpoint.initialize(tempDir)
@@ -121,7 +121,7 @@ describe("NodusEndpoint configuration", () => {
 		})
 
 		it("should throw NodusConfigurationError for truncated JSON", async () => {
-			await fs.writeFile(path.join(tempDir, ".Nodus", "endpoints.json"), '{"appBaseUrl": "https://test.com"', "utf8")
+			await fs.writeFile(path.join(tempDir, ".nodus", "endpoints.json"), '{"appBaseUrl": "https://test.com"', "utf8")
 
 			try {
 				await NodusEndpoint.initialize(tempDir)
@@ -133,7 +133,7 @@ describe("NodusEndpoint configuration", () => {
 		})
 
 		it("should throw NodusConfigurationError for empty file", async () => {
-			await fs.writeFile(path.join(tempDir, ".Nodus", "endpoints.json"), "", "utf8")
+			await fs.writeFile(path.join(tempDir, ".nodus", "endpoints.json"), "", "utf8")
 
 			try {
 				await NodusEndpoint.initialize(tempDir)
@@ -144,7 +144,7 @@ describe("NodusEndpoint configuration", () => {
 		})
 
 		it("should throw NodusConfigurationError for non-object JSON", async () => {
-			await fs.writeFile(path.join(tempDir, ".Nodus", "endpoints.json"), '"just a string"', "utf8")
+			await fs.writeFile(path.join(tempDir, ".nodus", "endpoints.json"), '"just a string"', "utf8")
 
 			try {
 				await NodusEndpoint.initialize(tempDir)
@@ -156,7 +156,7 @@ describe("NodusEndpoint configuration", () => {
 		})
 
 		it("should throw NodusConfigurationError for array JSON", async () => {
-			await fs.writeFile(path.join(tempDir, ".Nodus", "endpoints.json"), "[]", "utf8")
+			await fs.writeFile(path.join(tempDir, ".nodus", "endpoints.json"), "[]", "utf8")
 
 			try {
 				await NodusEndpoint.initialize(tempDir)
@@ -169,7 +169,7 @@ describe("NodusEndpoint configuration", () => {
 		})
 
 		it("should throw NodusConfigurationError for null JSON", async () => {
-			await fs.writeFile(path.join(tempDir, ".Nodus", "endpoints.json"), "null", "utf8")
+			await fs.writeFile(path.join(tempDir, ".nodus", "endpoints.json"), "null", "utf8")
 
 			try {
 				await NodusEndpoint.initialize(tempDir)
@@ -188,7 +188,7 @@ describe("NodusEndpoint configuration", () => {
 				mcpBaseUrl: "https://mcp.enterprise.com",
 			}
 
-			await fs.writeFile(path.join(tempDir, ".Nodus", "endpoints.json"), JSON.stringify(config), "utf8")
+			await fs.writeFile(path.join(tempDir, ".nodus", "endpoints.json"), JSON.stringify(config), "utf8")
 
 			try {
 				await NodusEndpoint.initialize(tempDir)
@@ -205,7 +205,7 @@ describe("NodusEndpoint configuration", () => {
 				mcpBaseUrl: "https://mcp.enterprise.com",
 			}
 
-			await fs.writeFile(path.join(tempDir, ".Nodus", "endpoints.json"), JSON.stringify(config), "utf8")
+			await fs.writeFile(path.join(tempDir, ".nodus", "endpoints.json"), JSON.stringify(config), "utf8")
 
 			try {
 				await NodusEndpoint.initialize(tempDir)
@@ -222,7 +222,7 @@ describe("NodusEndpoint configuration", () => {
 				apiBaseUrl: "https://api.enterprise.com",
 			}
 
-			await fs.writeFile(path.join(tempDir, ".Nodus", "endpoints.json"), JSON.stringify(config), "utf8")
+			await fs.writeFile(path.join(tempDir, ".nodus", "endpoints.json"), JSON.stringify(config), "utf8")
 
 			try {
 				await NodusEndpoint.initialize(tempDir)
@@ -234,7 +234,7 @@ describe("NodusEndpoint configuration", () => {
 		})
 
 		it("should throw NodusConfigurationError when all fields are missing", async () => {
-			await fs.writeFile(path.join(tempDir, ".Nodus", "endpoints.json"), "{}", "utf8")
+			await fs.writeFile(path.join(tempDir, ".nodus", "endpoints.json"), "{}", "utf8")
 
 			try {
 				await NodusEndpoint.initialize(tempDir)
@@ -252,7 +252,7 @@ describe("NodusEndpoint configuration", () => {
 				mcpBaseUrl: "https://mcp.enterprise.com",
 			}
 
-			await fs.writeFile(path.join(tempDir, ".Nodus", "endpoints.json"), JSON.stringify(config), "utf8")
+			await fs.writeFile(path.join(tempDir, ".nodus", "endpoints.json"), JSON.stringify(config), "utf8")
 
 			try {
 				await NodusEndpoint.initialize(tempDir)
@@ -270,7 +270,7 @@ describe("NodusEndpoint configuration", () => {
 				mcpBaseUrl: "https://mcp.enterprise.com",
 			}
 
-			await fs.writeFile(path.join(tempDir, ".Nodus", "endpoints.json"), JSON.stringify(config), "utf8")
+			await fs.writeFile(path.join(tempDir, ".nodus", "endpoints.json"), JSON.stringify(config), "utf8")
 
 			try {
 				await NodusEndpoint.initialize(tempDir)
@@ -288,7 +288,7 @@ describe("NodusEndpoint configuration", () => {
 				mcpBaseUrl: "https://mcp.enterprise.com",
 			}
 
-			await fs.writeFile(path.join(tempDir, ".Nodus", "endpoints.json"), JSON.stringify(config), "utf8")
+			await fs.writeFile(path.join(tempDir, ".nodus", "endpoints.json"), JSON.stringify(config), "utf8")
 
 			try {
 				await NodusEndpoint.initialize(tempDir)
@@ -306,7 +306,7 @@ describe("NodusEndpoint configuration", () => {
 				mcpBaseUrl: "https://mcp.enterprise.com",
 			}
 
-			await fs.writeFile(path.join(tempDir, ".Nodus", "endpoints.json"), JSON.stringify(config), "utf8")
+			await fs.writeFile(path.join(tempDir, ".nodus", "endpoints.json"), JSON.stringify(config), "utf8")
 
 			try {
 				await NodusEndpoint.initialize(tempDir)
@@ -326,7 +326,7 @@ describe("NodusEndpoint configuration", () => {
 				mcpBaseUrl: "https://mcp.enterprise.com",
 			}
 
-			await fs.writeFile(path.join(tempDir, ".Nodus", "endpoints.json"), JSON.stringify(config), "utf8")
+			await fs.writeFile(path.join(tempDir, ".nodus", "endpoints.json"), JSON.stringify(config), "utf8")
 
 			try {
 				await NodusEndpoint.initialize(tempDir)
@@ -344,7 +344,7 @@ describe("NodusEndpoint configuration", () => {
 				mcpBaseUrl: "https://mcp.enterprise.com",
 			}
 
-			await fs.writeFile(path.join(tempDir, ".Nodus", "endpoints.json"), JSON.stringify(config), "utf8")
+			await fs.writeFile(path.join(tempDir, ".nodus", "endpoints.json"), JSON.stringify(config), "utf8")
 
 			try {
 				await NodusEndpoint.initialize(tempDir)
@@ -362,7 +362,7 @@ describe("NodusEndpoint configuration", () => {
 				mcpBaseUrl: "https://mcp.enterprise.com",
 			}
 
-			await fs.writeFile(path.join(tempDir, ".Nodus", "endpoints.json"), JSON.stringify(config), "utf8")
+			await fs.writeFile(path.join(tempDir, ".nodus", "endpoints.json"), JSON.stringify(config), "utf8")
 
 			try {
 				await NodusEndpoint.initialize(tempDir)
@@ -381,7 +381,7 @@ describe("NodusEndpoint configuration", () => {
 				mcpBaseUrl: "https://mcp.enterprise.com",
 			}
 
-			await fs.writeFile(path.join(tempDir, ".Nodus", "endpoints.json"), JSON.stringify(config), "utf8")
+			await fs.writeFile(path.join(tempDir, ".nodus", "endpoints.json"), JSON.stringify(config), "utf8")
 
 			try {
 				await NodusEndpoint.initialize(tempDir)
@@ -401,7 +401,7 @@ describe("NodusEndpoint configuration", () => {
 				mcpBaseUrl: "https://mcp.enterprise.com",
 			}
 
-			await fs.writeFile(path.join(tempDir, ".Nodus", "endpoints.json"), JSON.stringify(config), "utf8")
+			await fs.writeFile(path.join(tempDir, ".nodus", "endpoints.json"), JSON.stringify(config), "utf8")
 
 			await NodusEndpoint.initialize(tempDir)
 
@@ -424,7 +424,7 @@ describe("NodusEndpoint configuration", () => {
 				mcpBaseUrl: "https://mcp.enterprise.com",
 			}
 
-			await fs.writeFile(path.join(tempDir, ".Nodus", "endpoints.json"), JSON.stringify(config), "utf8")
+			await fs.writeFile(path.join(tempDir, ".nodus", "endpoints.json"), JSON.stringify(config), "utf8")
 
 			await NodusEndpoint.initialize(tempDir)
 
@@ -467,7 +467,7 @@ describe("NodusEndpoint configuration", () => {
 				mcpBaseUrl: "https://mcp.enterprise.com",
 			}
 
-			await fs.writeFile(path.join(tempDir, ".Nodus", "endpoints.json"), JSON.stringify(config), "utf8")
+			await fs.writeFile(path.join(tempDir, ".nodus", "endpoints.json"), JSON.stringify(config), "utf8")
 
 			await NodusEndpoint.initialize(tempDir)
 
@@ -482,7 +482,7 @@ describe("NodusEndpoint configuration", () => {
 				mcpBaseUrl: "https://custom-mcp.internal/v1",
 			}
 
-			await fs.writeFile(path.join(tempDir, ".Nodus", "endpoints.json"), JSON.stringify(customConfig), "utf8")
+			await fs.writeFile(path.join(tempDir, ".nodus", "endpoints.json"), JSON.stringify(customConfig), "utf8")
 
 			await NodusEndpoint.initialize(tempDir)
 
@@ -527,7 +527,7 @@ describe("NodusEndpoint configuration", () => {
 				apiBaseUrl: "https://api.enterprise.com",
 				mcpBaseUrl: "https://mcp.enterprise.com",
 			}
-			await fs.writeFile(path.join(tempDir, ".Nodus", "endpoints.json"), JSON.stringify(config), "utf8")
+			await fs.writeFile(path.join(tempDir, ".nodus", "endpoints.json"), JSON.stringify(config), "utf8")
 			await NodusEndpoint.initialize(tempDir)
 
 			NodusEndpoint.isSelfHosted().should.be.true()
@@ -597,7 +597,7 @@ describe("NodusEndpoint configuration", () => {
 
 			// Set up both configs
 			await fs.writeFile(path.join(bundledDir, "endpoints.json"), JSON.stringify(bundledConfig), "utf8")
-			await fs.writeFile(path.join(tempDir, ".Nodus", "endpoints.json"), JSON.stringify(userConfig), "utf8")
+			await fs.writeFile(path.join(tempDir, ".nodus", "endpoints.json"), JSON.stringify(userConfig), "utf8")
 
 			await NodusEndpoint.initialize(bundledDir)
 
@@ -616,7 +616,7 @@ describe("NodusEndpoint configuration", () => {
 			}
 
 			// Only create user config, no bundled config
-			await fs.writeFile(path.join(tempDir, ".Nodus", "endpoints.json"), JSON.stringify(userConfig), "utf8")
+			await fs.writeFile(path.join(tempDir, ".nodus", "endpoints.json"), JSON.stringify(userConfig), "utf8")
 
 			await NodusEndpoint.initialize(bundledDir)
 

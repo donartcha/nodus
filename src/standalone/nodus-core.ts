@@ -321,7 +321,7 @@ Usage: node Nodus-core.js [options]
 Options:
   -p, --port <port>              Port for the main gRPC service (default: ${PROTOBUS_PORT})
   --host-bridge-port <port>      Port for the host bridge service (default: ${HOSTBRIDGE_PORT})
-  -c, --config <path>            Directory for Nodus data storage (default: ~/.Nodus)
+  -c, --config <path>            Directory for Nodus data storage (default: ~/.nodus)
   -h, --help                     Show this help message
 
 Environment Variables:

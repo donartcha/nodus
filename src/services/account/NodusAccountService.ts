@@ -7,10 +7,10 @@ import type {
 	UsageTransaction,
 	UserRemoteConfigDiscoveryResponse,
 	UserResponse,
-} from "@shared/nodusAccount"
+} from "@shared/NodusAccount"
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios"
 import { NodusEnv } from "@/config"
-import { Nodus_API_ENDPOINT } from "@/shared/Nodus/api"
+import { NODUS_API_ENDPOINT } from "@/shared/nodus/api"
 import { getAxiosSettings } from "@/shared/net"
 import { Logger } from "@/shared/services/Logger"
 import { AuthService } from "../auth/AuthService"
@@ -166,7 +166,7 @@ export class NodusAccountService {
 	 */
 	async fetchMe(): Promise<UserResponse | undefined> {
 		try {
-			const data = await this.authenticatedRequest<UserResponse>(Nodus_API_ENDPOINT.USER_INFO)
+			const data = await this.authenticatedRequest<UserResponse>(NODUS_API_ENDPOINT.USER_INFO)
 			return data
 		} catch (error) {
 			Logger.error("Failed to fetch user data (RPC):", error)
@@ -180,7 +180,7 @@ export class NodusAccountService {
 	 */
 	async fetchFeaturebaseToken(): Promise<FeaturebaseTokenResponse | undefined> {
 		try {
-			const data = await this.authenticatedRequest<FeaturebaseTokenResponse>(Nodus_API_ENDPOINT.FEATUREBASE_TOKEN)
+			const data = await this.authenticatedRequest<FeaturebaseTokenResponse>(NODUS_API_ENDPOINT.FEATUREBASE_TOKEN)
 			return data
 		} catch (error) {
 			Logger.error("Failed to fetch Featurebase token:", error)
@@ -255,7 +255,7 @@ export class NodusAccountService {
 		}
 
 		const data = await this.authenticatedRequest<UserRemoteConfigDiscoveryResponse | null>(
-			Nodus_API_ENDPOINT.USER_REMOTE_CONFIG,
+			NODUS_API_ENDPOINT.USER_REMOTE_CONFIG,
 			{},
 			{ allowNullData: true, authToken: token },
 		)
@@ -289,7 +289,7 @@ export class NodusAccountService {
 		// Call API to switch account
 		try {
 			// make XHR request to switch account
-			const _response = await this.authenticatedRequest<string>(Nodus_API_ENDPOINT.ACTIVE_ACCOUNT, {
+			const _response = await this.authenticatedRequest<string>(NODUS_API_ENDPOINT.ACTIVE_ACCOUNT, {
 				method: "PUT",
 				headers: {
 					"Content-Type": "application/json",

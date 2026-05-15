@@ -398,7 +398,7 @@ export const NodusAccountView = ({ NodusUser, userOrganizations, activeOrganizat
 								const target = e.target as HTMLSelectElement
 								if (target?.value) {
 									const value = target.value as "Local" | "Staging" | "Production"
-									updateSetting("NodusEnv", value.toLowerCase())
+									updateSetting("nodusEnv", value.toLowerCase())
 								}
 							}}>
 							{NodusEnvOptions.map((env) => (

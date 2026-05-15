@@ -1,5 +1,5 @@
 import { sapAiCoreModels } from "@shared/api"
-import { SapAiCoreModelDeployment } from "@shared/proto/index.Nodus"
+import { SapAiCoreModelDeployment } from "@shared/proto/index.nodus"
 import { VSCodeDropdown, VSCodeOption } from "@vscode/webview-ui-toolkit/react"
 import React, { memo, useEffect, useMemo } from "react"
 import { DropdownContainer } from "./common/ModelSelector"
